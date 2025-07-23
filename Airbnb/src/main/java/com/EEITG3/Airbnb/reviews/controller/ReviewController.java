@@ -19,8 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.review.model.Review;
-import com.review.model.ReviewService;
+
+import com.EEITG3.Airbnb.reviews.model.Review;
+import com.EEITG3.Airbnb.reviews.model.ReviewService;
 
 
 @RestController
