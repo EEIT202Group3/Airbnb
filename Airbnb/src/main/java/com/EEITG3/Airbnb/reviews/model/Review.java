@@ -25,6 +25,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Review {
 	
+	/*
+	 * Reviews JAVA-BEAN
+	 * */
+	
 	@Id @Column(name = "ReviewID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int reviewId;

@@ -10,6 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReviewService {
 	
+	/*
+	 * reviews Service
+	 */
+	
 	
 	@Autowired
 	private ReviewRepository rRepository;

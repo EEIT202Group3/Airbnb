@@ -27,6 +27,9 @@ import com.EEITG3.Airbnb.reviews.model.ReviewService;
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {
+	/*
+	 * reviews Controller
+	 */
 
     @Autowired
 	private ReviewService rService;
