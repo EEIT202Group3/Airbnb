@@ -59,12 +59,11 @@ public class ListingService {
 		return listRepository.findById(id);
 	}
 	
-	//查詢部分欄位 (ID,圖片一,房源名稱) #房源查詢欄用
-	public  List<LisBean> finNameAndPhotoOnly(){
-		String jpql="SELECT new com.listing.model.LisBean(l.lisid, l.house_name, l.photo1) FROM LisBean l";
-		return em.createQuery(jpql,LisBean.class).getResultList();
-	}
-	
+	//查詢部分欄位 (ID,圖片一,房源名稱) #房東查詢房源欄用
+	    public List<LisBean> getfindBasicListingInfo() {
+	        return listRepository.findBasicListingInfo();
+	    }
+
 	@Transactional
 	
 	//儲存設備(傳入List)
@@ -76,7 +75,7 @@ public class ListingService {
             listRepository.save(lis);
         }
     }
-	// 儲存設備（傳入 ID 字串）
+	// 儲存設備（傳入ID 字串）
     @Transactional
     public void saveEquipmentsByIds(Integer lisid, String[] equipIds) {
         if (equipIds == null || equipIds.length == 0) return;
@@ -90,5 +89,11 @@ public class ListingService {
 
         saveEquipments(lisid, equips);
     }
+    
+    //根據list_id查詢LisBean的整個資料(修改房源用)
+    public LisBean getListingById(int lisid) {
+        return listRepository.findByLisid(lisid);
+    }
+    
 	
 }
