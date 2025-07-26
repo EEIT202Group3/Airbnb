@@ -16,7 +16,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 
-@Entity @Table(name = "Review")
+@Entity @Table(name = "reviews")
 @Component
 
 @Data
@@ -29,37 +29,47 @@ public class Review {
 	 * Reviews JAVA-BEAN
 	 * */
 	
-	@Id @Column(name = "ReviewID")
+	@Id @Column(name = "review_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int reviewId;
 	
-	@Column(name="BookingID")
+	@Column(name="booking_id")
 	@NonNull
 	private String bookingId;
 	
-	@Column(name="ListID")
+	@Column(name="host_id")
 	@NonNull
-	private int listId;
+	private String hostId;
 	
-	@Column(name="UserID")
+	@Column(name="user_id")
 	@NonNull
 	private String userId;
 	
-	@Column(name="CleanScore")
+	@Column(name="list_id")
+	@NonNull
+	private int listId;
+	
+	@Column(name="clean_score")
+	@NonNull
 	private int cleanScore;
 	
-	@Column(name="CommScore")
+	@Column(name="comm_score")
+	@NonNull
 	private int commScore;
 	
-	@Column(name="ValueScore")
+	@Column(name="value_score")
+	@NonNull
 	private int valueScore;
 	
-	@Column(name="Comment")
-	private String comment;
+	@Column(name="cos_comm")
+	private String cus_comm;
 	
-	@Column(name="ReviewDate")
+	@Column(name="host_comm")
+	private String host_comm;
+	
+	@Column(name="review_date")
 	@NonNull
-	private Date reviewDate;
+	private Date review_date;
 	
 	@Column(name="image1")
 	private String image1;

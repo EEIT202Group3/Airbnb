@@ -14,7 +14,6 @@ public class ReviewService {
 	 * reviews Service
 	 */
 	
-	
 	@Autowired
 	private ReviewRepository rRepository;
 	
@@ -36,7 +35,6 @@ public class ReviewService {
 	}
 
 	public Review update(Review review) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

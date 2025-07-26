@@ -33,25 +33,11 @@ public class ReviewController {
 
     @Autowired
 	private ReviewService rService;
-
-	
-//	@PostMapping()
-//	public Review processFindByReviewId() {
-//		return rService.findByReviewId(1);
-//	}
     
-//    @GetMapping("/reviewGetAll")
-//    public String reviewGetAll(Model model ) {
-//    	List<Review> reviews = rService.findAll();
-//        model.addAttribute("reviews", reviews); // 給 JSP 用
-//        return "reviewGetAll1"; // JSP 檔名 /WEB-INF/views/review-list.jsp
-//    	
-//    }
     @GetMapping
     public List<Review> getAllReviews() {
         return rService.findAll();
     }
-    
     
     @GetMapping("/get/{id}")
     public Review getReviewById(@PathVariable Integer id) {
@@ -90,11 +76,11 @@ public class ReviewController {
         	review.setCleanScore((int)reviewData.get("cleanScore"));
         	review.setCommScore((int)reviewData.get("commScore"));
         	review.setValueScore((int)reviewData.get("valueScore"));
-        	review.setComment((String)reviewData.get("comment"));
+        	review.setCus_comm((String)reviewData.get("comment"));
         	String dateStr = (String) reviewData.get("reviewDate");
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         	Date date = sdf.parse(dateStr); // 這裡會拋出 ParseException，記得 try-catch
-        	review.setReviewDate(date);
+        	review.setReview_date(date);
         	rService.save(review);
         	return ResponseEntity.ok("更新成功");
 		} catch (Exception e) {
