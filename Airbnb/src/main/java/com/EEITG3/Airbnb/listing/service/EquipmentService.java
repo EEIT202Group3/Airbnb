@@ -37,6 +37,7 @@ public class EquipmentService {
 		public boolean insertEquipment(String equipName) {
 			try {
 				EquipmentBean equip = new EquipmentBean();
+				equip.setEquip_name(equipName);
 				equipmentRepository.save(equip);
 				return true;
 			}catch(Exception e) {

@@ -1,10 +1,13 @@
 package com.EEITG3.Airbnb.listing.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.EEITG3.Airbnb.listing.entity.*;
 import com.EEITG3.Airbnb.listing.repository.*;
@@ -59,11 +62,21 @@ public class ListingService {
 		return listRepository.findById(id);
 	}
 	
-	//查詢部分欄位 (ID,圖片一,房源名稱) #房東查詢房源欄用
-	    public List<LisBean> getfindBasicListingInfo() {
-	        return listRepository.findBasicListingInfo();
-	    }
+	@GetMapping("/basic")
+    public List<Map<String, Object>> getBasicListings() {
+        List<LisBean> fullList = listRepository.findAll();
 
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (LisBean bean : fullList) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("listId", bean.getListId());
+            map.put("houseName", bean.getHouseName());
+            map.put("photo1", bean.getPhoto1());
+            result.add(map);
+        }
+
+        return result;
+    }
 	@Transactional
 	
 	//儲存設備(傳入List)
