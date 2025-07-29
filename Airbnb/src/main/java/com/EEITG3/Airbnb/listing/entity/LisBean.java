@@ -1,6 +1,7 @@
 package com.EEITG3.Airbnb.listing.entity;
 
 
+
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -171,3 +172,4 @@ public class LisBean {
     public void setEquipments(List<EquipmentBean> equipments) { this.equipments = equipments; }
 
 }
+
