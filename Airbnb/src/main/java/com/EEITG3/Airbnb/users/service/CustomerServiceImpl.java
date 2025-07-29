@@ -1,10 +1,12 @@
 package com.EEITG3.Airbnb.users.service;
 
 import java.util.Map;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
@@ -44,6 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public Customer customerSignup(SignUpRequest request) {
 		Customer customer = new Customer(request.getEmail(),request.getPassword(),request.getUsername(),request.getPhone());
+
 		return repo.save(customer);
 	}
 
@@ -63,6 +66,7 @@ public class CustomerServiceImpl implements CustomerService {
 		return objectMapper.convertValue(customerNode, Customer.class);
 	}
 	
+
 
 	@Override
 	public Customer permission(String status, String customerId) {
