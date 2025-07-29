@@ -171,3 +171,4 @@ public class LisBean {
     public void setEquipments(List<EquipmentBean> equipments) { this.equipments = equipments; }
 
 }
+
