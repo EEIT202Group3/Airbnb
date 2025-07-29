@@ -1,37 +1,72 @@
 package com.EEITG3.Airbnb.users.service;
 
+import java.util.Map;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+import com.EEITG3.Airbnb.users.dto.LogInRequest;
+import com.EEITG3.Airbnb.users.dto.SignUpRequest;
 import com.EEITG3.Airbnb.users.entity.Customer;
 import com.EEITG3.Airbnb.users.repository.CustomerRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
 	private CustomerRepository repo;
+	private ObjectMapper objectMapper;
 	
 	@Autowired
-	public CustomerServiceImpl (CustomerRepository repo) {
+	public CustomerServiceImpl (CustomerRepository repo, ObjectMapper objectMapper) {
 		this.repo = repo;
+		this.objectMapper = objectMapper;
 	}
 	
 	@Override
-	public Customer customerLogin(String email) {
-		return repo.findCustomerByEmail(email);
+	public Customer customerLogin(LogInRequest request) {
+		//透過email找客戶
+		Customer customer = repo.findCustomerByEmail(request.getEmail());
+		//如果找不到客戶，丟出Exception
+		if(customer==null) {
+			throw new RuntimeException("帳號不存在");
+		}
+		//密碼不一樣，丟出Exception
+		if(!request.getPassword().equals(customer.getPassword())) {
+			throw new RuntimeException("帳號密碼錯誤");
+		}
+		//上面的檢查都沒問題，回傳客戶資料
+		return customer;
 	}
 
 	@Override
-	public Customer customerSignup(Customer customer) {
+	public Customer customerSignup(SignUpRequest request) {
+		Customer customer = new Customer(request.getEmail(),request.getPassword(),request.getUsername(),request.getPhone());
+
 		return repo.save(customer);
 	}
 
 	@Override
-	public Customer customerUpdate(Customer customer) {
+	public Customer customerUpdate(String customerId, Map<String, Object> patchPayload) {
+		Optional<Customer> temp = repo.findById(customerId);
+		if(!temp.isPresent()) {
+			throw new RuntimeException("帳號不存在");
+		}
+		Customer customer = apply(patchPayload, temp.get());
 		return repo.save(customer);
 	}
+	private Customer apply(Map<String, Object> patchPayload, Customer customer) {
+		ObjectNode customerNode = objectMapper.convertValue(customer, ObjectNode.class);
+		ObjectNode patchNode = objectMapper.convertValue(patchPayload, ObjectNode.class);
+		customerNode.setAll(patchNode);
+		return objectMapper.convertValue(customerNode, Customer.class);
+	}
+	
+
 
 	@Override
 	public Customer permission(String status, String customerId) {
