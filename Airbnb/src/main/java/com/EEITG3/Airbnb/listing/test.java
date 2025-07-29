@@ -1,7 +1,5 @@
 package com.EEITG3.Airbnb.listing;
 
 public class test {
-	
- private String name;
- private int id;
+
 }
