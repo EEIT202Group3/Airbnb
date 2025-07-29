@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.EEITG3.Airbnb.listing.entity.LisBean;
-import com.EEITG3.Airbnb.listing.repository.ListingRepository;
+import com.EEITG3.Airbnb.listing.repository.ListRepository;
 import com.EEITG3.Airbnb.payMent.dto.OrderRequestDto;
 import com.EEITG3.Airbnb.payMent.entity.Order;
 import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
@@ -31,7 +31,7 @@ public class OrderService {
 	    private OrderRepository orderRepository;
 
 	    @Autowired
-	    private ListingRepository listingRepository;
+	    private ListRepository listingRepository;
 
 	    @Autowired
 	    private CustomerRepository customerRepository;

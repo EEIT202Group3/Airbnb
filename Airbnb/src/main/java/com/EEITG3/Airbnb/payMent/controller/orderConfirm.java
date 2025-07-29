@@ -1,6 +1,7 @@
 package com.EEITG3.Airbnb.payMent.controller;
 
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.EEITG3.Airbnb.listing.entity.LisBean;
+import com.EEITG3.Airbnb.listing.repository.ListRepository;
+import com.EEITG3.Airbnb.payMent.dto.OrderRequestDto;
+import com.EEITG3.Airbnb.payMent.entity.Order;
+import com.EEITG3.Airbnb.payMent.service.OrderService;
+import com.EEITG3.Airbnb.users.entity.Customer;
+import com.EEITG3.Airbnb.users.repository.CustomerRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -26,13 +33,13 @@ public class orderConfirm {
 	private OrderService orderService;
 
 	@Autowired
-	private ListingRepository listingRepository;
+	private ListRepository listRepository;
 
 	@Autowired
 	private CustomerRepository customerRepository;
 	
 	
-}
+
 //@PostMapping("/confirm")
 //public ResponseEntity<?> confirmOrder(@RequestBody OrderRequestDTO dto) {
 //  // 你可以在這裡用 listId 查資料（從 ListingRepository）
@@ -63,7 +70,7 @@ public ResponseEntity<?> initOrderForm(@RequestParam Integer listId, HttpSession
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("未登入");
     }
 
-    LisBean listing = listingRepository.findById(listId)
+    LisBean listing = listRepository.findById(listId)
         .orElseThrow(() -> new RuntimeException("找不到房源"));
     Customer customer = customerRepository.findById(customerId)
         .orElseThrow(() -> new RuntimeException("找不到會員"));
@@ -78,7 +85,7 @@ public ResponseEntity<?> initOrderForm(@RequestParam Integer listId, HttpSession
 @PostMapping("/preview")
 public ResponseEntity<?> previewOrder(@RequestBody OrderRequestDto dto) {
 
-    LisBean listing = listingRepository.findById(dto.getListid())
+    LisBean listing = listRepository.findById(dto.getListid())
         .orElseThrow(() -> new RuntimeException("房源不存在"));
     Customer customer = customerRepository.findById(dto.getCustomerid())
         .orElseThrow(() -> new RuntimeException("會員不存在"));
