@@ -34,11 +34,21 @@ public class Customer {
 	private String avatarURL;
 	
 	@Column(name = "is_active")
-	private boolean isActive;
+	private boolean isActive = true;
 	
 	@Column(name = "created_at")
-	private LocalDate createAt;
+	private LocalDate createAt = LocalDate.now();
 
+	public Customer() {}
+	
+	public Customer(String email, String password, String username, String phone) {
+		super();
+		this.email = email;
+		this.password = password;
+		this.username = username;
+		this.phone = phone;
+	}
+	
 	public String getCustomerId() {
 		return customerId;
 	}
