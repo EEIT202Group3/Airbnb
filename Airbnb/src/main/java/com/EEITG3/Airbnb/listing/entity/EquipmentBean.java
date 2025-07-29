@@ -47,4 +47,5 @@ public class EquipmentBean {
     public String toString() {
         return "EquipmentBean [equip_id=" + equip_id + ", equip_name=" + equip_name + "]";
     }
+
 }

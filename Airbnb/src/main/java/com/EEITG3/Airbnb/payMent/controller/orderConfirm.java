@@ -84,7 +84,8 @@ public class orderConfirm {
     
     @PostMapping("/preview")
     public ResponseEntity<?> previewOrder(@RequestBody OrderRequestDto dto) {
-        LisBean listing = listingRepository.findById(dto.getListid())	
+
+        LisBean listing = listingRepository.findById(dto.getListid())
             .orElseThrow(() -> new RuntimeException("房源不存在"));
         Customer customer = customerRepository.findById(dto.getCustomerid())
             .orElseThrow(() -> new RuntimeException("會員不存在"));
