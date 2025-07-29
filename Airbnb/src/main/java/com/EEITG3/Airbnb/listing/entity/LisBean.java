@@ -169,5 +169,5 @@ public class LisBean {
     //讀取 equipments 屬性的讀取與設定功能
     public List<EquipmentBean> getEquipments() { return equipments; }
     public void setEquipments(List<EquipmentBean> equipments) { this.equipments = equipments; }
-}
 
+}
