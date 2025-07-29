@@ -1,49 +1,20 @@
-package com.payMent.controller;
+package com.EEITG3.Airbnb.payMent.controller;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import com.utils.HibernateUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-
-import com.payMent.bean.OrderBean;
-import com.payMent.dao.OrderDAO;
-
-@WebServlet("/getOrderDetail")
-public class getOrderDetail extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-
-	public getOrderDetail() {
-		super();
+@RestController
+@RequestMapping("/getorderdetail")
+public class getOrderDetail {
+	
+	@Autowired
+    private getOrdeDetailService orderDetailService;
+	
+	@GetMapping("/detail")
+	public OrderDetailResponseDto getOrderDetail(@RequestParam("booking_id") String booking_id) {
+	return orderDetailService.getOrderByBookingId(booking_id);
+	    }
 	}
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		SessionFactory factory = HibernateUtil.getSessionFactory();
-		Session session = factory.getCurrentSession();
-		OrderDAO dao = new OrderDAO(session);
-
-		String booking_id = request.getParameter("booking_id");
-
-		OrderBean order = dao.getById(booking_id);
-
-		request.setAttribute("order", order);
-		try {
-			request.getRequestDispatcher("/JSP/getOrderDetail.jsp").forward(request, response);
-		} catch (ServletException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doGet(request, response);
-	}
-
-}
