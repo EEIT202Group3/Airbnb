@@ -31,7 +31,7 @@ public class adminOrderDetail extends HttpServlet {
         // 查單筆
         if (booking_id != null && !booking_id.isEmpty()) {
             adminDAO dao = new adminDAO(session);
-            OrderBean order = dao.getById(booking_id);
+            Order order = dao.getById(booking_id);
             request.setAttribute("order", order);
             request.getRequestDispatcher("/JSP/adminOrderDetail.jsp").forward(request, response);
         } else {

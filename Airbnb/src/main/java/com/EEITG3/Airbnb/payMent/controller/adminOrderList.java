@@ -33,7 +33,7 @@ public class adminOrderList extends HttpServlet {
 			}
 		System.out.println("customer_id from session = " + customer_id);
 		adminDAO dao1 = new adminDAO(session);
-		List<OrderBean> orders = dao1.getByAll(customer_id);
+		List<Order> orders = dao1.getByAll(customer_id);
 		request.setAttribute("orders", orders);
 		request.getRequestDispatcher("/JSP/adminOrderList.jsp").forward(request, response);
 		System.out.println("抓到筆數：" + orders.size());
