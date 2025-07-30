@@ -1,7 +1,5 @@
 package com.EEITG3.Airbnb.listing.controller;
 
-
-
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +52,7 @@ public class ListingController {
     }
 
     //查詢單筆房源(房源基本資料)
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/basic")
     public Optional<LisBean> getfindById(@PathVariable("id") int id) {
         return listingService.findById(id);
     }
@@ -111,15 +109,5 @@ public class ListingController {
             return ResponseEntity.internalServerError().body("建立房源失敗: " + e.getMessage());
         }
     }
-    @PostMapping("/test-multi-upload")
-    public ResponseEntity<String> testMultiUpload(@RequestParam("photos") List<MultipartFile> photos) {
-        StringBuilder sb = new StringBuilder("收到檔案：\n");
-        for (MultipartFile file : photos) {
-            sb.append(file.getOriginalFilename())
-              .append(" (")
-              .append(file.getSize())
-              .append(" bytes)\n");
-        }
-        return ResponseEntity.ok(sb.toString());
-    }
+ 
 }
