@@ -44,6 +44,7 @@ public class EquipmentService {
 		        e.printStackTrace();
 		        throw e; 
 		    }
+
 		}
 		
 		

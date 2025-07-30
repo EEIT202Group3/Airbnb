@@ -1,5 +1,6 @@
 package com.EEITG3.Airbnb.listing.service;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -11,12 +12,14 @@ import com.EEITG3.Airbnb.listing.entity.EquipmentBean;
 import com.EEITG3.Airbnb.listing.entity.LisBean;
 import com.EEITG3.Airbnb.listing.repository.ListRepository;
 
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
 @Service
 public class ListingService {
+
 
     private final ListRepository listRepository;
 
@@ -40,6 +43,7 @@ public class ListingService {
     // 查詢基本資料（查詢房東現有房源）
     public List<Map<String, Object>> getBasicListings() {
         List<LisBean> fullList = listRepository.findAll();
+
         List<Map<String, Object>> result = new ArrayList<>();
         for (LisBean bean : fullList) {
             Map<String, Object> map = new HashMap<>();
@@ -48,6 +52,7 @@ public class ListingService {
             map.put("photo1", bean.getPhoto1());
             result.add(map);
         }
+
         return result;
     }
 

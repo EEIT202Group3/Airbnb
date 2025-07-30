@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.EEITG3.Airbnb.listing.entity.LisBean;
-import com.EEITG3.Airbnb.listing.repository.ListingRepository;
+import com.EEITG3.Airbnb.listing.repository.ListRepository;
 import com.EEITG3.Airbnb.payMent.dto.OrderRequestDto;
 import com.EEITG3.Airbnb.payMent.entity.Order;
 import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
@@ -31,7 +31,7 @@ public class OrderService {
 	    private OrderRepository orderRepository;
 
 	    @Autowired
-	    private ListingRepository listingRepository;
+	    private ListRepository listRepository;
 
 	    @Autowired
 	    private CustomerRepository customerRepository;
@@ -45,7 +45,7 @@ public class OrderService {
 
 
 	        // 根據 list_id 找房源
-	        LisBean listing = listingRepository.findById(dto.getListid())
+	        LisBean listing = listRepository.findById(dto.getListid())
 	                .orElseThrow(() -> new IllegalArgumentException("找不到房源，ID：" + dto.getListid()));
 
 	        Order order = new Order();

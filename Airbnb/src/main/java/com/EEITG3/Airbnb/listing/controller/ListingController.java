@@ -1,6 +1,7 @@
 package com.EEITG3.Airbnb.listing.controller;
 
 
+
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,50 @@ import com.EEITG3.Airbnb.listing.service.ListingService;
 @RequestMapping("/listings")
 @CrossOrigin
 public class ListingController {
+	private ListRepository listRepository;
+	
+    @Autowired
+    private ListingService listingService;
+
+    //新增房源
+    @PostMapping
+    public Integer createListing(@RequestBody LisBean lisBean) {
+        return listingService.saveListing(lisBean);
+    }
+
+    //刪除房源
+    @DeleteMapping("/{id}")
+    public boolean deleteListing(@PathVariable("id") int id) {
+        return listingService.deleteListing(id);
+    }
+
+    //查詢全部房源
+    @GetMapping
+    public List<LisBean> getAllListings() {
+        return listingService.findAll();
+    }
+
+    //查詢(ID、房名、圖片1)
+    @GetMapping("/basic")
+    public List<Map<String,Object>>getBasicListings(){
+    	List<LisBean>fullList= listRepository.findAll();
+    	List<Map<String, Object>>result= new ArrayList<>();
+    	for(LisBean bean : fullList) {
+    		Map<String, Object>map = new HashMap<>();
+    		map.put("listId",bean.getListId());
+    		map.put("houseName",bean.getHouseName());
+    		map.put("photo1",bean.getPhoto1());
+    		result.add(map);
+    	}
+    	return result;
+    }
+
+    //查詢單筆房源
+    @GetMapping("/{id}")
+    public LisBean getListingById(@PathVariable("id") int id) {
+        return listingService.getListingById(id);
+    }
+
 
     @Autowired
     private ListingService listingService;
@@ -102,6 +147,4 @@ public class ListingController {
         }
         return ResponseEntity.ok(sb.toString());
     }
-
-    
 }

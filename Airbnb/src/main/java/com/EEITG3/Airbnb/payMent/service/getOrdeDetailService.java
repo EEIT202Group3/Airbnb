@@ -4,7 +4,7 @@ package com.EEITG3.Airbnb.payMent.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.EEITG3.Airbnb.listing.repository.ListingRepository;
+import com.EEITG3.Airbnb.listing.repository.ListRepository;
 import com.EEITG3.Airbnb.payMent.dto.OrderDetailResponseDto;
 import com.EEITG3.Airbnb.payMent.entity.Order;
 import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
@@ -21,7 +21,7 @@ public class getOrdeDetailService {
     private OrderRepository orderRepository;
 
     @Autowired
-    private ListingRepository listingRepository;
+    private ListRepository listRepository;
 
     @Autowired
     private CustomerRepository customerRepository;

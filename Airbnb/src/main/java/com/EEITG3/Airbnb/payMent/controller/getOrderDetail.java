@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.EEITG3.Airbnb.payMent.dto.OrderDetailResponseDto;
+import com.EEITG3.Airbnb.payMent.service.getOrdeDetailService;
+
 @RestController
 @RequestMapping("/getorderdetail")
 public class getOrderDetail {
