@@ -7,14 +7,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.EEITG3.Airbnb.payMent.dto.OrderDetailResponseDto;
-import com.EEITG3.Airbnb.payMent.service.getOrdeDetailService;
+import com.EEITG3.Airbnb.payMent.service.GetOrdeDetailService;
 
 @RestController
 @RequestMapping("/getorderdetail")
-public class getOrderDetail {
+public class GetOrderDetail {
 	
 	@Autowired
-    private getOrdeDetailService orderDetailService;
+    private GetOrdeDetailService orderDetailService;
 	
 	@GetMapping("/detail")
 	public OrderDetailResponseDto getOrderDetail(@RequestParam("booking_id") String booking_id) {
