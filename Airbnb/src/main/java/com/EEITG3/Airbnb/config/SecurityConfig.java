@@ -54,7 +54,10 @@ public class SecurityConfig {
 		//設定不同 URL 路徑的授權規則
 		http.authorizeHttpRequests(configurer ->
 			configurer
-				.anyRequest().permitAll()
+				//只開放登入、註冊不需要驗證
+				.requestMatchers("/api/customers/login", "/api/customers/signup").permitAll()
+				//其他都需要驗證
+				.anyRequest().authenticated()
 		);
 		
 		//不使用 session

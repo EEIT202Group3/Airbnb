@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,20 +52,32 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public Customer customerSignup(SignUpRequest request) {
-		Customer customer = new Customer(request.getEmail(),request.getPassword(),request.getUsername(),request.getPhone());
-
-		return repo.save(customer);
+	public String customerSignup(SignUpRequest request) {
+		Optional<Customer> temp = repo.findCustomerByEmail(request.getEmail());
+		//表示已經有註冊過了
+		if(temp.isPresent()) {
+			throw new IllegalArgumentException("已註冊");
+		}
+		//先對密碼進行加密
+		String encodedPassword = encoder.encode(request.getPassword());
+		//用request收到的資料建立新的entity
+		Customer customer = new Customer(request.getEmail(),encodedPassword,request.getUsername(),request.getPhone());
+		//存入資料庫
+		repo.save(customer);
+		//用這個使用者生成token
+		return jwtService.generateToken(customer.getEmail());
 	}
 
 	@Override
-	public Customer customerUpdate(String customerId, Map<String, Object> patchPayload) {
-		Optional<Customer> temp = repo.findById(customerId);
+	public Customer customerUpdate(Map<String, Object> patchPayload) {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		Optional<Customer> temp = repo.findCustomerByEmail(email);
 		if(!temp.isPresent()) {
-			throw new RuntimeException("帳號不存在");
+			throw new RuntimeException("找不到客戶");
 		}
-		Customer customer = apply(patchPayload, temp.get());
-		return repo.save(customer);
+		Customer customer = temp.get();
+		Customer updatedCustomer = apply(patchPayload, customer);
+		return repo.save(updatedCustomer);
 	}
 	private Customer apply(Map<String, Object> patchPayload, Customer customer) {
 		ObjectNode customerNode = objectMapper.convertValue(customer, ObjectNode.class);

@@ -14,9 +14,9 @@ public interface CustomerService {
 	//客戶登入
 	String customerLogin(LogInRequest request);
 	//客戶註冊
-	Customer customerSignup(SignUpRequest request);
+	String customerSignup(SignUpRequest request);
 	//客戶更新資料
-	Customer customerUpdate(String customerId, Map<String, Object> patchPayload);
+	Customer customerUpdate(Map<String, Object> patchPayload);
 	
 	//後台功能
 	//停權、啟用
