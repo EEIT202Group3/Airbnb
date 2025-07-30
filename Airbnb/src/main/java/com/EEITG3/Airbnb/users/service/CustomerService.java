@@ -12,7 +12,7 @@ public interface CustomerService {
 
 	//前台功能
 	//客戶登入
-	Customer customerLogin(LogInRequest request);
+	String customerLogin(LogInRequest request);
 	//客戶註冊
 	Customer customerSignup(SignUpRequest request);
 	//客戶更新資料
