@@ -4,27 +4,20 @@ package com.EEITG3.Airbnb.payMent.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.EEITG3.Airbnb.listing.repository.ListRepository;
 import com.EEITG3.Airbnb.payMent.dto.OrderDetailResponseDto;
 import com.EEITG3.Airbnb.payMent.entity.Order;
 import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
-import com.EEITG3.Airbnb.users.repository.CustomerRepository;
 
 import jakarta.transaction.Transactional;
 
 
 @Service
 @Transactional
-public class getOrdeDetailService {
+public class GetOrdeDetailService {
 
     @Autowired
     private OrderRepository orderRepository;
 
-    @Autowired
-    private ListRepository listRepository;
-
-    @Autowired
-    private CustomerRepository customerRepository;
 
     public OrderDetailResponseDto getOrderByBookingId(String bookingid) {
     	 Order order = orderRepository.findByBookingId(bookingid)
