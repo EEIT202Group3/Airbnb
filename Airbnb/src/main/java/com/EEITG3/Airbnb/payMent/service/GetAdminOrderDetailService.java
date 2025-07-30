@@ -1,29 +1,28 @@
 package com.EEITG3.Airbnb.payMent.service;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.EEITG3.Airbnb.payMent.dto.AdminOrderDetailResponseDto;
 import com.EEITG3.Airbnb.payMent.dto.OrderDetailResponseDto;
 import com.EEITG3.Airbnb.payMent.entity.Order;
+import com.EEITG3.Airbnb.payMent.repository.AdminRepository;
 import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
 
 import jakarta.transaction.Transactional;
 
-
 @Service
 @Transactional
-public class GetOrdeDetailService {
-
+public class GetAdminOrderDetailService {
     @Autowired
-    private OrderRepository orderRepository;
+    private AdminRepository adminRepository;
 
 
-    public OrderDetailResponseDto getOrderByBookingId(String bookingid) {
-    	 Order order = orderRepository.findByBookingId(bookingid)
+    public AdminOrderDetailResponseDto getOrderByBookingId(String bookingid) {
+    	 Order order = adminRepository.findByBookingId(bookingid)
     	            .orElseThrow(() -> new IllegalArgumentException("查無此訂單：" + bookingid));
 
-    	    OrderDetailResponseDto dto = new OrderDetailResponseDto();
+    	 	AdminOrderDetailResponseDto dto = new AdminOrderDetailResponseDto();
     	    dto.setBookingid(order.getBookingid());
     	    dto.setUsername(order.getUsername());
     	    dto.setHousename(order.getHousename());
@@ -45,4 +44,13 @@ public class GetOrdeDetailService {
 
     	    return dto;
     }
+    public boolean updateMentStatus(String bookingId, String mentStatus) {
+        int updatedMent = adminRepository.updateMentStatus(bookingId, mentStatus);
+        return updatedMent > 0;
+    }
+    public boolean updateBookingStatus(String bookingId, String bookingStatus) {
+        int updatedBooking = adminRepository.updateBookingStatus(bookingId, bookingStatus);
+        return updatedBooking > 0;
+    }
+    
 }

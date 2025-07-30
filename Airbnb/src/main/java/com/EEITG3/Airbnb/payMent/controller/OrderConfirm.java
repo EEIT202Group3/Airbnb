@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpSession;
 //接收 /ordersconfirm 的 POST 請求
 @RestController
 @RequestMapping("/orderconfirm")
-public class orderConfirm {
+public class OrderConfirm {
 
 	@Autowired
 	private OrderService orderService;

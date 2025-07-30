@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.EEITG3.Airbnb.payMent.dto.OrderAllResponseDto;
 import com.EEITG3.Airbnb.payMent.entity.Order;
-import com.EEITG3.Airbnb.payMent.service.getOrderAllListService;
+import com.EEITG3.Airbnb.payMent.service.GetOrderAllListService;
 
 @RestController
 @RequestMapping("/getorderall")
-public class getOrderAllList {
+public class GetOrderAllList {
 
     @Autowired
-    private getOrderAllListService orderService;
+    private GetOrderAllListService orderService;
 
     @GetMapping("/byCustomer")
     public List<OrderAllResponseDto> getOrdersByCustomerId(@RequestParam("customer_id") String customer_id) {
