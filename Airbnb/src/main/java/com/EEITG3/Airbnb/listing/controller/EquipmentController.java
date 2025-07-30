@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.EEITG3.Airbnb.listing.service.EquipmentService;
 import com.EEITG3.Airbnb.listing.entity.EquipmentBean;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/equipment")
 public class EquipmentController {

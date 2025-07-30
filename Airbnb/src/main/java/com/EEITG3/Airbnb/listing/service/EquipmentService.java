@@ -35,16 +35,15 @@ public class EquipmentService {
 				
 		//新增設備
 		public boolean insertEquipment(String equipName) {
-			try {
-				EquipmentBean equip = new EquipmentBean();
-				equip.setEquip_name(equipName);
-				equipmentRepository.save(equip);
-				return true;
-			}catch(Exception e) {
-				e.printStackTrace();
-				return false;
-			}
-			
+		    try {
+		        EquipmentBean equip = new EquipmentBean();
+		        equip.setEquip_name(equipName);
+		        equipmentRepository.save(equip);
+		        return true;
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		        throw e; 
+		    }
 		}
 		
 		
