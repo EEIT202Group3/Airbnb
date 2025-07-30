@@ -10,7 +10,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,15 +57,15 @@ public class CustomerController {
 			}
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 		}
-		Customer customer = service.customerSignup(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(customer);
+		String token = service.customerSignup(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(token);
 	}
 	
 	//客戶更新資料
-	@PatchMapping("/update/{customerId}")
-	public ResponseEntity<?> update(@PathVariable String customerId, @RequestBody Map<String, Object> patchPayload) {
+	@PatchMapping("/update")
+	public ResponseEntity<?> update(@RequestBody Map<String, Object> patchPayload) {
 		try {
-			Customer customer = service.customerUpdate(customerId, patchPayload);
+			Customer customer = service.customerUpdate(patchPayload);
 			return ResponseEntity.ok(customer);
 		} catch (RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
