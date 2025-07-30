@@ -1,6 +1,6 @@
 package com.EEITG3.Airbnb.users.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +37,7 @@ public class Customer {
 	private boolean isActive = true;
 	
 	@Column(name = "created_at")
-	private LocalDate createAt = LocalDate.now();
+	private LocalDateTime createAt = LocalDateTime.now();
 
 	public Customer() {}
 	
@@ -102,15 +102,15 @@ public class Customer {
 		return isActive;
 	}
 
-	public void setActive(boolean isActive) {
+	public void setIsActive(boolean isActive) {
 		this.isActive = isActive;
 	}
 
-	public LocalDate getCreateAt() {
+	public LocalDateTime getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(LocalDate createAt) {
+	public void setCreateAt(LocalDateTime createAt) {
 		this.createAt = createAt;
 	}
 

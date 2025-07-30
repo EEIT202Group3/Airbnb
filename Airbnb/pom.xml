@@ -77,6 +77,27 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+	        <groupId>io.jsonwebtoken</groupId>
+	        <artifactId>jjwt-api</artifactId>
+	        <version>0.12.5</version>
+	    </dependency>
+	
+	    <!-- JJWT Implementation (需要 runtime scope) -->
+	    <dependency>
+	        <groupId>io.jsonwebtoken</groupId>
+	        <artifactId>jjwt-impl</artifactId>
+	        <version>0.12.5</version>
+	        <scope>runtime</scope>
+	    </dependency>
+	
+	    <!-- JJWT JSON Serializer (使用 Jackson) -->
+	    <dependency>
+	        <groupId>io.jsonwebtoken</groupId>
+	        <artifactId>jjwt-jackson</artifactId>
+	        <version>0.12.5</version>
+	        <scope>runtime</scope>
+	    </dependency>
 	</dependencies>
 
 	<build>

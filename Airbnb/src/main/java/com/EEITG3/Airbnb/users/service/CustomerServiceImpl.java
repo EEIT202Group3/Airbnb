@@ -5,9 +5,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
+import com.EEITG3.Airbnb.jwt.JwtService;
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
 import com.EEITG3.Airbnb.users.entity.Customer;
@@ -20,27 +25,29 @@ public class CustomerServiceImpl implements CustomerService {
 
 	private CustomerRepository repo;
 	private ObjectMapper objectMapper;
+	private JwtService jwtService;
+	private AuthenticationManager authManager;
+	private BCryptPasswordEncoder encoder;
 	
 	@Autowired
-	public CustomerServiceImpl (CustomerRepository repo, ObjectMapper objectMapper) {
+	public CustomerServiceImpl(CustomerRepository repo, ObjectMapper objectMapper, JwtService jwtService,
+			AuthenticationManager authManager, BCryptPasswordEncoder encoder) {
+		super();
 		this.repo = repo;
 		this.objectMapper = objectMapper;
+		this.jwtService = jwtService;
+		this.authManager = authManager;
+		this.encoder = encoder;
 	}
 	
 	@Override
-	public Customer customerLogin(LogInRequest request) {
-		//透過email找客戶
-		Customer customer = repo.findCustomerByEmail(request.getEmail());
-		//如果找不到客戶，丟出Exception
-		if(customer==null) {
-			throw new RuntimeException("帳號不存在");
+	public String customerLogin(LogInRequest request) {
+		Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+		if(authentication.isAuthenticated()) {
+			return jwtService.generateToken(request.getEmail());
+		} else {
+			throw new BadCredentialsException("驗證失敗");
 		}
-		//密碼不一樣，丟出Exception
-		if(!request.getPassword().equals(customer.getPassword())) {
-			throw new RuntimeException("帳號密碼錯誤");
-		}
-		//上面的檢查都沒問題，回傳客戶資料
-		return customer;
 	}
 
 	@Override
@@ -79,11 +86,11 @@ public class CustomerServiceImpl implements CustomerService {
 		//看前端傳來的指令是什麼，執行對應動作
 		switch (status){
 		case "ACTIVE": {
-			customer.setActive(true);
+			customer.setIsActive(true);
 			break;
 		}
 		case "SUSPEND": {
-			customer.setActive(false);
+			customer.setIsActive(false);
 			break;
 		}
 		default:
