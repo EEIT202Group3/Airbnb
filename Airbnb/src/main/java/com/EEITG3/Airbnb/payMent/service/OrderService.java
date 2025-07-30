@@ -2,7 +2,7 @@ package com.EEITG3.Airbnb.payMent.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +38,11 @@ public class OrderService {
 
 	    public Order createOrder(OrderRequestDto dto) {
 	        // 根據 username 找 Customer
-	        Customer customer = customerRepository.findByUsername(dto.getUsername());
-	        if (customer == null) {
-	            throw new IllegalArgumentException("找不到使用者：" + dto.getUsername());
+	        Optional<Customer> temp = customerRepository.findById(dto.getCustomerid());
+	        if(!temp.isPresent()) {
+	        	throw new IllegalArgumentException("找不到使用者：" + dto.getUsername());
 	        }
-
+	    	Customer customer = temp.get();
 
 	        // 根據 list_id 找房源
 	        LisBean listing = listRepository.findById(dto.getListid())
