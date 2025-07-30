@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EEITG3.Airbnb.listing.entity.LisBean;
+import com.EEITG3.Airbnb.listing.repository.ListRepository;
 import com.EEITG3.Airbnb.listing.service.ListingService;
 
 @RestController
@@ -24,11 +25,6 @@ public class ListingController {
     @Autowired
     private ListingService listingService;
 
-    //新增房源
-    @PostMapping
-    public Integer createListing(@RequestBody LisBean lisBean) {
-        return listingService.saveListing(lisBean);
-    }
 
     //刪除房源
     @DeleteMapping("/{id}")
@@ -38,7 +34,7 @@ public class ListingController {
 
     //查詢全部房源
     @GetMapping
-    public List<LisBean> getAllListings() {
+    public List<LisBean> getfindAll() {
         return listingService.findAll();
     }
 
@@ -57,41 +53,20 @@ public class ListingController {
     	return result;
     }
 
-    //查詢單筆房源
+    //查詢單筆房源(房源基本資料)
+    @GetMapping("/{id}")
+    public Optional<LisBean> getfindById(@PathVariable("id") int id) {
+        return listingService.findById(id);
+    }
+    
+    //查詢單筆房源（房源資料與設備）
     @GetMapping("/{id}")
     public LisBean getListingById(@PathVariable("id") int id) {
         return listingService.getListingById(id);
     }
 
 
-    @Autowired
-    private ListingService listingService;
-
-    // 查詢全部房源
-    @GetMapping
-    public List<LisBean> getAllListings() {
-        return listingService.findAll();
-    }
-
-    // 查詢簡要資料（ID、房名、照片1）
-    @GetMapping("/basic")
-    public List<Map<String, Object>> getBasicListings() {
-        return listingService.getBasicListings();
-    }
-
-    // 查詢單筆房源
-    @GetMapping("/{id}")
-    public LisBean getListingById(@PathVariable("id") int id) {
-        return listingService.getListingById(id);
-    }
-
-    // 刪除房源
-    @DeleteMapping("/{id}")
-    public boolean deleteListing(@PathVariable("id") int id) {
-        return listingService.deleteListing(id);
-    }
-
-    // 儲存房源設備（用於修改後更新設備）
+    // 儲存房源設備（修改後更新設備）
     @PostMapping("/{id}/equipments")
     public void saveEquipments(@PathVariable("id") Integer id, @RequestBody String[] equipIds) {
         listingService.saveEquipmentsByIds(id, equipIds);

@@ -40,21 +40,6 @@ public class ListingService {
         return listRepository.findById(id);
     }
 
-    // 查詢基本資料（查詢房東現有房源）
-    public List<Map<String, Object>> getBasicListings() {
-        List<LisBean> fullList = listRepository.findAll();
-
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (LisBean bean : fullList) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("listId", bean.getListId());
-            map.put("houseName", bean.getHouseName());
-            map.put("photo1", bean.getPhoto1());
-            result.add(map);
-        }
-
-        return result;
-    }
 
     // 刪除房源
     public boolean deleteListing(int lisId) {
@@ -89,7 +74,7 @@ public class ListingService {
         saveEquipments(lisid, equips);
     }
 
-    // 儲存設備（透過 List<EquipmentBean>）
+    // 儲存設備
     public void saveEquipments(Integer lisid, List<EquipmentBean> equipments) {
         Optional<LisBean> optional = listRepository.findById(lisid);
         if (optional.isPresent()) {
