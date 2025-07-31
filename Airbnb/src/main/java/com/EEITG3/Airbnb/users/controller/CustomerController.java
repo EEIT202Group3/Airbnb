@@ -71,7 +71,7 @@ public class CustomerController {
 	
 	//客戶更新資料
 	@PatchMapping("/customers/update")
-	public ResponseEntity<?> update(@RequestBody Map<String, Object> patchPayload) {
+	public ResponseEntity<?> update(@RequestBody Map<String, Object> patchPayload, @AuthenticationPrincipal CustomerDetails customerDetails) {
 		try {
 			Customer customer = service.customerUpdate(patchPayload);
 			return ResponseEntity.ok(customer);

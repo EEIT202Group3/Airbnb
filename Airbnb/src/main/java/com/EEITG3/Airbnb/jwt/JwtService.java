@@ -5,10 +5,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 public interface JwtService {
 
 	//產生 JWT Token
-	String generateToken(String email);
+	String generateToken(String email, String role);
 	
 	//從 JWT Token 中取出 email
 	String extractEmail(String token);
+	
+	//從 JWT Token 中取出 role
+	String extractRole(String token);
 
 	//驗證 JWT Token 是否有效
 	boolean validateToken(String token, UserDetails customerDetails);
