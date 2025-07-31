@@ -57,7 +57,7 @@ public class SecurityConfig {
 		http.authorizeHttpRequests(configurer ->
 			configurer
 				//只開放登入、註冊不需要驗證
-				.requestMatchers("/api/customers/login", "/api/customers/signup").permitAll()
+				.requestMatchers("/api/customers/login", "/api/customers/signup","/api/hosts/login","/api/hosts/signup").permitAll()
 				//其他都需要驗證
 				.anyRequest().authenticated()
 		);

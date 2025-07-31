@@ -18,6 +18,7 @@ import com.EEITG3.Airbnb.users.entity.Host;
 import com.EEITG3.Airbnb.users.entity.HostDetails;
 import com.EEITG3.Airbnb.users.repository.HostRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 public class HostServiceImpl implements HostService {
@@ -72,8 +73,19 @@ public class HostServiceImpl implements HostService {
 	}
 
 	@Override
-	public Host hostUpdate(Map<String, Object> patchPayload) {
-		// TODO Auto-generated method stub
-		return null;
+	public Host hostUpdate(Map<String, Object> patchPayload, HostDetails hostDetails) {
+		Optional<Host> temp = repo.findHostByEmail(hostDetails.getUsername());
+		if(!temp.isPresent()) {
+			throw new RuntimeException("找不到房東");
+		}
+		Host host = temp.get();
+		Host updatedHost = apply(patchPayload, host);
+		return repo.save(updatedHost);
+	}
+	private Host apply(Map<String, Object> patchPayload, Host host) {
+		ObjectNode customerNode = objectMapper.convertValue(host, ObjectNode.class);
+		ObjectNode patchNode = objectMapper.convertValue(patchPayload, ObjectNode.class);
+		customerNode.setAll(patchNode);
+		return objectMapper.convertValue(customerNode, Host.class);
 	}
 }
