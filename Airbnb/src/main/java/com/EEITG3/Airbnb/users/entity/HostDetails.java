@@ -7,28 +7,30 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class CustomerDetails implements UserDetails {
+public class HostDetails implements UserDetails {
 
 	private static final long serialVersionUID = 1L;
-	private Customer customer;
+	private Host host;
 	
-	public CustomerDetails(Customer customer) {
-		this.customer = customer;
+	public HostDetails(Host host) {
+		this.host = host;
 	}
-	
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return Collections.singleton(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
+		return Collections.singleton(new SimpleGrantedAuthority("ROLE_HOST"));
 	}
+
 	@Override
 	public String getPassword() {
-		return customer.getPassword();
+		return host.getPassword();
 	}
-	//因為要用email驗證，所以這邊調整一下
+
 	@Override
 	public String getUsername() {
-		return customer.getEmail();
+		return host.getEmail();
 	}
+	
 	@Override
     public boolean isAccountNonExpired() {
         return true;
@@ -36,7 +38,7 @@ public class CustomerDetails implements UserDetails {
 	//可以透過後臺來停權使用者
 	@Override
     public boolean isAccountNonLocked() {
-        return customer.isActive(); // 若設為 false 則視為鎖定
+        return host.isActive(); // 若設為 false 則視為鎖定
     }
 	@Override
     public boolean isCredentialsNonExpired() {
@@ -44,6 +46,8 @@ public class CustomerDetails implements UserDetails {
     }
     @Override
     public boolean isEnabled() {
-        return customer.isActive();
+        return host.isActive();
     }
+	
+	
 }

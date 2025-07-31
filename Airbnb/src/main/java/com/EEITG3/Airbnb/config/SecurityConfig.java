@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.EEITG3.Airbnb.jwt.JwtFilter;
 import com.EEITG3.Airbnb.users.service.CustomerDetailsService;
@@ -75,4 +77,18 @@ public class SecurityConfig {
 		//回傳 SecurityFilterChain 物件，Spring Boot 就會使用這條安全規則
 		return http.build();
 	}
+	
+	//解決CORS
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173/","http://localhost:5174/")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
+                        .allowedHeaders("*");
+            }
+        };
+    }
 }

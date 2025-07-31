@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.EEITG3.Airbnb.users.service.CustomerDetailsService;
+import com.EEITG3.Airbnb.users.service.HostDetailsService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,11 +24,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
 	private JwtService jwtService;
 	private CustomerDetailsService customerDetailsService;
+	private HostDetailsService hostDetailsService;
 	
 	@Autowired
-	public JwtFilter(JwtService jwtService, CustomerDetailsService customerDetailsService) {
+	public JwtFilter(JwtService jwtService, CustomerDetailsService customerDetailsService, HostDetailsService hostDetailsService) {
 		this.jwtService = jwtService;
 		this.customerDetailsService = customerDetailsService;
+		this.hostDetailsService = hostDetailsService;
 	}
 	
 	@Override
@@ -36,6 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		
         String token = null;
         String email = null;
+        String role = null;
 
         //從Cookies抓JWT
         if (request.getCookies() != null) {
@@ -44,6 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     token = cookie.getValue();
                     try {
                         email = jwtService.extractEmail(token);
+                        role = jwtService.extractRole(token);
                     } catch (Exception e) {
                         // 無效 token（可能過期、篡改等），略過處理
                     }
@@ -53,13 +58,24 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails customerDetails = customerDetailsService.loadUserByUsername(email);
-            if (jwtService.validateToken(token, customerDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(customerDetails, null, customerDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource()
-                        .buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
+            try {
+            	UserDetails userDetails = null;
+            	if("CUSTOMER".equalsIgnoreCase(role)) {
+            		userDetails = customerDetailsService.loadUserByUsername(email);
+            	}else if ("HOST".equalsIgnoreCase(role)) {
+					userDetails = hostDetailsService.loadUserByUsername(email);
+				}else {
+					throw new RuntimeException("角色錯誤");
+				}
+            	
+            	if (jwtService.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+			} catch (Exception e) {
+				// TODO: handle exception
+			}    
         }
 
         filterChain.doFilter(request, response);

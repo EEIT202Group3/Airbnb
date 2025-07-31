@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public String customerLogin(LogInRequest request) {
 		Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 		if(authentication.isAuthenticated()) {
-			return jwtService.generateToken(request.getEmail());
+			return jwtService.generateToken(request.getEmail(),"CUSTOMER");
 		} else {
 			throw new BadCredentialsException("驗證失敗");
 		}
@@ -67,13 +66,12 @@ public class CustomerServiceImpl implements CustomerService {
 		//存入資料庫
 		repo.save(customer);
 		//用這個使用者生成token
-		return jwtService.generateToken(customer.getEmail());
+		return jwtService.generateToken(customer.getEmail(),"CUSTOMER");
 	}
 
 	@Override
-	public Customer customerUpdate(Map<String, Object> patchPayload) {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		Optional<Customer> temp = repo.findCustomerByEmail(email);
+	public Customer customerUpdate(Map<String, Object> patchPayload, CustomerDetails customerDetails) {
+		Optional<Customer> temp = repo.findCustomerByEmail(customerDetails.getUsername());
 		if(!temp.isPresent()) {
 			throw new RuntimeException("找不到客戶");
 		}
@@ -122,7 +120,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public Customer currentCustomer(CustomerDetails customerDetails) {
 		Optional<Customer> temp = repo.findCustomerByEmail(customerDetails.getUsername());
 		if(!temp.isPresent()) {
-			throw new RuntimeException("找不到使用者");
+			throw new RuntimeException("找不到客戶");
 		}
 		Customer customer = temp.get();
 		return customer;

@@ -20,7 +20,7 @@ public interface CustomerService {
 	//查看個人資料
 	Customer currentCustomer(CustomerDetails customerDetails);
 	//客戶更新資料
-	Customer customerUpdate(Map<String, Object> patchPayload);
+	Customer customerUpdate(Map<String, Object> patchPayload, CustomerDetails customerDetails);
 	
 	//後台功能
 	//找全部客戶
