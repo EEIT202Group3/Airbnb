@@ -1,5 +1,6 @@
 package com.EEITG3.Airbnb.users.service;
 
+import java.util.List;
 import java.util.Map;
 
 import java.util.Optional;
@@ -17,6 +18,7 @@ import com.EEITG3.Airbnb.jwt.JwtService;
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
 import com.EEITG3.Airbnb.users.entity.Customer;
+import com.EEITG3.Airbnb.users.entity.CustomerDetails;
 import com.EEITG3.Airbnb.users.repository.CustomerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -86,8 +88,6 @@ public class CustomerServiceImpl implements CustomerService {
 		return objectMapper.convertValue(customerNode, Customer.class);
 	}
 	
-
-
 	@Override
 	public Customer permission(String status, String customerId) {
 		//先找到客戶
@@ -111,6 +111,21 @@ public class CustomerServiceImpl implements CustomerService {
 		}
 		//把更新後的狀態存回資料庫、回傳更新後的資料
 		return repo.save(customer);
+	}
+
+	@Override
+	public List<Customer> findAllCustomers() {
+		return repo.findAll();
+	}
+
+	@Override
+	public Customer currentCustomer(CustomerDetails customerDetails) {
+		Optional<Customer> temp = repo.findCustomerByEmail(customerDetails.getUsername());
+		if(!temp.isPresent()) {
+			throw new RuntimeException("找不到使用者");
+		}
+		Customer customer = temp.get();
+		return customer;
 	}
 
 	

@@ -30,7 +30,7 @@ public class JwtServiceImpl implements JwtService {
                 .add(claims)
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 30*60*1000))
+                .expiration(new Date(System.currentTimeMillis() + 60*60*1000))
                 .and()
                 .signWith(getKey())
                 .compact();
@@ -62,7 +62,11 @@ public class JwtServiceImpl implements JwtService {
     @Override
 	public boolean validateToken(String token, UserDetails customerDetails) {
         final String email = extractEmail(token);
-        return (email.equals(customerDetails.getUsername()) && !isTokenExpired(token));
+        boolean result = email.equals(customerDetails.getUsername()) && !isTokenExpired(token);
+        if(result) {
+        	System.out.println("驗證成功");
+        }
+        return result;
     }
 
     private boolean isTokenExpired(String token) {
