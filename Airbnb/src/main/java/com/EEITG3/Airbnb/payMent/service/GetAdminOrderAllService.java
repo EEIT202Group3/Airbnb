@@ -7,10 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.EEITG3.Airbnb.payMent.dto.AdminOrderAllResponseDto;
-import com.EEITG3.Airbnb.payMent.dto.OrderAllResponseDto;
 import com.EEITG3.Airbnb.payMent.entity.Order;
 import com.EEITG3.Airbnb.payMent.repository.AdminRepository;
-import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -24,7 +22,7 @@ public class GetAdminOrderAllService {
 
 	public List<AdminOrderAllResponseDto> getOrdersByCustomerId(String customer_id) {
 		List<Order> orders = adminRepository.findAll().stream()
-				.filter(o -> o.getCustomer() != null && customer_id.equals(o.getCustomer().getCustomerId()))
+				.filter(o -> o.getCustomerId() != null && customer_id.equals(o.getCustomerId()))
 				.collect(Collectors.toList());
 
 		return orders.stream().map(order -> {
