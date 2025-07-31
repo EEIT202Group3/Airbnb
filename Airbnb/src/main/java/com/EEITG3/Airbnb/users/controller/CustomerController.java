@@ -73,7 +73,7 @@ public class CustomerController {
 	@PatchMapping("/customers/update")
 	public ResponseEntity<?> update(@RequestBody Map<String, Object> patchPayload, @AuthenticationPrincipal CustomerDetails customerDetails) {
 		try {
-			Customer customer = service.customerUpdate(patchPayload);
+			Customer customer = service.customerUpdate(patchPayload, customerDetails);
 			return ResponseEntity.ok(customer);
 		} catch (RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

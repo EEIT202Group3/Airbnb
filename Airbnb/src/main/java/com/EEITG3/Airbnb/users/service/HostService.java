@@ -17,7 +17,7 @@ public interface HostService {
 	//查看個人資料
 	Host currentHost(HostDetails hostDetails);
 	//房東更新資料
-	Host hostUpdate(Map<String, Object> patchPayload);
+	Host hostUpdate(Map<String, Object> patchPayload, HostDetails hostDetails);
 	
 	//後台功能
 	//找全部房東
