@@ -14,6 +14,7 @@ import com.EEITG3.Airbnb.users.service.CustomerDetailsService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -32,17 +33,27 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		String authHeader = request.getHeader("Authorization");
+		
         String token = null;
-        String username = null;
+        String email = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            username = jwtService.extractEmail(token);
+        //從Cookies抓JWT
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("jwt")) {
+                    token = cookie.getValue();
+                    try {
+                        email = jwtService.extractEmail(token);
+                    } catch (Exception e) {
+                        // 無效 token（可能過期、篡改等），略過處理
+                    }
+                    break;
+                }
+            }
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails customerDetails = customerDetailsService.loadUserByUsername(username);
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails customerDetails = customerDetailsService.loadUserByUsername(email);
             if (jwtService.validateToken(token, customerDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(customerDetails, null, customerDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource()
