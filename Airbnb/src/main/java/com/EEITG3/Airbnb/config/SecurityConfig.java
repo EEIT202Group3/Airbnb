@@ -76,13 +76,14 @@ public class SecurityConfig {
 		//關閉 CSRF 防護，REST API 不需要
 		http.csrf(csrf -> csrf.disable());
 		
+		//開啟並設定 CORS 支援、套用下面的 CORS 設定
 		http.cors(Customizer.withDefaults());
 		
 		//回傳 SecurityFilterChain 物件，Spring Boot 就會使用這條安全規則
 		return http.build();
 	}
 	
-	//解決CORS
+	//CORS 設定
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
