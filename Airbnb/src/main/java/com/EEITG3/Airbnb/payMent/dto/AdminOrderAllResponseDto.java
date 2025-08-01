@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 public class AdminOrderAllResponseDto {
 	private String username;
+	private String email;
     private String housename;
     private String address;
     private String tel;
@@ -22,6 +23,12 @@ public class AdminOrderAllResponseDto {
 	}
 	public String getHousename() {
 		return housename;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	public void setHousename(String housename) {
 		this.housename = housename;

@@ -13,8 +13,8 @@ import com.EEITG3.Airbnb.payMent.entity.Order;
 import jakarta.transaction.Transactional;
 
 public interface AdminRepository extends JpaRepository<Order, String> {
-	// @Query("SELECT o FROM Order o WHERE o.customer.customer_id = :customer_id")
-	List<Order> findByCustomerCustomerId(String customer_id);
+	@Query("SELECT o FROM Order o WHERE o.customerId = :customerId")
+	List<Order> findByCustomerCustomerId(String customerId);
 
 	// @Query("SELECT o FROM Order o WHERE o.booking_id = :booking_id")
 	Optional<Order> findByBookingId(String bookingId);
