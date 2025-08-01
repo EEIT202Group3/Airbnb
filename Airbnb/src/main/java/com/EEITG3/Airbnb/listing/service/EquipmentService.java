@@ -1,5 +1,4 @@
 package com.EEITG3.Airbnb.listing.service;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import com.EEITG3.Airbnb.listing.entity.*;
@@ -12,21 +11,16 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class EquipmentService {
 
-    private final ListRepository listRepository;
-	
-	private final EquipmentRepository equipmentRepository;
+    private final EquipmentRepository equipmentRepository;
 	
 	@PersistenceContext
 	private EntityManager em;
 	
 	public EquipmentService(EquipmentRepository equipmentRepository,ListRepository listRepository) {
 		
-		this.equipmentRepository = equipmentRepository;	
-		this.listRepository = listRepository;
+		this.equipmentRepository = equipmentRepository;
 	}
-	
-	
-	
+
 		//查詢全部設備
 		public List<EquipmentBean>getAllEquipments(){
 			return equipmentRepository.findAll();
@@ -44,10 +38,8 @@ public class EquipmentService {
 		        e.printStackTrace();
 		        throw e; 
 		    }
-
 		}
-		
-		
+				
 		// 刪除設備
 	    public boolean deleteEquipment(int equipId) {
 	        try {
@@ -61,27 +53,6 @@ public class EquipmentService {
 	        return false;
 	    }
 	    
-		
-		//儲存房源設備關聯
-		public boolean seveListingeEquipments(int lisid,List<Integer> equipIds) {
-			try {
-				LisBean listing = listRepository.findById(lisid).orElse(null);
-				if(listing ==null)return false; 
-				
-				List<EquipmentBean>equipList = new ArrayList<>();
-				for(int id : equipIds) {
-					equipmentRepository.findById(id).ifPresent(equipList::add);
-				}
-				listing.setEquipments(equipList);
-				listRepository.save(listing);
-				return true;
-				
-			}catch (Exception e) {
-				e.printStackTrace();
-				return false;
-			}	
-		}
-		
 		//查詢設備名稱
 		public List<String> getEquipmentNamesByListingId(int lisid){
 			return equipmentRepository.findEquipNamesByLisid(lisid);

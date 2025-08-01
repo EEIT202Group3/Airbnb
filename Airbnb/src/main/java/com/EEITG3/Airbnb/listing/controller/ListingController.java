@@ -2,6 +2,7 @@ package com.EEITG3.Airbnb.listing.controller;
 
 import java.util.*;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +19,8 @@ import com.EEITG3.Airbnb.listing.service.ListingService;
 @RequestMapping("/listings")
 @CrossOrigin
 public class ListingController {
+	
+	@Autowired
 	private ListRepository listRepository;
 	
     @Autowired
@@ -25,9 +28,10 @@ public class ListingController {
 
 
     //刪除房源
-    @DeleteMapping("/{id}")
-    public boolean deleteListing(@PathVariable("id") int id) {
-        return listingService.deleteListing(id);
+    @DeleteMapping("/{listId}")
+    public boolean deleteListing(@PathVariable("listId") int listId) {
+        return listingService.deleteListing(listId);
+        
     }
 
     //查詢全部房源
@@ -36,19 +40,19 @@ public class ListingController {
         return listingService.findAll();
     }
 
-    //查詢(ID、房名、圖片1)
-    @GetMapping("/basic")
-    public List<Map<String,Object>>getBasicListings(){
-    	List<LisBean>fullList= listRepository.findAll();
-    	List<Map<String, Object>>result= new ArrayList<>();
-    	for(LisBean bean : fullList) {
-    		Map<String, Object>map = new HashMap<>();
-    		map.put("listId",bean.getListId());
-    		map.put("houseName",bean.getHouseName());
-    		map.put("photo1",bean.getPhoto1());
-    		result.add(map);
-    	}
-    	return result;
+    //根據host_id查詢(ID、房名、圖片1)
+    @GetMapping("/host/{hostId}")
+    public List<Map<String, Object>> getListingsByHostId(@PathVariable UUID hostId) {
+        List<LisBean> list = listRepository.findByHostId(hostId);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (LisBean bean : list) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("listId", bean.getListId());
+            map.put("houseName", bean.getHouseName());
+            map.put("photo1", bean.getPhoto1());
+            result.add(map);
+        }
+        return result;
     }
 
     //查詢單筆房源(房源基本資料)
@@ -109,5 +113,42 @@ public class ListingController {
             return ResponseEntity.internalServerError().body("建立房源失敗: " + e.getMessage());
         }
     }
+    //編輯房源
+    @PutMapping(path = "/{id}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateListing(
+            @PathVariable("id") Integer id,
+            @RequestParam("houseName") String houseName,
+            @RequestParam("ads") String ads,
+            @RequestParam("room") String room,
+            @RequestParam("bed") String bed,
+            @RequestParam("describe") String describe,
+            @RequestParam("tel") String tel,
+            @RequestParam("ppl") int ppl,
+            @RequestParam("price") int price,
+            @RequestParam("equipments") List<Integer> equipmentIds,
+            @RequestParam(value = "photos", required = false) List<MultipartFile> photos
+    ) {
+        try {
+            LisBean original = listingService.getListingById(id);
+            if (original == null) return ResponseEntity.notFound().build();
+
+            original.setHouseName(houseName);
+            original.setAds(ads);
+            original.setRoom(room);
+            original.setBed(bed);
+            original.setDescribe(describe);
+            original.setTel(tel);
+            original.setPpl(ppl);
+            original.setPrice(price);
+
+            listingService.updateListingWithPhotosAndEquipments(original, photos, equipmentIds);
+
+            return ResponseEntity.ok("房源更新成功");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("房源更新失敗: " + e.getMessage());
+        }
+    }
+
+ 
  
 }
