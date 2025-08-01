@@ -1,25 +1,20 @@
 package com.EEITG3.Airbnb.reviews.controller;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -88,10 +83,10 @@ public class ReviewController {
 		return rService.insertReview(listId, bookingId, custId, hostId, cleanScore, commScore, valueScore, custComm,
 				images);
 	}
-
+/*
 	@PutMapping("/update/{id}")
 	public ResponseEntity<?> updateReview(
-			@RequestParam Integer reviewId,
+			@PathVariable("id") Integer reviewId,
 			@RequestParam Integer listId, 
 			@RequestParam String bookingId,
 			@RequestParam String custId, 
@@ -106,7 +101,37 @@ public class ReviewController {
 		System.out.println(reviewId +" " + listId + bookingId + custId + hostId + reviewDate + cleanScore + " " + commScore + " " + valueScore + cusComm);
 		
 		return rService.updateReview(reviewId,listId, bookingId, custId, hostId, cleanScore, commScore, valueScore, cusComm, hostComm);
+	}*/
+	/*
+	@PatchMapping(value = "/update/{id}")
+	public ResponseEntity<?> patchReview(
+		@PathVariable("id") Integer reviewId, 
+	    @RequestPart("cleanScore") int cleanScore,
+	    @RequestPart("commScore") int commScore,
+	    @RequestPart("valueScore") int valueScore,
+	    @RequestPart("cusComm") String cusComm,
+	    @RequestPart("hostComm") String hostComm,
+	    @RequestPart(value = "image", required = false) List<MultipartFile> images
+	) {
+	    System.out.println(reviewId + " " + cleanScore + " " + commScore + " " + valueScore 
+	                       + " " + cusComm + " " + hostComm);
+	    
+	    return rService.patchReview(reviewId, cleanScore, commScore, valueScore, cusComm, hostComm, images);
 	}
-
+*/
+	
+	@PatchMapping(value= "/update/{id}")
+	public ResponseEntity<?> patchReview(
+			@PathVariable("id") Integer reviewId,
+			@RequestParam int cleanScore, 
+			@RequestParam int commScore, 
+			@RequestParam int valueScore,
+			@RequestParam String cusComm,
+			@RequestParam String hostComm){
+		
+		  return rService.patchReview(reviewId, cleanScore, commScore, valueScore, cusComm, hostComm);
+		
+	}
+	
     
 }
