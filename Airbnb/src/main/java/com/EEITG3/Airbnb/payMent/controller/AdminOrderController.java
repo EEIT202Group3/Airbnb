@@ -45,7 +45,7 @@ public class AdminOrderController {
 	    boolean success = adminOrderService.updateBookingStatus(bookingId, bookingStatus);
 	    return success ? ResponseEntity.ok("更新成功") : ResponseEntity.badRequest().body("更新失敗");
 	}
-	//查詢全部
+	//查詢單筆明細
 	@GetMapping("/customerbyemail")
 	public ResponseEntity<?> getCustomerByEmail(@RequestParam("email") String email) {
 	    Customer customer = customerRepository.findCustomerByEmail(email)
@@ -57,6 +57,7 @@ public class AdminOrderController {
 
 	    return ResponseEntity.ok(result);
 	}
+	//查詢全部
 	@GetMapping("/adminbyCustomer")
 	public List<AdminOrderAllResponseDto> getOrdersByCustomerId(@RequestParam("customerId") String customerId) {
 	    return adminOrderService.getOrdersByCustomerId(customerId);
