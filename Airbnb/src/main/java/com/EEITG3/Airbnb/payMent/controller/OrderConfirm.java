@@ -48,7 +48,7 @@ public class OrderConfirm {
 	private CustomerRepository customerRepository;
 
 	@PostMapping("/preview")
-	public ResponseEntity<?> previewOrder(@RequestBody OrderRequestDto dto, @CookieValue(value = "jwt") String token) {
+	public ResponseEntity<?> previewOrder(@RequestBody OrderRequestDto dto, @CookieValue(value = "jwt_customer") String token) {
 		String email = jwtService.extractEmail(token);
 		LisBean listing = listRepository.findById(dto.getListid()).orElseThrow(() -> new RuntimeException("房源不存在"));
 		Customer customer = customerRepository.findCustomerByEmail(email)
@@ -77,7 +77,7 @@ public class OrderConfirm {
 	}
 
 	@PostMapping("/finalize")
-	public ResponseEntity<?> finalizeOrder(@RequestBody OrderRequestDto dto, @CookieValue(value = "jwt") String token) {
+	public ResponseEntity<?> finalizeOrder(@RequestBody OrderRequestDto dto, @CookieValue(value = "jwt_customer") String token) {
 		try {
 			String email = jwtService.extractEmail(token);
 			Order order = orderService.createOrder(dto,email);
@@ -86,15 +86,15 @@ public class OrderConfirm {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("建立訂單失敗：" + e.getMessage());
 		}
 	}
-	//客戶查詢全部訂單
+	//單筆訂單明細
 	@GetMapping("/detail")
 	public OrderDetailResponseDto getOrderDetail(@RequestParam("booking_id") String booking_id) {
 	return orderService.getOrderByBookingId(booking_id);
 	    }
 	
-	//單筆訂單明細
+	//客戶查詢全部訂單
     @GetMapping("/byCustomer")
-    public List<OrderAllResponseDto> getOrdersByCustomerId(@CookieValue(value = "jwt") String token) {
+    public List<OrderAllResponseDto> getOrdersByCustomerId(@CookieValue(value = "jwt_customer") String token) {
         String email = jwtService.extractEmail(token);
         
     	return orderService.getOrdersByCustomerId(email);

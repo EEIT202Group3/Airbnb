@@ -55,24 +55,21 @@ public class OrderService {
 
 	        Order order = new Order();
 	        order.setListing(listing);   // 設定房源對象
-
+	        order.setCustomerId(dto.getCustomerid());
 	        order.setUsername(dto.getUsername()); // 顯示用
 	        order.setHousename(dto.getHousename());
 	        order.setAddress(dto.getAddress());
 	        order.setTel(dto.getTel());
 	        order.setBed(dto.getBed());
 	        order.setPeople(dto.getPeople());
-
 	        LocalDateTime now = LocalDateTime.now();
 	        order.setCheckindate(dto.getCheckindate().atStartOfDay());
 	        order.setCheckoutdate(dto.getCheckoutdate().atStartOfDay());
 	        order.setCreatedtime(now);
-
 	        String booking_method = "現金";
 	        order.setBookingmethod(booking_method);
 	        order.setMentstatus("現金".equals(booking_method) ? "待付款" : "已付款");
 	        order.setBookingstatus("待入住");
-
 	        order.setPaymentid(UUID.randomUUID().toString());
 	        order.setPrice(dto.getPrice());
 	        order.setTotal(BigDecimal.valueOf(dto.getTotal()));
