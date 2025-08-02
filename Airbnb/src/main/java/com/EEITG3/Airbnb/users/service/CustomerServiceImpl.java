@@ -46,7 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public String customerLogin(LogInRequest request) {
 		Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 		if(authentication.isAuthenticated()) {
-			return jwtService.generateToken(request.getEmail(),"CUSTOMER");
+			return jwtService.generateToken(request.getEmail(),"ROLE_CUSTOMER");
 		} else {
 			throw new BadCredentialsException("驗證失敗");
 		}
@@ -66,7 +66,7 @@ public class CustomerServiceImpl implements CustomerService {
 		//存入資料庫
 		repo.save(customer);
 		//用這個使用者生成token
-		return jwtService.generateToken(customer.getEmail(),"CUSTOMER");
+		return jwtService.generateToken(customer.getEmail(),"ROLE_CUSTOMER");
 	}
 
 	@Override

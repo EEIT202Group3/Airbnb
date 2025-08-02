@@ -21,6 +21,7 @@ public interface CustomerService {
 	Customer currentCustomer(CustomerDetails customerDetails);
 	//客戶更新資料
 	Customer customerUpdate(Map<String, Object> patchPayload, CustomerDetails customerDetails);
+	//登出
 	
 	//後台功能
 	//找全部客戶

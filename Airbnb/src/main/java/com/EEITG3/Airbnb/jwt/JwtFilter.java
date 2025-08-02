@@ -39,35 +39,37 @@ public class JwtFilter extends OncePerRequestFilter {
 		
         String token = null;
         String email = null;
-        String role = null;
+        UserDetails userDetails = null;
 
-        //從Cookies抓JWT
+        //從Cookies抓customer、host的JWT，優先級：host>customer
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals("jwt")) {
-                    token = cookie.getValue();
-                    try {
-                        email = jwtService.extractEmail(token);
-                        role = jwtService.extractRole(token);
-                    } catch (Exception e) {
-                        // 無效 token（可能過期、篡改等），略過處理
-                    }
-                    break;
-                }
+                //先去抓jwt_host，如果有就把資料設定成host的並跳出
+            	if(cookie.getName().equalsIgnoreCase("jwt_host")) {
+            		token = cookie.getValue();
+            		try {
+						email = jwtService.extractEmail(token);
+						userDetails = hostDetailsService.loadUserByUsername(email);
+					} catch (Exception e) {
+						
+					}
+            		break;
+            	//沒有jwt_host，才去找jwt_customer
+            	}else if (cookie.getName().equals("jwt_customer")) {
+					token = cookie.getValue();
+					try {
+						email = jwtService.extractEmail(token);
+						userDetails = customerDetailsService.loadUserByUsername(email);
+					} catch (Exception e) {
+						// TODO: handle exception
+					}
+				}
             }
         }
 
+        //用上面抓好的資料去做驗證
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
-            	UserDetails userDetails = null;
-            	if("CUSTOMER".equalsIgnoreCase(role)) {
-            		userDetails = customerDetailsService.loadUserByUsername(email);
-            	}else if ("HOST".equalsIgnoreCase(role)) {
-					userDetails = hostDetailsService.loadUserByUsername(email);
-				}else {
-					throw new RuntimeException("角色錯誤");
-				}
-            	
             	if (jwtService.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
