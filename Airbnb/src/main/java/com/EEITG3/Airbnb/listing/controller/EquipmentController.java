@@ -2,6 +2,7 @@ package com.EEITG3.Airbnb.listing.controller;
 
 import java.util.List;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,14 +40,6 @@ public class EquipmentController {
         return result ? "刪除成功" : "刪除失敗";
     }
 
-    // 儲存房源設備關聯（將設備 ID 陣列綁定到房源）
-    @PostMapping("/assign")
-    public String assignEquipmentsToListing(
-            @RequestParam int lisid,
-            @RequestBody List<Integer> equipIds) {
-        boolean result = equipmentService.seveListingeEquipments(lisid, equipIds);
-        return result ? "儲存成功" : "儲存失敗";
-    }
 
     //查詢房源設備名稱
     @GetMapping("/names/{lisid}")

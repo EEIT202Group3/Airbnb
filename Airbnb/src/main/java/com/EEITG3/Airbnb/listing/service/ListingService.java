@@ -2,6 +2,8 @@ package com.EEITG3.Airbnb.listing.service;
 
 
 import java.io.File;
+
+
 import java.io.IOException;
 import java.util.*;
 
@@ -42,10 +44,10 @@ public class ListingService {
 
 
     // 刪除房源
-    public boolean deleteListing(int lisId) {
+    public boolean deleteListing(int listId) {
         try {
-            if (listRepository.existsById(lisId)) {
-                listRepository.deleteById(lisId);
+            if (listRepository.existsById(listId)) {
+                listRepository.deleteById(listId);
                 return true;
             }
         } catch (Exception e) {
@@ -90,7 +92,7 @@ public class ListingService {
 
         // 儲存圖片
         List<String> photoUrls = new ArrayList<>();
-        String storageDir = "/Users/youm/pohto/"; 
+        String storageDir = "/Users/youm/pohto/";  
 
         for (int i = 0; i < photos.size() && i < 10; i++) {
             MultipartFile photo = photos.get(i);
@@ -99,6 +101,7 @@ public class ListingService {
                 File dest = new File(storageDir,fileName);
                 photo.transferTo(dest);
                 photoUrls.add(fileName);
+               
             }
         }
 
@@ -131,5 +134,56 @@ public class ListingService {
         LisBean saved = listRepository.save(lisBean);
         return saved.getListId();
     }
+    
+    //編輯房源
+    @Transactional
+    public void updateListingWithPhotosAndEquipments(
+            LisBean lisBean,
+            List<MultipartFile> photos,
+            List<Integer> equipmentIds
+    ) throws IOException {
+
+        // 1. 處理新圖片（如有）
+        if (photos != null && !photos.isEmpty()) {
+            List<String> photoUrls = new ArrayList<>();
+            String storageDir = "/Users/youm/pohto/";
+
+            for (int i = 0; i < photos.size() && i < 10; i++) {
+                MultipartFile photo = photos.get(i);
+                if (!photo.isEmpty()) {
+                    String fileName = System.currentTimeMillis() + "_" + photo.getOriginalFilename();
+                    File dest = new File(storageDir, fileName);
+                    photo.transferTo(dest);
+                    photoUrls.add(fileName);
+                }
+            }
+
+            // 覆蓋原本照片欄位
+            lisBean.setPhoto1(photoUrls.size() > 0 ? photoUrls.get(0) : null);
+            lisBean.setPhoto2(photoUrls.size() > 1 ? photoUrls.get(1) : null);
+            lisBean.setPhoto3(photoUrls.size() > 2 ? photoUrls.get(2) : null);
+            lisBean.setPhoto4(photoUrls.size() > 3 ? photoUrls.get(3) : null);
+            lisBean.setPhoto5(photoUrls.size() > 4 ? photoUrls.get(4) : null);
+            lisBean.setPhoto6(photoUrls.size() > 5 ? photoUrls.get(5) : null);
+            lisBean.setPhoto7(photoUrls.size() > 6 ? photoUrls.get(6) : null);
+            lisBean.setPhoto8(photoUrls.size() > 7 ? photoUrls.get(7) : null);
+            lisBean.setPhoto9(photoUrls.size() > 8 ? photoUrls.get(8) : null);
+            lisBean.setPhoto10(photoUrls.size() > 9 ? photoUrls.get(9) : null);
+        }
+
+        // 2. 設定設備
+        List<EquipmentBean> equipmentList = new ArrayList<>();
+        for (Integer eid : equipmentIds) {
+            EquipmentBean equip = em.find(EquipmentBean.class, eid);
+            if (equip != null) equipmentList.add(equip);
+        }
+        lisBean.setEquipments(equipmentList);
+
+        // 3. 更新
+        listRepository.save(lisBean);
+    }
+
+    
+ 
 
 }

@@ -2,6 +2,8 @@ package com.EEITG3.Airbnb.listing.entity;
 
 import jakarta.persistence.*;
 
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +19,7 @@ public class LisBean {
     private Integer listId; 		// 房源ID
 
     @Column(name = "host_id", nullable = false, columnDefinition = "uniqueidentifier")
-    private UUID host_Id;    	    // 房東會員ID
+    private UUID host_Id;  	    // 房東會員ID
 
     @Column(name = "review_count", nullable = false)
     private int reviewCount = 0;   // 評價數(根據評價那邊的平均分數去連結reviewCount 以平均分數高低去排序房源排列的優先順序)
