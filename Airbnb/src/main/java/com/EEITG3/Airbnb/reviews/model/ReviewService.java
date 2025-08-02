@@ -1,6 +1,7 @@
 package com.EEITG3.Airbnb.reviews.model;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -83,6 +84,8 @@ public class ReviewService {
 		updateBean.setValueScore(valueScore);
 		updateBean.setCusComm(cusComm);
 		updateBean.setHostComm(hostComm);
+		String reviewDate = new ReviewUtils().getToday();
+		updateBean.setReviewDate(reviewDate);
 		
 		Review resultBean = save(updateBean);
 		if(resultBean != null) {
@@ -91,6 +94,75 @@ public class ReviewService {
 	 		 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("新增失敗");
 	 	 }
 	}
+/*
+	public ResponseEntity<?> patchReview(Integer reviewId, int cleanScore, int commScore, int valueScore,
+			String cusComm, String hostComm, List<MultipartFile> images) {
+			// 透過ID找出該評論
+		Optional<Review> optionalReview = rRepository.findById(reviewId);
+
+		if (!optionalReview.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Review not found");
+		}
+
+		Review review = optionalReview.get();
+
+			// 更新評分與評論文字
+		review.setCleanScore(cleanScore);
+		review.setCommScore(commScore);
+		review.setValueScore(valueScore);
+		review.setCusComm(cusComm);
+		review.setHostComm(hostComm);
+
+		// 若有圖片上傳，處理圖片
+		if (images != null && !images.isEmpty()) {
+			List<String> imageList = new ReviewUtils().uploadImg(images);
+			for (int i = 0; i < imageList.size() && i < 3; i++) {
+			    switch (i) {
+			        case 0 -> review.setImage1(imageList.get(0));
+			        case 1 -> review.setImage2(imageList.get(1));
+			        case 2 -> review.setImage3(imageList.get(2));
+			    }
+			}
+		}
+			// 儲存更新後的評論
+		rRepository.save(review);
+		Review resultBean = save(review);
+		if(resultBean != null) {
+			return ResponseEntity.ok("Review updated successfully");
+		}else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("更新失敗");
+		}
+
+		
+	}*/
+	
+	public ResponseEntity<?> patchReview(Integer reviewId, int cleanScore, int commScore, int valueScore,
+			String cusComm, String hostComm) {
+			// 透過ID找出該評論
+		Optional<Review> optionalReview = rRepository.findById(reviewId);
+
+		if (!optionalReview.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Review not found");
+		}
+
+		Review review = optionalReview.get();
+
+			// 更新評分與評論文字
+		review.setCleanScore(cleanScore);
+		review.setCommScore(commScore);
+		review.setValueScore(valueScore);
+		review.setCusComm(cusComm);
+		review.setHostComm(hostComm);
+
+			// 儲存更新後的評論
+		rRepository.save(review);
+		Review resultBean = save(review);
+		if(resultBean != null) {
+			return ResponseEntity.ok("Review updated successfully");
+		}else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("更新失敗");
+		}
+		}
 
 
 }
