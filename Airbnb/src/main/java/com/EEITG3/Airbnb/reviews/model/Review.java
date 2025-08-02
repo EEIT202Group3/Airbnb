@@ -1,5 +1,5 @@
 package com.EEITG3.Airbnb.reviews.model;
-import java.util.Date;
+
 
 import org.springframework.stereotype.Component;
 
@@ -15,20 +15,14 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-
 @Entity @Table(name = "reviews")
 @Component
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Review {
-	
-	/*
-	 * Reviews JAVA-BEAN
-	 * */
-	
+
 	@Id @Column(name = "review_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int reviewId;
@@ -41,9 +35,9 @@ public class Review {
 	@NonNull
 	private String hostId;
 	
-	@Column(name="user_id")
+	@Column(name="customer_id")
 	@NonNull
-	private String userId;
+	private String custId;
 	
 	@Column(name="list_id")
 	@NonNull
@@ -61,15 +55,15 @@ public class Review {
 	@NonNull
 	private int valueScore;
 	
-	@Column(name="cos_comm")
-	private String cus_comm;
+	@Column(name="cus_comm")
+	private String cusComm;
 	
 	@Column(name="host_comm")
-	private String host_comm;
+	private String hostComm;
 	
 	@Column(name="review_date")
 	@NonNull
-	private Date review_date;
+	private String reviewDate;
 	
 	@Column(name="image1")
 	private String image1;
@@ -79,6 +73,6 @@ public class Review {
 	
 	@Column(name="image3")
 	private String image3;
-	
 
 }
+

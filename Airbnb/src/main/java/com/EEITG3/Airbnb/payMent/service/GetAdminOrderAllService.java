@@ -6,34 +6,27 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.EEITG3.Airbnb.listing.repository.ListRepository;
-import com.EEITG3.Airbnb.payMent.dto.OrderAllResponseDto;
+import com.EEITG3.Airbnb.payMent.dto.AdminOrderAllResponseDto;
 import com.EEITG3.Airbnb.payMent.entity.Order;
-import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
-import com.EEITG3.Airbnb.users.repository.CustomerRepository;
+import com.EEITG3.Airbnb.payMent.repository.AdminRepository;
 
 import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
-public class getOrderAllListService {
+public class GetAdminOrderAllService {
 
 	@Autowired
-	private OrderRepository orderRepository;
+	private AdminRepository adminRepository;
 
-	@Autowired
-	private ListRepository listRepository;
 
-	@Autowired
-	private CustomerRepository customerRepository;
-
-	public List<OrderAllResponseDto> getOrdersByCustomerId(String customer_id) {
-		List<Order> orders = orderRepository.findAll().stream()
-				.filter(o -> o.getCustomer() != null && customer_id.equals(o.getCustomer().getCustomerId()))
+	public List<AdminOrderAllResponseDto> getOrdersByCustomerId(String customer_id) {
+		List<Order> orders = adminRepository.findAll().stream()
+				.filter(o -> o.getCustomerId() != null && customer_id.equals(o.getCustomerId()))
 				.collect(Collectors.toList());
 
 		return orders.stream().map(order -> {
-			OrderAllResponseDto dto = new OrderAllResponseDto();
+			AdminOrderAllResponseDto dto = new AdminOrderAllResponseDto();
 			dto.setHousename(order.getHousename());
 			dto.setBed(order.getBed());
 			dto.setAddress(order.getAddress());

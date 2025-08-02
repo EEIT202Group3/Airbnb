@@ -3,9 +3,9 @@ package com.EEITG3.Airbnb.payMent.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class OrderAllResponseDto {
-	private String bookingId;
+public class AdminOrderAllResponseDto {
 	private String username;
+	private String email;
     private String housename;
     private String address;
     private String tel;
@@ -15,15 +15,6 @@ public class OrderAllResponseDto {
     private LocalDateTime checkindate;
     private LocalDateTime checkoutdate;
     private BigDecimal totalamount;
-    
-    
-    
-	public String getBookingId() {
-		return bookingId;
-	}
-	public void setBookingId(String bookingId) {
-		this.bookingId = bookingId;
-	}
 	public String getUsername() {
 		return username;
 	}
@@ -32,6 +23,12 @@ public class OrderAllResponseDto {
 	}
 	public String getHousename() {
 		return housename;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	public void setHousename(String housename) {
 		this.housename = housename;

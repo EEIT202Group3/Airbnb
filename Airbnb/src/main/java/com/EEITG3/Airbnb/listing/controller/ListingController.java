@@ -113,6 +113,7 @@ public class ListingController {
             return ResponseEntity.internalServerError().body("建立房源失敗: " + e.getMessage());
         }
     }
+
     //編輯房源
     @PutMapping(path = "/{id}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateListing(
@@ -148,7 +149,4 @@ public class ListingController {
             return ResponseEntity.internalServerError().body("房源更新失敗: " + e.getMessage());
         }
     }
-
- 
- 
 }

@@ -34,6 +34,15 @@ public class Host {
 	@Column(name = "created_at")
 	private LocalDate createAt;
 	
+	public Host() {}
+	public Host(String email, String password, String username, String phone) {
+		super();
+		this.email = email;
+		this.password = password;
+		this.username = username;
+		this.phone = phone;
+	}
+
 	public String getHostId() {
 		return hostId;
 	}
