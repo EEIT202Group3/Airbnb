@@ -44,7 +44,7 @@ public class HostServiceImpl implements HostService {
 	public String hostLogin(LogInRequest request) {
 		Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 		if(authentication.isAuthenticated()) {
-			return jwtService.generateToken(request.getEmail(), "HOST");
+			return jwtService.generateToken(request.getEmail(), "ROLE_HOST");
 		} else {
 			throw new BadCredentialsException("驗證失敗");
 		}
@@ -59,7 +59,7 @@ public class HostServiceImpl implements HostService {
 		String encodedPassword = encoder.encode(request.getPassword());
 		Host host = new Host(request.getEmail(),encodedPassword,request.getUsername(),request.getPhone());
 		repo.save(host);
-		return jwtService.generateToken(host.getEmail(),"HOST");
+		return jwtService.generateToken(host.getEmail(),"ROLE_HOST");
 	}
 
 	@Override

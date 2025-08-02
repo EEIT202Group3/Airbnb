@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.EEITG3.Airbnb.users.CookieUtil;
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
+import com.EEITG3.Airbnb.users.entity.Host;
+import com.EEITG3.Airbnb.users.entity.HostDetails;
 import com.EEITG3.Airbnb.users.service.HostService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,7 +39,7 @@ public class HostController {
 	public ResponseEntity<?> logIn(@RequestBody LogInRequest request, HttpServletResponse response){
 		try {
 			String token = service.hostLogin(request);
-			CookieUtil.saveCookie(response, token);
+			CookieUtil.saveHostCookie(response, token);
 			return ResponseEntity.ok(token);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
@@ -57,7 +61,15 @@ public class HostController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 		}
 		String token = service.hostSignUp(request);
-		CookieUtil.saveCookie(response, token);
+		CookieUtil.saveHostCookie(response, token);
 		return ResponseEntity.status(HttpStatus.CREATED).body(token);
 	}
+	
+	//找個人資料
+	@GetMapping("/hosts/current")
+	public ResponseEntity<?> getAllHosts(@AuthenticationPrincipal HostDetails hostDetails){
+		Host result = service.currentHost(hostDetails);
+		return ResponseEntity.ok(result);
+	}
+	
 }

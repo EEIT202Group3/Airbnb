@@ -43,7 +43,7 @@ public class CustomerController {
 	public ResponseEntity<?> logIn(@RequestBody LogInRequest request, HttpServletResponse response) {
 		try {
 			String token = service.customerLogin(request);
-			CookieUtil.saveCookie(response, token);
+			CookieUtil.saveCustomerCookie(response, token);
 			return ResponseEntity.ok(token);
 		} catch (BadCredentialsException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
@@ -65,7 +65,7 @@ public class CustomerController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 		}
 		String token = service.customerSignup(request);
-		CookieUtil.saveCookie(response, token);
+		CookieUtil.saveCustomerCookie(response, token);
 		return ResponseEntity.status(HttpStatus.CREATED).body(token);
 	}
 	
