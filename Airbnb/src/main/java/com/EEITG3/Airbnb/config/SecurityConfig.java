@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -21,6 +23,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.EEITG3.Airbnb.jwt.JwtFilter;
 import com.EEITG3.Airbnb.users.service.CustomerDetailsService;
+
+import jakarta.activation.DataSource;
 
 @Configuration
 public class SecurityConfig {
@@ -52,35 +56,7 @@ public class SecurityConfig {
 
     }
 	
-//	@Bean
-//	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//		
-//		http.securityMatcher("/**");
-//		
-//		//設定不同 URL 路徑的授權規則
-//		http.authorizeHttpRequests(configurer ->
-//			configurer.anyRequest().permitAll()
-//		);
-//		
-//		//不使用 session
-//		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//		
-//		//把 JWT 驗證加到其他 Filter 前面
-//		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-//		
-//		//啟用 HTTP Basic 認證
-//		http.httpBasic(Customizer.withDefaults());
-//		
-//		//關閉 CSRF 防護，REST API 不需要
-//		http.csrf(csrf -> csrf.disable());
-//		
-//		//開啟並設定 CORS 支援、套用下面的 CORS 設定
-//		http.cors(Customizer.withDefaults());
-//		
-//		//回傳 SecurityFilterChain 物件，Spring Boot 就會使用這條安全規則
-//		return http.build();
-//	}
-	
+	//設定只有客戶能用的API
 	@Bean
 	public SecurityFilterChain customerFilterChain(HttpSecurity http) throws Exception {
 		return http.securityMatcher("/api/customers/**")
@@ -96,6 +72,7 @@ public class SecurityConfig {
 				.build();	
 	}
 	
+	//設定只有房東能用的API
 	@Bean
 	public SecurityFilterChain hostFilterChain(HttpSecurity http) throws Exception {
 		return http.securityMatcher("/api/hosts/**")
@@ -111,6 +88,20 @@ public class SecurityConfig {
 				.build();	
 	}
 	
+	//設定後台的權限
+	@Bean
+	public SecurityFilterChain admFilterChain(HttpSecurity http) throws Exception {
+		return http.securityMatcher("/api/admins/**")
+				   .httpBasic(Customizer.withDefaults())
+				   .csrf(csrf->csrf.disable())
+				   .authorizeHttpRequests(configurer -> 
+				       configurer.anyRequest().hasRole("ADMIN")
+				   )
+				   .build();
+	}
+	
+	
+	
 	//CORS 設定
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
@@ -124,5 +115,15 @@ public class SecurityConfig {
 		source.registerCorsConfiguration("/**", config);
 
 		return source;
+	}
+	
+	@Bean
+	public UserDetailsManager userDetailsManager(DataSource dataSource) {
+		JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager();
+		jdbcUserDetailsManager.setUsersByUsernameQuery(
+				"SELECT admin_id,password,is_active FROM admins WHERE admin_id = ?");
+		jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
+				"SeLECT admin_id,authority FROM authorities WHERE admin_id=?");
+		return jdbcUserDetailsManager;
 	}
 }
