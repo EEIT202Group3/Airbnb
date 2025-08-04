@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -15,7 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -23,6 +24,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.EEITG3.Airbnb.jwt.JwtFilter;
 import com.EEITG3.Airbnb.users.service.CustomerDetailsService;
+import com.EEITG3.Airbnb.users.service.HostDetailsService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import javax.sql.DataSource;
 
@@ -31,11 +35,13 @@ public class SecurityConfig {
 
 	private JwtFilter jwtFilter;
 	private CustomerDetailsService customerDetailsService;
+	private HostDetailsService hostDetailsService;
 	
 	@Autowired
-	public SecurityConfig(JwtFilter jwtService, CustomerDetailsService customerDetailsService) {
+	public SecurityConfig(JwtFilter jwtService, CustomerDetailsService customerDetailsService, HostDetailsService hostDetailsService) {
 		this.customerDetailsService = customerDetailsService;
 		this.jwtFilter = jwtService;
+		this.hostDetailsService = hostDetailsService;
 	}
 	
 	@Bean
@@ -43,22 +49,36 @@ public class SecurityConfig {
 		return new BCryptPasswordEncoder(12);
 	}
 	
+	//Customer的provider，負責驗證customer的帳號密碼
 	@Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider customerAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(customerDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
+	//Host的provider，負責驗證host的帳號密碼
+	@Bean
+	public AuthenticationProvider hostAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(hostDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
 	
+	//統一調用所有provider，要把customer、host的provider都放進來
 	@Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-
+		List<AuthenticationProvider> providers = List.of(
+		        customerAuthenticationProvider(),
+		        hostAuthenticationProvider()
+		    );
+		return new ProviderManager(providers);
     }
 	
 	//設定只有客戶能用的API
 	@Bean
+	@Order(3)
 	public SecurityFilterChain customerFilterChain(HttpSecurity http) throws Exception {
+		System.out.println(">>> Customer filter chain applied");
 		return http.securityMatcher("/api/customers/**")
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -74,7 +94,9 @@ public class SecurityConfig {
 	
 	//設定只有房東能用的API
 	@Bean
+	@Order(2)
 	public SecurityFilterChain hostFilterChain(HttpSecurity http) throws Exception {
+		System.out.println(">>> Host filter chain applied");
 		return http.securityMatcher("/api/hosts/**")
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -90,17 +112,51 @@ public class SecurityConfig {
 	
 	//設定後台的權限
 	@Bean
-	public SecurityFilterChain admFilterChain(HttpSecurity http) throws Exception {
-		return http.securityMatcher("/api/admins/**")
-				   .httpBasic(Customizer.withDefaults())
-				   .csrf(csrf->csrf.disable())
-				   .authorizeHttpRequests(configurer -> 
-				       configurer.anyRequest().hasRole("ADMIN")
-				   )
-				   .build();
+	@Order(1)
+	public SecurityFilterChain adminFilterChain(HttpSecurity http, DataSource dataSource) throws Exception {
+		System.out.println(">>> Admin filter chain applied");
+		//告訴Spring要去哪裡找使用者、權限
+		JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+		jdbcUserDetailsManager.setUsersByUsernameQuery(
+				"SELECT admin_id AS username, password, is_active AS enabled FROM admins WHERE admin_id = ?");
+		jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
+				"SeLECT admin_id AS username, authority FROM authorities WHERE admin_id=?");
+		//避免用到其他人的provider，所以在內部設定provider
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider(jdbcUserDetailsManager);
+        provider.setPasswordEncoder(passwordEncoder());
+		//設定權限限制
+        return http
+                .securityMatcher("/api/admins/**")
+                .authenticationProvider(provider)
+                .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/api/admins/login", "/api/admins/logout").permitAll()
+                    .anyRequest().hasRole("ADMIN")
+                )
+                //設定表單登入
+                .formLogin(form -> form
+                    .loginProcessingUrl("/api/admins/login") // 登入 API
+                    .usernameParameter("username") // 對應表單欄位名
+                    .passwordParameter("password")
+                    .successHandler((request, response, authentication) -> {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                    })
+                    .failureHandler((request, response, exception) -> {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    })
+                )
+                //設定登出
+                .logout(logout -> logout
+                    .logoutUrl("/api/admins/logout") // 登出 API
+                    .logoutSuccessHandler((request, response, auth) -> {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                    })
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID")
+                )
+                .httpBasic(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .build();
 	}
-	
-	
 	
 	//CORS 設定
 	@Bean
@@ -115,15 +171,5 @@ public class SecurityConfig {
 		source.registerCorsConfiguration("/**", config);
 
 		return source;
-	}
-	
-	@Bean
-	public UserDetailsManager userDetailsManager(DataSource dataSource) {
-		JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-		jdbcUserDetailsManager.setUsersByUsernameQuery(
-				"SELECT admin_id,password,is_active FROM admins WHERE admin_id = ?");
-		jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
-				"SeLECT admin_id,authority FROM authorities WHERE admin_id=?");
-		return jdbcUserDetailsManager;
 	}
 }

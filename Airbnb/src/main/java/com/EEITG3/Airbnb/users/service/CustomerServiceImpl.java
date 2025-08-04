@@ -10,7 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.EEITG3.Airbnb.jwt.JwtService;
@@ -29,11 +29,11 @@ public class CustomerServiceImpl implements CustomerService {
 	private ObjectMapper objectMapper;
 	private JwtService jwtService;
 	private AuthenticationManager authManager;
-	private BCryptPasswordEncoder encoder;
+	private PasswordEncoder encoder;
 	
 	@Autowired
 	public CustomerServiceImpl(CustomerRepository repo, ObjectMapper objectMapper, JwtService jwtService,
-			AuthenticationManager authManager, BCryptPasswordEncoder encoder) {
+			AuthenticationManager authManager, PasswordEncoder encoder) {
 		super();
 		this.repo = repo;
 		this.objectMapper = objectMapper;
