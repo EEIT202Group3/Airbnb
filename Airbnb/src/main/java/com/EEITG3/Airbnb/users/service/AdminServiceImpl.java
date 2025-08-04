@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.EEITG3.Airbnb.users.repository.AdminRepository;
+import com.EEITG3.Airbnb.users.repository.UserAdminRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.EEITG3.Airbnb.users.entity.Admin;
@@ -14,11 +14,11 @@ import com.EEITG3.Airbnb.users.entity.Admin;
 @Service
 public class AdminServiceImpl implements AdminService {
 
-	private AdminRepository repo;
+	private UserAdminRepository repo;
 	private ObjectMapper objectMapper;
 	
 	@Autowired
-	public AdminServiceImpl(AdminRepository repo) {
+	public AdminServiceImpl(UserAdminRepository repo) {
 		super();
 		this.repo = repo;
 	}
