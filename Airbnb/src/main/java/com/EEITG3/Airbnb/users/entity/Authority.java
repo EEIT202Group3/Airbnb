@@ -1,5 +1,7 @@
 package com.EEITG3.Airbnb.users.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -16,6 +18,7 @@ public class Authority {
 	@Id
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
+	@JsonBackReference
 	private Admin admin;
 	
 	@Id

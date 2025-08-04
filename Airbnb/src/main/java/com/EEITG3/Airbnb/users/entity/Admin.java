@@ -3,6 +3,8 @@ package com.EEITG3.Airbnb.users.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,6 +26,7 @@ public class Admin {
 	@Column(name = "is_active")
 	private boolean isActive=true;
 	@OneToMany(mappedBy = "admin", fetch = FetchType.EAGER)
+	@JsonManagedReference
 	private List<Authority> authorities;
 	
 	public String getAdminId() {
