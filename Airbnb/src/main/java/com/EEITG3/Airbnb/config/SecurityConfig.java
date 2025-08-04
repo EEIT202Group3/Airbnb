@@ -24,7 +24,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.EEITG3.Airbnb.jwt.JwtFilter;
 import com.EEITG3.Airbnb.users.service.CustomerDetailsService;
 
-import jakarta.activation.DataSource;
+import javax.sql.DataSource;
 
 @Configuration
 public class SecurityConfig {
@@ -119,7 +119,7 @@ public class SecurityConfig {
 	
 	@Bean
 	public UserDetailsManager userDetailsManager(DataSource dataSource) {
-		JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager();
+		JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
 		jdbcUserDetailsManager.setUsersByUsernameQuery(
 				"SELECT admin_id,password,is_active FROM admins WHERE admin_id = ?");
 		jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(

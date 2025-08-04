@@ -20,6 +20,7 @@ public class AdminController {
 		this.adminService = adminService;
 	}
 
+	//取得全部員工資料
 	@GetMapping()
 	public ResponseEntity<?> getAllAdmins(){
 		return ResponseEntity.ok(adminService.getAllAdmins());
