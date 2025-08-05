@@ -131,6 +131,8 @@ public class SecurityConfig{
         return http
                 .securityMatcher("/api/admins/**")
                 .authenticationProvider(provider)
+                .cors(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
                 	.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/api/admins/login", "/api/admins/logout").permitAll()
@@ -138,8 +140,8 @@ public class SecurityConfig{
                 )
                 //設定表單登入
                 .formLogin(form -> form
-                    .loginProcessingUrl("/api/admins/login") // 登入 API
-                    .usernameParameter("username") // 對應表單欄位名
+                    .loginProcessingUrl("/api/admins/login")
+                    .usernameParameter("adminId")
                     .passwordParameter("password")
                     .successHandler((request, response, authentication) -> {
                         response.setStatus(HttpServletResponse.SC_OK);
@@ -157,11 +159,16 @@ public class SecurityConfig{
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                 )
+                //因為Spring Security預設回傳HTML頁面，所以遇到例外他會拋出HTML而不是狀態碼，所以需要這邊的設定讓例外可以拋出狀態碼給前端接收
+                .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint((request, response, authException) -> {
+                    	response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    })
+                    .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    	response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    })
+                )
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/admins/login", "/api/admins/logout").permitAll()
-                        .anyRequest().hasRole("ADMIN")
-                		)
                 .build();
 	}
 	
@@ -172,6 +179,7 @@ public class SecurityConfig{
 	        .securityMatcher("/api/**")
 	        .csrf(csrf -> csrf.disable())
 	        .cors(Customizer.withDefaults())
+	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 	        .authorizeHttpRequests(auth -> auth
 	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 	            .anyRequest().permitAll())
@@ -192,9 +200,6 @@ public class SecurityConfig{
 
 		return source;
 	}
-	
-	
-	
 	
 	// 修維的圖片 API
 	@Bean
