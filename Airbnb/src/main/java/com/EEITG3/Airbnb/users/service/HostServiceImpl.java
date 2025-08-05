@@ -1,5 +1,6 @@
 package com.EEITG3.Airbnb.users.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -87,5 +88,10 @@ public class HostServiceImpl implements HostService {
 		ObjectNode patchNode = objectMapper.convertValue(patchPayload, ObjectNode.class);
 		customerNode.setAll(patchNode);
 		return objectMapper.convertValue(customerNode, Host.class);
+	}
+
+	@Override
+	public List<Host> findAllHosts() {
+		return repo.findAll();
 	}
 }

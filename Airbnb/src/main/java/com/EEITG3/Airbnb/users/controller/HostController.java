@@ -71,5 +71,9 @@ public class HostController {
 		Host result = service.currentHost(hostDetails);
 		return ResponseEntity.ok(result);
 	}
+	@GetMapping("/admins/hosts")
+	public List<Host> getAllHost(){
+		return service.findAllHosts();
+	}
 	
 }
