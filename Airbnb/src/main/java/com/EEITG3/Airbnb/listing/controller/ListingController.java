@@ -40,7 +40,7 @@ public class ListingController {
         return listingService.findAll();
     }
 
-    //根據host_id查詢(ID、房名、圖片1)
+    //根據host_id查詢(ID、房名、圖片1) 房東房源查詢列表
     @GetMapping("/host/{hostId}")
     public List<Map<String, Object>> getListingsByHostId(@PathVariable UUID hostId) {
         List<LisBean> list = listRepository.findByHostId(hostId);
@@ -54,6 +54,28 @@ public class ListingController {
         }
         return result;
     }
+    
+    //顯示房源卡用的
+    @GetMapping("/simple")
+    public List<Map<String, Object>> getSimpleListings() {
+        List<LisBean> allListings = listingService.findAll();
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (LisBean lis : allListings) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("listId", lis.getListId());
+            item.put("ads", lis.getAds());
+            item.put("reviewCount", lis.getReviewCount());
+            item.put("price", lis.getPrice());
+            item.put("room",lis.getRoom());
+            item.put("photo1", lis.getPhoto1()); 
+            result.add(item);
+        }
+
+        return result;
+    }
+ 
 
     //查詢單筆房源(房源基本資料)
     @GetMapping("/{id}/basic")

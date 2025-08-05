@@ -90,7 +90,7 @@ public class ListingService {
     @Transactional
     public Integer saveListingWithPhotosAndEquipments(LisBean lisBean, List<MultipartFile> photos, List<Integer> equipmentIds) throws IOException {
 
-        // 儲存圖片
+        
         List<String> photoUrls = new ArrayList<>();
         String storageDir = "/Users/youm/pohto/";  
 
@@ -105,7 +105,7 @@ public class ListingService {
             }
         }
 
-        // 對應 10 張圖欄位
+        
         for (int i = 0; i < photoUrls.size(); i++) {
             String url = photoUrls.get(i);
             switch (i) {
@@ -122,7 +122,7 @@ public class ListingService {
             }
         }
 
-        // 設定設備
+        
         List<EquipmentBean> equipList = new ArrayList<>();
         for (Integer id : equipmentIds) {
             EquipmentBean equip = em.find(EquipmentBean.class, id);
@@ -130,7 +130,7 @@ public class ListingService {
         }
         lisBean.setEquipments(equipList);
 
-        // 儲存
+        
         LisBean saved = listRepository.save(lisBean);
         return saved.getListId();
     }
@@ -143,7 +143,7 @@ public class ListingService {
             List<Integer> equipmentIds
     ) throws IOException {
 
-        // 1. 處理新圖片（如有）
+        
         if (photos != null && !photos.isEmpty()) {
             List<String> photoUrls = new ArrayList<>();
             String storageDir = "/Users/youm/pohto/";
@@ -158,7 +158,7 @@ public class ListingService {
                 }
             }
 
-            // 覆蓋原本照片欄位
+            
             lisBean.setPhoto1(photoUrls.size() > 0 ? photoUrls.get(0) : null);
             lisBean.setPhoto2(photoUrls.size() > 1 ? photoUrls.get(1) : null);
             lisBean.setPhoto3(photoUrls.size() > 2 ? photoUrls.get(2) : null);
@@ -171,7 +171,7 @@ public class ListingService {
             lisBean.setPhoto10(photoUrls.size() > 9 ? photoUrls.get(9) : null);
         }
 
-        // 2. 設定設備
+        
         List<EquipmentBean> equipmentList = new ArrayList<>();
         for (Integer eid : equipmentIds) {
             EquipmentBean equip = em.find(EquipmentBean.class, eid);
@@ -179,11 +179,10 @@ public class ListingService {
         }
         lisBean.setEquipments(equipmentList);
 
-        // 3. 更新
+        
         listRepository.save(lisBean);
     }
 
-    
  
 
 }
