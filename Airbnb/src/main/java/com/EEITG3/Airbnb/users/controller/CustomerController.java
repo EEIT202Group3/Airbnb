@@ -86,6 +86,19 @@ public class CustomerController {
 		return service.findAllCustomers();
 	}
 	
+	//更改權限
+	@PatchMapping("/admins/customers/updatePermission")
+	public ResponseEntity<?> updatePermission(@RequestBody Map<String, Object> data){
+		try {
+			String status = (String) data.get("status");
+			String email = (String) data.get("email");
+			service.permission(status, email);
+			return ResponseEntity.ok(Map.of("message","success"));
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
+	}
+	
 	//找目前客戶的資料
 	@GetMapping("/customers/current")
 	public Customer getCurrentCustomer(@AuthenticationPrincipal CustomerDetails customerDetails) {
