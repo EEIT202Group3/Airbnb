@@ -94,4 +94,27 @@ public class HostServiceImpl implements HostService {
 	public List<Host> findAllHosts() {
 		return repo.findAll();
 	}
+
+	@Override
+	public Host permission(String status, String hostEmail) {
+		Optional<Host> temp = repo.findHostByEmail(hostEmail);
+		Host host = new Host();
+		if(temp.isPresent()) {
+			host = temp.get();
+		}
+		switch (status){
+		case "ACTIVE": {
+			host.setActive(true);
+			break;
+		}
+		case "SUSPEND": {
+			host.setActive(false);
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + status);
+		}
+		//把更新後的狀態存回資料庫、回傳更新後的資料
+		return repo.save(host);
+	}
 }

@@ -102,7 +102,7 @@ public class Customer {
 		return isActive;
 	}
 
-	public void setIsActive(boolean isActive) {
+	public void setActive(boolean isActive) {
 		this.isActive = isActive;
 	}
 

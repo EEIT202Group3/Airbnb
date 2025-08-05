@@ -25,4 +25,5 @@ public interface HostService {
 	//找全部房東
 	List<Host> findAllHosts();
 	//停權、啟用
+	Host permission(String status, String hostEmail);
 }

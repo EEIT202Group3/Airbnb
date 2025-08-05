@@ -80,6 +80,12 @@ public class CustomerController {
 		}
 	}
 	
+	//找個人資料
+	@GetMapping("/customers/current")
+	public Customer getCurrentCustomer(@AuthenticationPrincipal CustomerDetails customerDetails) {
+		return service.currentCustomer(customerDetails);
+	}
+	
 	//找全部客戶資料
 	@GetMapping("/admins/customers")
 	public List<Customer> getAllCustomers(){
@@ -97,14 +103,5 @@ public class CustomerController {
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
-	}
-	
-	//找目前客戶的資料
-	@GetMapping("/customers/current")
-	public Customer getCurrentCustomer(@AuthenticationPrincipal CustomerDetails customerDetails) {
-		return service.currentCustomer(customerDetails);
-	}
-	
-
-	
+	}	
 }
