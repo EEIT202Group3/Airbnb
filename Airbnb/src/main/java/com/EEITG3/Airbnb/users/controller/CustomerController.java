@@ -81,7 +81,7 @@ public class CustomerController {
 	}
 	
 	//找全部客戶資料
-	@GetMapping("/customers")
+	@GetMapping("/admins/customers")
 	public List<Customer> getAllCustomers(){
 		return service.findAllCustomers();
 	}

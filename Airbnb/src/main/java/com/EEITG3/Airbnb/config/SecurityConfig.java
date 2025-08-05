@@ -78,11 +78,9 @@ public class SecurityConfig {
 	@Bean
 	@Order(3)
 	public SecurityFilterChain customerFilterChain(HttpSecurity http) throws Exception {
-		System.out.println(">>> Customer filter chain applied");
 		return http.securityMatcher("/api/customers/**")
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-				.httpBasic(Customizer.withDefaults())
 				.csrf(csrf->csrf.disable())
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(configurer->
@@ -96,11 +94,9 @@ public class SecurityConfig {
 	@Bean
 	@Order(2)
 	public SecurityFilterChain hostFilterChain(HttpSecurity http) throws Exception {
-		System.out.println(">>> Host filter chain applied");
 		return http.securityMatcher("/api/hosts/**")
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-				.httpBasic(Customizer.withDefaults())
 				.csrf(csrf->csrf.disable())
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(configurer->
@@ -114,7 +110,6 @@ public class SecurityConfig {
 	@Bean
 	@Order(1)
 	public SecurityFilterChain adminFilterChain(HttpSecurity http, DataSource dataSource) throws Exception {
-		System.out.println(">>> Admin filter chain applied");
 		//告訴Spring要去哪裡找使用者、權限
 		JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
 		jdbcUserDetailsManager.setUsersByUsernameQuery(
@@ -128,10 +123,6 @@ public class SecurityConfig {
         return http
                 .securityMatcher("/api/admins/**")
                 .authenticationProvider(provider)
-                .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/admins/login", "/api/admins/logout").permitAll()
-                    .anyRequest().hasRole("ADMIN")
-                )
                 //設定表單登入
                 .formLogin(form -> form
                     .loginProcessingUrl("/api/admins/login") // 登入 API
@@ -153,8 +144,11 @@ public class SecurityConfig {
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                 )
-                .httpBasic(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/admins/login", "/api/admins/logout").permitAll()
+                        .anyRequest().hasRole("ADMIN")
+                		)
                 .build();
 	}
 	
