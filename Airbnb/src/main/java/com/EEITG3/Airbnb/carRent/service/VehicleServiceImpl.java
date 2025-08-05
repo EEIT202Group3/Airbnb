@@ -12,14 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository vRepository;
     private final ReservationRepository rRepository;
 
-    public VehicleServiceImpl(VehicleRepository vRepository, ReservationRepository rRepository) {
+    public VehicleServiceImpl(VehicleRepository vRepository, ReservationRepository rRepository, ReservationService reservationService) {
         this.vRepository = vRepository;
         this.rRepository = rRepository;
     }
@@ -28,8 +32,9 @@ public class VehicleServiceImpl implements VehicleService {
     public Vehicle insert(Vehicle vehicle) throws Exception {
         Integer id = vehicle.getVehicleId();
         if (id != null && vRepository.existsById(id)) {
-            throw new Exception("此預約已存在");
+            throw new Exception("此車輛已存在");
         }
+        checkPlateNoAvailable(vehicle.getPlateNo(), null);
         return vRepository.save(vehicle);
     }
 
@@ -40,6 +45,7 @@ public class VehicleServiceImpl implements VehicleService {
             throw new Exception("查無此車輛資料");
         }
         Vehicle original = vRepository.findById(id).orElseThrow(() -> new Exception("找不到車輛"));
+        checkPlateNoAvailable(vehicle.getPlateNo(), id);
         original.setPlateNo(vehicle.getPlateNo());
         original.setBrand(vehicle.getBrand());
         original.setModel(vehicle.getModel());
@@ -100,5 +106,15 @@ public class VehicleServiceImpl implements VehicleService {
         vRepository.deleteById(id);
         System.out.println("成功刪除ID:" + id);
         return id;
+    }
+
+    public void checkPlateNoAvailable(String plateNo, Integer excludeId) {
+        Optional<Vehicle> conflicts = vRepository.findByPlateNo(plateNo);
+        if (conflicts.isPresent()) {
+            Vehicle found = conflicts.get();
+            if (excludeId == null || !found.getVehicleId().equals(excludeId)) {
+                throw new RuntimeException("該車牌已被登入");
+            }
+        }
     }
 }

@@ -53,12 +53,17 @@ const insertVehicle = async () => {
   try {
     const res = await api.post(`/vehicles/insert`, vehicle.value);
     alert("新增成功！");
-    const newId = res.data.vehicle_id;
+    const newId = res.data.vehicleId;
     insertVehicleMode.value = false;
     isEditing.value = false;
-    await router.push(`/car-rent/vehicles/${newId}`);
+    await router.push(`/car-rent/back-homepage/vehicles/${newId}`);
   } catch (err) {
-    alert("新增失敗：" + err);
+    const msg = err?.response?.data?.message || "更新失敗，請稍後再試";
+    if (msg.includes("車輛在所選時間已被預約")) {
+      alert("此車輛在所選時間已被預約，請選擇其他時間或車輛");
+    } else {
+      alert(msg);
+    }
   }
 };
 
@@ -70,7 +75,12 @@ const saveVehicle = async () => {
     alert("修改成功！");
     isEditing.value = false;
   } catch (err) {
-    alert("修改失敗：" + err);
+    const msg = err?.response?.data?.message || "更新失敗，請稍後再試";
+    if (msg.includes("車輛在所選時間已被預約")) {
+      alert("此車輛在所選時間已被預約，請選擇其他時間或車輛");
+    } else {
+      alert(msg);
+    }
   }
 };
 
@@ -255,7 +265,11 @@ const deleteVehicle = async () => {
                 <td>狀態</td>
                 <td>
                   <span v-if="!isEditing">{{ vehicle.status }}</span>
-                  <input v-else v-model="vehicle.status" class="form-control form-control-sm"/>
+                  <select v-else class="form-select input-short editable" v-model="vehicle.status">
+                  <option value="可租用">可用</option>
+                  <option value="已預約">維修中</option>
+                  <option value="維修中">下架</option>
+                  </select>
                 </td>
               </tr>
               </tbody>

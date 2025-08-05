@@ -53,8 +53,8 @@ const saveEditing = async () => {
     isEditing.value = false;
   } catch (err) {
     const msg = err?.response?.data?.message || "修改失敗，請稍後再試";
-    if (msg.includes("車輛在所選時間已被預約")) {
-      alert("此車輛在所選時間已被預約，請選擇其他時間或車輛");
+    if (msg.includes("該車牌已被登入")) {
+      alert("該車牌已被登入，請再次檢查車牌資訊");
     } else {
       alert(msg);
     }
@@ -88,16 +88,23 @@ const insertReservation = async () => {
     alert("新增成功");
     insertReservationMode.value = false;
     isEditing.value = false;
-    await router.push(`/car-rent/reservations/${newId}`);
+    await router.push(`/car-rent/back-homepage/reservations/${newId}`);
   } catch (err) {
     const msg = err?.response?.data?.message || "更新失敗，請稍後再試";
-    if (msg.includes("車輛在所選時間已被預約")) {
-      alert("此車輛在所選時間已被預約，請選擇其他時間或車輛");
+    if (msg.includes("該車牌已被登入")) {
+      alert("該車牌已被登入，請再次檢查車牌資訊");
     } else {
       alert(msg);
     }
   }
 };
+
+// 完成訂單
+function finishedReservation() {
+  reservation.value.status = "完成訂單";
+  saveEditing();
+  alert("訂單已標記為完成");
+}
 </script>
 
 <template>
@@ -105,15 +112,21 @@ const insertReservation = async () => {
     <div class="container-fluid">
       <div class="row">
         <main class="main-content">
-  <button class="btn btn-outline-dark m-2" @click="showSidebar = true">
-    <i class="fa-solid fa-bars"></i> 功能選單
-  </button>
-  <Sidebar :visible="showSidebar" :close="() => showSidebar = false" />
+          <button class="btn btn-outline-dark m-2" @click="showSidebar = true">
+            <i class="fa-solid fa-bars"></i> 功能選單
+          </button>
+          <Sidebar :visible="showSidebar" :close="() => showSidebar = false"/>
 
           <div class="bg-white p-4 rounded shadow-sm">
             <div class="d-flex justify-content-between align-items-center mb-3">
+
               <h4 class="fw-bold">訂單一覽</h4>
               <div id="action-buttons">
+                <button class="btn btn-outline-primary btn-sm"
+                        v-if="!insertReservationMode && !isEditing"
+                        @click="finishedReservation">
+                  完成訂單
+                </button>
                 <button class="btn btn-primary btn-sm" v-if="isEditing && !insertReservationMode"
                         @click="saveEditing">確定儲存
                 </button>
@@ -170,42 +183,48 @@ const insertReservation = async () => {
                             <td>駕照號碼</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.license }}</span>
-                              <input v-else class="form-control input-short editable" type="text" v-model="reservation.license" />
+                              <input v-else class="form-control input-short editable" type="text"
+                                     v-model="reservation.license"/>
                             </td>
                           </tr>
                           <tr>
                             <td>姓名</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.driverName }}</span>
-                              <input v-else class="form-control input-short editable" type="text" v-model="reservation.driverName" />
+                              <input v-else class="form-control input-short editable" type="text"
+                                     v-model="reservation.driverName"/>
                             </td>
                           </tr>
                           <tr>
                             <td>電話</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.driverPhone }}</span>
-                              <input v-else class="form-control input-short editable" type="text" v-model="reservation.driverPhone" />
+                              <input v-else class="form-control input-short editable" type="text"
+                                     v-model="reservation.driverPhone"/>
                             </td>
                           </tr>
                           <tr>
                             <td>電子信箱</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.driverEmail }}</span>
-                              <input v-else class="form-control input-short editable" type="text" v-model="reservation.driverEmail" />
+                              <input v-else class="form-control input-short editable" type="text"
+                                     v-model="reservation.driverEmail"/>
                             </td>
                           </tr>
                           <tr>
                             <td>年齡</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.driverAge }}</span>
-                              <input v-else class="form-control input-short editable" type="number" v-model="reservation.driverAge" />
+                              <input v-else class="form-control input-short editable" type="number"
+                                     v-model="reservation.driverAge"/>
                             </td>
                           </tr>
                           <tr>
                             <td>租屋訂單編號</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.bookingId }}</span>
-                              <input v-else class="form-control input-short editable" type="text" v-model="reservation.bookingId" />
+                              <input v-else class="form-control input-short editable" type="text"
+                                     v-model="reservation.bookingId"/>
                             </td>
                           </tr>
                           </tbody>
@@ -226,21 +245,24 @@ const insertReservation = async () => {
                             <td>訂單編號</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.reservationId }}</span>
-                              <input v-else type="text" class="form-control input-short" v-model="reservation.reservationId" disabled placeholder="不可自行輸入">
+                              <input v-else type="text" class="form-control input-short"
+                                     v-model="reservation.reservationId" disabled placeholder="不可自行輸入">
                             </td>
                           </tr>
                           <tr>
                             <td>訂單建立時間</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.createdAt }}</span>
-                              <input v-else type="text" class="form-control input-short editable" v-model="reservation.createdAt" disabled placeholder="不可自行輸入">
+                              <input v-else type="text" class="form-control input-short editable"
+                                     v-model="reservation.createdAt" disabled placeholder="不可自行輸入">
                             </td>
                           </tr>
                           <tr>
                             <td>訂單總金額</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.totalAmount }}</span>
-                              <input v-else type="number" class="form-control input-short editable" v-model="reservation.totalAmount">
+                              <input v-else type="number" class="form-control input-short editable"
+                                     v-model="reservation.totalAmount">
                             </td>
                           </tr>
                           <tr>
@@ -250,9 +272,11 @@ const insertReservation = async () => {
                                 {{ reservation.pickupDate }} ～ {{ reservation.returnDate }}
                               </div>
                               <div class="datetime-group" v-else>
-                                <input type="datetime-local" class="form-control input-short editable" v-model="reservation.pickupDate">
+                                <input type="datetime-local" class="form-control input-short editable"
+                                       v-model="reservation.pickupDate">
                                 <span>～</span>
-                                <input type="datetime-local" class="form-control input-short editable" v-model="reservation.returnDate">
+                                <input type="datetime-local" class="form-control input-short editable"
+                                       v-model="reservation.returnDate">
                               </div>
                             </td>
                           </tr>
@@ -260,21 +284,28 @@ const insertReservation = async () => {
                             <td>租用車輛</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.vehicleId }}</span>
-                              <input v-else type="text" class="form-control input-short editable" v-model="reservation.vehicleId">
+                              <input v-else type="text" class="form-control input-short editable"
+                                     v-model="reservation.vehicleId">
                             </td>
                           </tr>
                           <tr>
                             <td>租車地點</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.locationId }}</span>
-                              <input v-else type="text" class="form-control input-short editable" v-model="reservation.locationId">
+                              <input v-else type="text" class="form-control input-short editable"
+                                     v-model="reservation.locationId">
                             </td>
                           </tr>
                           <tr>
                             <td>付款狀態</td>
                             <td>
                               <span v-if="!isEditing">{{ reservation.status }}</span>
-                              <input v-else type="text" class="form-control input-short editable" v-model="reservation.status">
+                              <select v-else class="form-select input-short editable" v-model="reservation.status">
+                                <option value="未付款">未付款</option>
+                                <option value="已付款">已付款</option>
+                                <option value="取消訂單">取消訂單</option>
+                                <option value="完成訂單" disabled class="text-info">完成訂單</option>
+                              </select>
                             </td>
                           </tr>
                           </tbody>
@@ -336,6 +367,7 @@ body {
   margin: auto;
   padding: 20px;
   width: calc(100% - 200px);
+
 }
 
 .form-control[readonly] {
@@ -369,5 +401,4 @@ body {
   white-space: nowrap;
   margin-left: 0.5rem;
 }
-
 </style>

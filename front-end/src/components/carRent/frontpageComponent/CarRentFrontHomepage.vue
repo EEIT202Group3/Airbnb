@@ -2,7 +2,9 @@
 import "@/assets/carRent/frontHomepage.css"
 import NavigationBar from "@/components/carRent/frontpageComponent/NavigationBar.vue";
 import SearchBar from "@/components/carRent/frontpageComponent/SearchBar.vue";
+import {useRoute} from "vue-router";
 
+const route = useRoute();
 const locationList = [{
   name: '台北',
   img: '../../../../public/carPicture/taipei.jpg',
@@ -21,136 +23,116 @@ const locationList = [{
 </script>
 
 <template>
+  <div v-if="route.path === '/car-rent/front-homepage'">
   <NavigationBar></NavigationBar>
   <SearchBar></SearchBar>
 
+    <!-- 熱門地點 -->
+    <div class="container mt-5">
+      <h4 class="mb-4 fw-bold"><i class="bi bi-geo-alt-fill me-2 text-primary"></i>地點推薦</h4>
+      <div class="row g-4">
+        <div class="col-md-4" v-for="loc in locationList" :key="loc.name">
+          <div class="card h-100 shadow-sm">
+            <a href="#">
+              <img :src="loc.img" class="card-img-top" :alt="loc.name" style="height: 200px; object-fit: cover;">
+            </a>
+            <div class="card-body">
+              <h5 class="card-title text-primary fw-bold">{{ loc.name }}</h5>
+              <p class="card-text lh-base">{{ loc.desc }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <!-- 熱門地點 -->
-  <div class="container mt-5">
-    <p>地點推薦</p>
-    <div class="row g-4">
-      <div class="col-md-4" v-for="loc in locationList" :key="loc.name">
-        <div class="card h-100">
-          <a href="#">
-            <img :src="loc.img" class="card-img-top" :alt="loc.name">
-          </a>
-          <div class="card-body">
-            <h5 class="card-title">{{ loc.name }}</h5>
-            <p class="card-text">{{ loc.desc }}</p>
+    <!-- 租車說明區塊 -->
+    <div class="container mt-5">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white fs-5 fw-bold">
+          如何找到最超值的租車服務
+        </div>
+        <div class="card-body">
+          <div class="mb-4">
+            <h6 class="fw-bold">💡 快速比價，一站完成預訂</h6>
+            <p class="mb-0">
+              本平台整合上百家租車供應商，<strong>免費比價</strong>、<strong>直接預訂</strong>，讓你省時省力、輕鬆找到心儀車款。
+            </p>
+          </div>
+
+          <div class="mb-4">
+            <h6 class="fw-bold">📅 彈性預訂與免費取消</h6>
+            <p class="mb-0">
+              多數車行提供《<strong>彈性預訂政策</strong>》與<strong>免費取消</strong>選項，讓你就算臨時變動行程也不擔心。
+            </p>
+          </div>
+
+          <div class="mb-4">
+            <h6 class="fw-bold">📈 長期租車更划算</h6>
+            <p class="mb-0">
+              若有長時間需求（如一週以上），建議選擇《<strong>月租方案</strong>》查看是否比短租更優惠，特別適合中長期出差或旅遊。
+            </p>
+          </div>
+
+          <div class="mb-4">
+            <h6 class="fw-bold">⛽ 留意燃油政策</h6>
+            <p class="mb-0">
+              建議選擇《<strong>滿油取車、滿油還車</strong>》政策，避免被收取額外油費，亦可自行掌握加油成本。
+            </p>
+          </div>
+
+          <div class="mb-4">
+            <h6 class="fw-bold">🔑 自助取車更方便</h6>
+            <p class="mb-0">
+              可選擇《<strong>免鑰匙或自助取車</strong>》服務，免排隊、不需填表，直接到場取車開走，<strong>大幅節省時間</strong>。
+            </p>
+          </div>
+
+          <div class="mb-4">
+            <h6 class="fw-bold">🌱 電動車環保又省油</h6>
+            <p class="mb-0">
+              若支持永續旅遊，可篩選《<strong>電動車</strong>》選項，不但已充電完畢、免加油費，也更環保減碳。
+            </p>
+          </div>
+
+          <div class="mb-2">
+            <h6 class="fw-bold">📍 取車地點靈活選</h6>
+            <p class="mb-0">
+              若預算有限，可考慮到市區外圍地點取車，通常《<strong>租金會更便宜</strong>》，搭乘大眾運輸前往即可。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 常見問題 -->
+    <div class="container mt-5">
+      <h4 class="mb-4 fw-bold"><i class="bi bi-question-circle-fill me-2 text-warning"></i>常見問題</h4>
+      <div class="accordion" id="faqAccordion">
+        <div class="accordion-item" v-for="(faq, idx) in [
+      { q: '請問哪裡可以查到各據點的營業時間？', a: '您可以在「服務據點」內，尋找您欲租車的據點位置及營業時間。' },
+      { q: '現場租車有什麼折扣？', a: '問就是沒有。' },
+      { q: '請問如何知道自己想要的日期是否仍有車可租呢？', a: '您可致電於想要取車的據點（請參考「服務據點」）或透過「意見信箱」詢問。' },
+      { q: '電話/網路預約後，如何進行付費交易？', a: '無論方式皆接受信用卡及現金付款。' },
+      { q: '我是會員但不會開車，可以請別人取車嗎？', a: '很抱歉，需具備駕照者本人到場取車。' },
+      { q: '取車時需要帶什麼證件？', a: '須攜帶身分證、駕照，網路預約則需加上付款憑證或信用卡。' }
+    ]" :key="idx">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
+                    :data-bs-target="'#faq' + idx" aria-expanded="false" :aria-controls="'faq' + idx">
+              <i class="bi bi-question-circle me-2 text-secondary"></i>{{ faq.q }}
+            </button>
+          </h2>
+          <div :id="'faq' + idx" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              {{ faq.a }}
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- 租車步驟 -->
-  <div class="container  mt-5">
-    <div class="card">
-      <div class="card-header">如何找到最超值的租車服務</div>
-      <div class="card-body">
-        <figure>
-          <blockquote class="blockquote">
-            <p>使用本服務</p>
-          </blockquote>
-          <figcaption class="blockquote-footer">
-
-            我們經常被評為「最值得信賴的旅遊搜尋網站」。
-            網站服務完全免費，而我們會搜尋上百家租車供應商服務，讓你能迅速比較價格並預訂心儀的服務。歡迎查看以下詳情，了解如何善用租車搜尋功能。
-            立即預訂，日後還能取消
-            市面上有很多汽車和廂型車租賃服務都提供《彈性預訂政策》和免費取消選項。因此，你能以優惠價格租車，同時享受充分彈性，即便計畫臨時有變也能安心。
-
-            在中壢市租車一整個月
-            想要租車長達近一個月嗎？一般來說，租車業者往往會提供長期租車服務，以減少兩筆預訂之間昂貴的管理費用。不妨在找車時選擇
-            30 天，查看月租費用是否比自己需要的三週還便宜。
-
-            比較《燃油政策》
-            為節省你在啟程前加滿油的費用，尋找租車服務時，記得選擇滿取滿還的《燃油政策》。
-
-            省去排隊時間
-            當你在我們的網站上搜尋租車服務時，會看到顯眼的免鑰匙或自助取車選項。不用鑰匙或填寫文件就能取車，就等於不用排隊了。只要前往最方便的取車地點，即可輕鬆開車上路。
-
-            更環保的選擇
-            探索美麗地球，減少環境衝擊，不妨篩選電動車作為代步工具。電動車會在你取車前就充滿電，代表你也無須費心去比較不同的《燃油政策》。
-
-            看看更遠的地方
-            如果預算有限，搭乘大眾運輸交通工具到更遠的汽車租賃取車地點，通常會更便宜。<cite
-              title="Source Title">資料來源</cite>
-          </figcaption>
-        </figure>
-      </div>
-    </div>
-  </div>
-
-  <!-- 常見問題 -->
-  <div class="container mt-4">
-    <div class="mb-2">
-      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1"
-              aria-expanded="false" aria-controls="collapse1">
-        請問哪裡可以查到各據點的營業時間？
-      </button>
-      <div class="collapse" id="collapse1">
-        <div class="card card-body">
-          答：您可以在「服務據點」內，尋找您欲租車的據點位置及營業時間。
-        </div>
-      </div>
-    </div>
-    <div class="mb-2">
-      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2"
-              aria-expanded="false" aria-controls="collapse2">
-        現場租車有什麼折扣？
-      </button>
-      <div class="collapse" id="collapse2">
-        <div class="card card-body">
-          答：問就是沒有。
-        </div>
-      </div>
-    </div>
-    <div class="mb-2">
-      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3"
-              aria-expanded="false" aria-controls="collapse3">
-        請問如何知道自己想要的日期是否仍有車可租呢？
-      </button>
-      <div class="collapse" id="collapse3">
-        <div class="card card-body">
-          答：您可致電於想要取車的據點（請參考「服務據點」）或是在我們的「意見信箱」詢問，請您屆時提供
-        </div>
-      </div>
-    </div>
-    <div class="mb-2">
-      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4"
-              aria-expanded="false" aria-controls="collapse4">
-        當我電話/網路預約租車，如何進行付費交易？
-      </button>
-      <div class="collapse" id="collapse4">
-        <div class="card card-body">
-          答：無論網路預約租車，或是電話預約租車並現場取車付費時，接受信用卡及現金。
-        </div>
-      </div>
-    </div>
-    <div class="mb-2">
-      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5"
-              aria-expanded="false" aria-controls="collapse5">
-        我是網路會員，但我本身不會開車，可先付款再請別人取車嗎？
-      </button>
-      <div class="collapse" id="collapse5">
-        <div class="card card-body">
-          答：很抱歉，不會開還敢租車。
-        </div>
-      </div>
-    </div>
-    <div class="mb-2">
-      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6"
-              aria-expanded="false" aria-controls="collapse6">
-        我需要攜帶什麼憑證取車呢？
-      </button>
-      <div class="collapse" id="collapse6">
-        <div class="card card-body">
-          答：若您已於網路預約租車並線上信用卡付費成功，僅需攜帶您的「身分證正本」及「中華民國駕照正本」至取車據點即可取車。
-          若您為電話預約租車，需攜帶您的「信用卡」、「身分證正本」及「中華民國駕照正本」至取車據點方可取車。
-        </div>
-      </div>
-    </div>
-
+  <div v-else>
+    <router-view></router-view>
   </div>
 </template>
 
