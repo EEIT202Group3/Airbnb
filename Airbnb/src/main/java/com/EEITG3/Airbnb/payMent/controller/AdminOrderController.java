@@ -30,8 +30,8 @@ public class AdminOrderController {
 	
 	//查詢單筆明細
 	@GetMapping("/admindetail")
-	public AdminOrderDetailResponseDto adminOrderDetailResponseDto(@RequestParam("booking_id") String booking_id) {
-		return adminOrderService.getOrderByBookingId(booking_id);
+	public AdminOrderDetailResponseDto adminOrderDetailResponseDto(@RequestParam("bookingId") String bookingId) {
+		return adminOrderService.getOrderByBookingId(bookingId);
 	}
 	//更新付款狀態
 	@PostMapping("/updatementstatus")

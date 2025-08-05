@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.EEITG3.Airbnb.listing.entity.LisBean;
-import com.EEITG3.Airbnb.users.entity.Customer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
