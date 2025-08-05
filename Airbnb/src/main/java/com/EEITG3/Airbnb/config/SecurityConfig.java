@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +24,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import com.EEITG3.Airbnb.jwt.JwtFilter;
 import com.EEITG3.Airbnb.users.service.CustomerDetailsService;
 import com.EEITG3.Airbnb.users.service.HostDetailsService;
@@ -31,7 +36,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 @Configuration
-public class SecurityConfig {
+@EnableWebSecurity
+public class SecurityConfig{
 
 	private JwtFilter jwtFilter;
 	private CustomerDetailsService customerDetailsService;
@@ -87,6 +93,7 @@ public class SecurityConfig {
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(configurer->
 					configurer
+					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 					.requestMatchers("/api/customers/login","/api/customers/signup").permitAll()
 					.anyRequest().hasRole("CUSTOMER"))
 				.build();	
@@ -105,6 +112,7 @@ public class SecurityConfig {
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(configurer->
 					configurer
+					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 					.requestMatchers("/api/hosts/login","/api/hosts/signup").permitAll()
 					.anyRequest().hasRole("HOST"))
 				.build();	
@@ -129,6 +137,7 @@ public class SecurityConfig {
                 .securityMatcher("/api/admins/**")
                 .authenticationProvider(provider)
                 .authorizeHttpRequests(auth -> auth
+                	.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/api/admins/login", "/api/admins/logout").permitAll()
                     .anyRequest().hasRole("ADMIN")
                 )
@@ -158,6 +167,19 @@ public class SecurityConfig {
                 .build();
 	}
 	
+	@Bean
+	@Order(4)
+	public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
+	    return http
+	        .securityMatcher("/api/**")
+	        .csrf(csrf -> csrf.disable())
+	        .cors(Customizer.withDefaults())
+	        .authorizeHttpRequests(auth -> auth
+	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+	            .anyRequest().permitAll())
+	        .build();
+	}
+	
 	//CORS 設定
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
@@ -172,4 +194,20 @@ public class SecurityConfig {
 
 		return source;
 	}
+	
+	
+	
+	
+	// 修維的圖片 API
+	@Bean
+    public WebMvcConfigurer resourceConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addResourceHandlers(ResourceHandlerRegistry registry) {
+                registry.addResourceHandler("/images/**")
+                        .addResourceLocations("file:/Users/youm/pohto/")
+                        .setCachePeriod(3600);
+            }
+        };
+    }
 }
