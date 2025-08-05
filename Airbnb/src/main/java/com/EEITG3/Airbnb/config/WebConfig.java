@@ -1,6 +1,7 @@
 package com.EEITG3.Airbnb.config;
 
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -15,6 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:/Users/youm/pohto/")
                 .setCachePeriod(3600); 
     }
+
 
     // CORS 設定
     @Override

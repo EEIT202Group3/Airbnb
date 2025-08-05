@@ -40,6 +40,7 @@ public class ListingController {
         return listingService.findAll();
     }
 
+
     //根據host_id查詢(ID、房名、圖片1)
     @GetMapping("/host/{hostId}")
     public List<Map<String, Object>> getListingsByHostId(@PathVariable UUID hostId) {
@@ -54,6 +55,28 @@ public class ListingController {
         }
         return result;
     }
+    
+    //顯示房源卡用的
+    @GetMapping("/simple")
+    public List<Map<String, Object>> getSimpleListings() {
+        List<LisBean> allListings = listingService.findAll();
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (LisBean lis : allListings) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("listId", lis.getListId());
+            item.put("ads", lis.getAds());
+            item.put("reviewCount", lis.getReviewCount());
+            item.put("price", lis.getPrice());
+            item.put("room",lis.getRoom());
+            item.put("photo1", lis.getPhoto1()); 
+            result.add(item);
+        }
+
+        return result;
+    }
+ 
 
     //查詢單筆房源(房源基本資料)
     @GetMapping("/{id}/basic")
@@ -113,7 +136,6 @@ public class ListingController {
             return ResponseEntity.internalServerError().body("建立房源失敗: " + e.getMessage());
         }
     }
-
     //編輯房源
     @PutMapping(path = "/{id}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateListing(
@@ -149,4 +171,7 @@ public class ListingController {
             return ResponseEntity.internalServerError().body("房源更新失敗: " + e.getMessage());
         }
     }
+
+ 
+ 
 }
