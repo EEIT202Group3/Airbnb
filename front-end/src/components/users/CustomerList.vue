@@ -2,10 +2,17 @@
 import { ref,onMounted } from 'vue';
 import { getAllCustomers } from '@/service/user/CustomerService';
 import { permission } from '@/service/user/CustomerService';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const customers = ref([]);
 onMounted(
     async()=>{
-        customers.value = await getAllCustomers();
+        const result = await getAllCustomers();
+        if(!result){
+            router.push({name:'Homepage'});
+        }else{
+            customers.value = result;
+        }
     }
 );
 async function updatePermission(active,email){
@@ -16,7 +23,12 @@ async function updatePermission(active,email){
         status = 'ACTIVE';
     }
     const result = await permission(status,email);
-    console.log(result);
+    if(result.message==='success'){
+        alert('更新成功')
+        customers.value = await getAllCustomers();
+    }else{
+        alert('更新失敗')
+    }
 }
 
 
@@ -41,7 +53,7 @@ async function updatePermission(active,email){
                 <td v-if="customer.active" style="color: green;">啟用中</td>
                 <td v-else style="color: red;">停權中</td>
                 <td v-if="customer.active"><v-btn color="red" @click="updatePermission(customer.active,customer.email)">停權</v-btn></td>
-                <td v-else><v-btn>啟用</v-btn color="green" @click="updatePermission(customer.activem,customer.email)"></td>
+                <td v-else><v-btn color="green" @click="updatePermission(customer.active,customer.email)">啟用</v-btn></td>
             </tr>
         </tbody>
     </v-table>

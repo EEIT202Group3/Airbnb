@@ -1,14 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import { getCurrentAdmin } from '@/service/user/AdminService';
 import { useRouter } from 'vue-router';
+import { useAdminStore } from '@/stores/user/adminStore';
 const loginDialog = ref(false);
+const adminStore = useAdminStore();
 const formData = ref({
     "adminId":'',
     "password":''
 });
-const adminDetails = ref(null);
 const router = useRouter();
+
+onMounted(async()=>{
+    if(!adminStore.admin){
+        const result = await getCurrentAdmin();
+        adminStore.admin = result;
+    }
+})
 
 async function logout(){
     try {
@@ -17,7 +25,7 @@ async function logout(){
             credentials: 'include'
         });
         if (response.ok) {
-            adminDetails.value=null;
+            adminStore.admin=null;
             alert("登出成功");
         } else {
             alert("登出失敗");
@@ -42,7 +50,7 @@ async function login() {
             })
         });
         if(response.ok){
-            adminDetails.value = await getCurrentAdmin();
+            adminStore.admin = await getCurrentAdmin();
             router.push({name:'Homepage'});
         }
     } catch (error) {
@@ -70,9 +78,9 @@ async function login() {
     </v-app-bar>
     <v-navigation-drawer>
       <v-list nav>
-        <v-list-item v-if="adminDetails">
-            <div>{{ adminDetails.adminId }}</div>
-            <div>{{ adminDetails.username }}</div>
+        <v-list-item v-if="adminStore.admin">
+            <div>{{ adminStore.admin.adminId }}</div>
+            <div>{{ adminStore.admin.username }}</div>
         </v-list-item>
         <v-list-item v-else>
             <div>未登入</div>

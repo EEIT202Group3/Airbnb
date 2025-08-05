@@ -1,6 +1,7 @@
 package com.EEITG3.Airbnb.users.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -71,9 +73,23 @@ public class HostController {
 		Host result = service.currentHost(hostDetails);
 		return ResponseEntity.ok(result);
 	}
+	
+	//找全部房東
 	@GetMapping("/admins/hosts")
 	public List<Host> getAllHost(){
 		return service.findAllHosts();
+	}
+	//更改權限
+	@PatchMapping("/admins/hosts/updatePermission")
+	public ResponseEntity<?> updatePermission(@RequestBody Map<String, Object> data){
+		try {
+			String status = (String) data.get("status");
+			String email = (String) data.get("email");
+			service.permission(status, email);
+			return ResponseEntity.ok(Map.of("message","success"));
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
 	}
 	
 }

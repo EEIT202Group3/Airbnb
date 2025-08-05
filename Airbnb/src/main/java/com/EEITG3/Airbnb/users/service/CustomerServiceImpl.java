@@ -97,11 +97,11 @@ public class CustomerServiceImpl implements CustomerService {
 		//看前端傳來的指令是什麼，執行對應動作
 		switch (status){
 		case "ACTIVE": {
-			customer.setIsActive(true);
+			customer.setActive(true);
 			break;
 		}
 		case "SUSPEND": {
-			customer.setIsActive(false);
+			customer.setActive(false);
 			break;
 		}
 		default:
