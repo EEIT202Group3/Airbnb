@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.EEITG3.Airbnb.users.repository.UserAdminRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,6 +49,17 @@ public class AdminServiceImpl implements AdminService {
 		ObjectNode adminNode = objectMapper.convertValue(admin, ObjectNode.class);
 		adminNode.setAll(patchNode);
 		return objectMapper.convertValue(adminNode, Admin.class);
+	}
+
+	@Override
+	public Admin currentAdmin(UserDetails userDetails) {
+		String adminId = userDetails.getUsername();
+		Optional<Admin> temp = repo.findById(adminId);
+		if(!temp.isPresent()) {
+			throw new RuntimeException("找不到管理者");
+		}
+		Admin admin = temp.get();
+		return admin;
 	}
 
 	

@@ -1,5 +1,6 @@
 package com.EEITG3.Airbnb.users.service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
@@ -22,5 +23,6 @@ public interface HostService {
 	
 	//後台功能
 	//找全部房東
+	List<Host> findAllHosts();
 	//停權、啟用
 }
