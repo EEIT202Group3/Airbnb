@@ -33,9 +33,8 @@ public class Order implements java.io.Serializable {
 		@JoinColumn(name = "list_id")
 		private LisBean listing;              // 房源ID (外來鍵)
 
-		@ManyToOne(fetch = FetchType.LAZY)
-		@JoinColumn(name = "customer_id")
-		private Customer customer;
+		@Column(name = "customer_id")
+		private String customerId;
 
 	    @Column(name = "reservation_id")
 	    private Integer reservationId;     // 租車ID (外來鍵)
@@ -110,8 +109,8 @@ public class Order implements java.io.Serializable {
 		public LisBean getListing() {return listing;}
 		public void setListing(LisBean listing) {this.listing = listing;}
 
-		public Customer getCustomer() {return customer;}
-		public void setCustomer(Customer customer) {this.customer = customer;}
+		public String getCustomerId() {return customerId;}
+		public void setCustomerId(String customerId) {this.customerId = customerId;}
 
 		public Integer getReservationid() {return reservationId;}
 		public void setReservationid(Integer reservationId) {this.reservationId = reservationId;}

@@ -40,7 +40,8 @@ public class ListingController {
         return listingService.findAll();
     }
 
-    //根據host_id查詢(ID、房名、圖片1) 房東房源查詢列表
+
+    //根據host_id查詢(ID、房名、圖片1)
     @GetMapping("/host/{hostId}")
     public List<Map<String, Object>> getListingsByHostId(@PathVariable UUID hostId) {
         List<LisBean> list = listRepository.findByHostId(hostId);

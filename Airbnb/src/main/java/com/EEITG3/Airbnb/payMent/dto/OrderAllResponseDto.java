@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class OrderAllResponseDto {
+	private String bookingId;
 	private String username;
     private String housename;
     private String address;
@@ -14,6 +15,15 @@ public class OrderAllResponseDto {
     private LocalDateTime checkindate;
     private LocalDateTime checkoutdate;
     private BigDecimal totalamount;
+    
+    
+    
+	public String getBookingId() {
+		return bookingId;
+	}
+	public void setBookingId(String bookingId) {
+		this.bookingId = bookingId;
+	}
 	public String getUsername() {
 		return username;
 	}

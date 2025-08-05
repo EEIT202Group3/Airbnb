@@ -1,24 +1,22 @@
 package com.EEITG3.Airbnb.reviews.controller;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EEITG3.Airbnb.reviews.model.Review;
 import com.EEITG3.Airbnb.reviews.model.ReviewService;
@@ -31,61 +29,109 @@ public class ReviewController {
 	 * reviews Controller
 	 */
 
-    @Autowired
+	@Autowired
 	private ReviewService rService;
-    
-    @GetMapping
-    public List<Review> getAllReviews() {
-        return rService.findAll();
-    }
-    
-    @GetMapping("/get/{id}")
-    public Review getReviewById(@PathVariable Integer id) {
-        return rService.findByReviewID(id); // 找不到可回 null 或拋異常
-    }
-	
-    
-    @DeleteMapping("/del/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Integer id) {
-    	System.out.println("此api接收參數:" +id);
-        try {
-        	rService.deleteById(id);
-        	return ResponseEntity.ok("刪除成功");
-        } catch (Exception e) {            
-        	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("刪除失敗: " + e.getMessage());
 
+	@GetMapping
+	public List<Review> getAllReviews() {
+		List<Review> reviews = rService.findAll();
+		for (Review r : reviews) {
 		}
-    }
-    
-    @PostMapping("/insert")
-    public Review createReview(@RequestBody Review review) {
-        return rService.save(review);
-    }
-    
-    @PutMapping("/update/{id}")
-    @ResponseBody
-    public ResponseEntity<?> updateReview(@PathVariable Integer id, @RequestBody Map<String, Object> reviewData) throws ParseException {
-    	
-    	try {
+		return rService.findAll();
+	}
 
-        	System.out.println("收到的review :" +reviewData);
-        	Review review = rService.findByReviewID(id);
-        	review.setBookingId((String)reviewData.get("bookingId"));
-        	review.setListId((int)reviewData.get("listId"));
-        	review.setUserId((String) reviewData.get("userId"));
-        	review.setCleanScore((int)reviewData.get("cleanScore"));
-        	review.setCommScore((int)reviewData.get("commScore"));
-        	review.setValueScore((int)reviewData.get("valueScore"));
-        	review.setCus_comm((String)reviewData.get("comment"));
-        	String dateStr = (String) reviewData.get("reviewDate");
-        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        	Date date = sdf.parse(dateStr); // 這裡會拋出 ParseException，記得 try-catch
-        	review.setReview_date(date);
-        	rService.save(review);
-        	return ResponseEntity.ok("更新成功");
+	@GetMapping("/listing")
+	public List<Review> getAllReviewsByList(Integer id) {
+		List<Review> reviews = rService.findByListId(id);
+		return rService.findByListId(id);
+	}
+
+	@GetMapping("/get/{id}")
+	public Review getReviewById(@PathVariable Integer id) {
+		return rService.findByReviewID(id); // 找不到可回 null 或拋異常
+	}
+
+	@DeleteMapping("/del/{id}")
+	public ResponseEntity<?> deleteById(@PathVariable Integer id) {
+		System.out.println("此api接收參數:" + id);
+		try {
+			rService.deleteById(id);
+			return ResponseEntity.ok("刪除成功");
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("更新失敗: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("刪除失敗: " + e.getMessage());
+
 		}
-    }
+	}
+
+
+	/*
+	 * 呼叫service.insert 傳入參數，儲存review對象進行 repo.save(reviews) 用util 處理上傳圖片
+	 */
+
+	@PostMapping("/insert")
+	public ResponseEntity<?> insertReview(
+		@RequestParam Integer listId, 
+		@RequestParam String bookingId,
+		@RequestParam String custId, 
+		@RequestParam String hostId,
+		@RequestParam int cleanScore, 
+		@RequestParam int commScore, 
+		@RequestParam int valueScore,
+		@RequestParam String custComm, 
+		@RequestPart(required = false) List<MultipartFile> images // 可上傳多張圖片
+	) {
+		return rService.insertReview(listId, bookingId, custId, hostId, cleanScore, commScore, valueScore, custComm,
+				images);
+	}
+/*
+	@PutMapping("/update/{id}")
+	public ResponseEntity<?> updateReview(
+			@PathVariable("id") Integer reviewId,
+			@RequestParam Integer listId, 
+			@RequestParam String bookingId,
+			@RequestParam String custId, 
+			@RequestParam String hostId,
+			@RequestParam String reviewDate,
+			@RequestParam int cleanScore, 
+			@RequestParam int commScore, 
+			@RequestParam int valueScore,
+			@RequestParam String cusComm,
+			@RequestParam String hostComm
+			){
+		System.out.println(reviewId +" " + listId + bookingId + custId + hostId + reviewDate + cleanScore + " " + commScore + " " + valueScore + cusComm);
+		
+		return rService.updateReview(reviewId,listId, bookingId, custId, hostId, cleanScore, commScore, valueScore, cusComm, hostComm);
+	}*/
+	/*
+	@PatchMapping(value = "/update/{id}")
+	public ResponseEntity<?> patchReview(
+		@PathVariable("id") Integer reviewId, 
+	    @RequestPart("cleanScore") int cleanScore,
+	    @RequestPart("commScore") int commScore,
+	    @RequestPart("valueScore") int valueScore,
+	    @RequestPart("cusComm") String cusComm,
+	    @RequestPart("hostComm") String hostComm,
+	    @RequestPart(value = "image", required = false) List<MultipartFile> images
+	) {
+	    System.out.println(reviewId + " " + cleanScore + " " + commScore + " " + valueScore 
+	                       + " " + cusComm + " " + hostComm);
+	    
+	    return rService.patchReview(reviewId, cleanScore, commScore, valueScore, cusComm, hostComm, images);
+	}
+*/
+	
+	@PatchMapping(value= "/update/{id}")
+	public ResponseEntity<?> patchReview(
+			@PathVariable("id") Integer reviewId,
+			@RequestParam int cleanScore, 
+			@RequestParam int commScore, 
+			@RequestParam int valueScore,
+			@RequestParam String cusComm,
+			@RequestParam String hostComm){
+		
+		  return rService.patchReview(reviewId, cleanScore, commScore, valueScore, cusComm, hostComm);
+		
+	}
+	
     
 }

@@ -143,7 +143,6 @@ public class ListingService {
             List<Integer> equipmentIds
     ) throws IOException {
 
-        
         if (photos != null && !photos.isEmpty()) {
             List<String> photoUrls = new ArrayList<>();
             String storageDir = "/Users/youm/pohto/";
@@ -158,7 +157,6 @@ public class ListingService {
                 }
             }
 
-            
             lisBean.setPhoto1(photoUrls.size() > 0 ? photoUrls.get(0) : null);
             lisBean.setPhoto2(photoUrls.size() > 1 ? photoUrls.get(1) : null);
             lisBean.setPhoto3(photoUrls.size() > 2 ? photoUrls.get(2) : null);
@@ -171,7 +169,7 @@ public class ListingService {
             lisBean.setPhoto10(photoUrls.size() > 9 ? photoUrls.get(9) : null);
         }
 
-        
+
         List<EquipmentBean> equipmentList = new ArrayList<>();
         for (Integer eid : equipmentIds) {
             EquipmentBean equip = em.find(EquipmentBean.class, eid);
@@ -182,7 +180,5 @@ public class ListingService {
         
         listRepository.save(lisBean);
     }
-
- 
 
 }
