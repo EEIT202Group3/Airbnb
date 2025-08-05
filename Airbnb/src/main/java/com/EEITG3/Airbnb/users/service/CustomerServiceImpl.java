@@ -87,9 +87,9 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 	
 	@Override
-	public Customer permission(String status, String customerId) {
+	public Customer permission(String status, String customerEmail) {
 		//先找到客戶
-		Optional<Customer> temp = repo.findById(customerId);
+		Optional<Customer> temp = repo.findCustomerByEmail(customerEmail);
 		Customer customer = new Customer();
 		if(temp.isPresent()) {
 			customer = temp.get();
