@@ -12,7 +12,9 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
     Reservation findByDriverPhone(String driverPhone);
 
+
     Reservation findByLicense(String license);
+
 
     @Query(value = """
                 SELECT r.* FROM reservations r
@@ -24,6 +26,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
             @Param("plateNo") String plateNo,
             @Param("targetDate") LocalDate targetDate
     );
+
 
     @Query(value = """
                 SELECT * FROM reservations r
@@ -38,4 +41,44 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
             @Param("returnDate") LocalDateTime returnDate,
             @Param("reservationId") Integer reservationId
     );
+
+
+    @Query(value = """  
+                SELECT COUNT(*) FROM reservations 
+                WHERE pickup_date > CURRENT_TIMESTAMP 
+                AND status NOT IN ('取消', '完成訂單')
+            """, nativeQuery = true)
+    Integer countUpcomingReservations();
+
+
+    @Query(value = """
+                SELECT COUNT(*) FROM reservations  
+                WHERE pickup_date <= CURRENT_TIMESTAMP 
+                AND return_date >= CURRENT_TIMESTAMP
+                AND status NOT IN ('取消', '完成訂單')
+            """, nativeQuery = true)
+    Integer countOngoingReservations();
+
+
+    @Query(value = """
+                SELECT COUNT(*) FROM reservations
+                WHERE return_date <= CURRENT_TIMESTAMP
+                AND status = '完成訂單'
+            """, nativeQuery = true)
+    Integer countReturnedToday();
+
+
+    @Query(value = """
+                SELECT COUNT(*) FROM reservations
+                WHERE return_date < CURRENT_TIMESTAMP
+                AND status NOT IN ('完成訂單', '取消')
+            """, nativeQuery = true)
+    Integer countOverdueReservations();
+
+
+    @Query(value = """
+                SELECT COUNT(*) FROM reservations
+                WHERE status = '取消'
+            """, nativeQuery = true)
+    Integer countCancelledReservations();
 }

@@ -1,12 +1,16 @@
 package com.EEITG3.Airbnb.carRent.controller;
 
 import com.EEITG3.Airbnb.carRent.entity.Reservation;
+import com.EEITG3.Airbnb.carRent.entity.Vehicle;
 import com.EEITG3.Airbnb.carRent.service.ReservationService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/reservations")
@@ -59,6 +63,13 @@ public class ReservationController {
         return rService.findByLicense(license);
     }
 
+    @GetMapping("/car-select")
+    public List<Vehicle> findRentableVehicle(
+            @RequestParam("pickupDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime pickupDateTime,
+            @RequestParam("returnDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime returnDateTime) {
+        return rService.findRentableVehicle(pickupDateTime, returnDateTime);
+    }
+
     @GetMapping("/search")
     public Reservation search(@RequestParam String type, @RequestParam String query) {
         try {
@@ -78,4 +89,8 @@ public class ReservationController {
         return rService.findById(id);
     }
 
+    @GetMapping("/dashboard")
+    public Map<String, Integer> reservationDashBoard(){
+        return rService.reservationDashBoard();
+    }
 }

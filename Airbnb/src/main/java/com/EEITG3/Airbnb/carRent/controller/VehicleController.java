@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +19,9 @@ import java.util.UUID;
 @CrossOrigin(origins = "*")
 public class VehicleController {
     private final VehicleService vService;
-    private final VehicleRepository vehicleRepository;
 
     public VehicleController(VehicleService vService, VehicleRepository vehicleRepository) {
         this.vService = vService;
-        this.vehicleRepository = vehicleRepository;
     }
 
     @PostMapping("/insert")
@@ -40,25 +35,11 @@ public class VehicleController {
 
     @PutMapping("/update")
     public Vehicle update(@RequestBody Vehicle vehicle) {
-        Vehicle original = vehicleRepository.findById(vehicle.getVehicleId())
-                .orElseThrow(() -> new RuntimeException("找不到車輛"));
-        original.setPlateNo(vehicle.getPlateNo());
-        original.setBrand(vehicle.getBrand());
-        original.setModel(vehicle.getModel());
-        original.setColor(vehicle.getColor());
-        original.setFuelType(vehicle.getFuelType());
-        original.setTransmission(vehicle.getTransmission());
-        original.setSeatCapacity(vehicle.getSeatCapacity());
-        original.setFuelCapacity(vehicle.getFuelCapacity());
-        original.setVehicleTax(vehicle.getVehicleTax());
-        original.setDailyRent(vehicle.getDailyRent());
-        original.setMileage(vehicle.getMileage());
-        original.setLatitude(vehicle.getLatitude());
-        original.setLongitude(vehicle.getLongitude());
-        original.setStatus(vehicle.getStatus());
-        original.setImage(vehicle.getImage());
-        System.out.println("接收到的圖片檔名：" + vehicle.getImage());
-        return vehicleRepository.save(original);
+        try {
+            return vService.update(vehicle);
+        } catch (Exception e) {
+            throw new RuntimeException("修改失敗：" + e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete/{id}")

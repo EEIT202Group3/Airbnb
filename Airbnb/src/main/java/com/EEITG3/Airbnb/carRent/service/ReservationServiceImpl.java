@@ -1,21 +1,27 @@
 package com.EEITG3.Airbnb.carRent.service;
 
 import com.EEITG3.Airbnb.carRent.entity.Reservation;
+import com.EEITG3.Airbnb.carRent.entity.Vehicle;
 import com.EEITG3.Airbnb.carRent.repository.ReservationRepository;
+import com.EEITG3.Airbnb.carRent.repository.VehicleRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository rRepository;
+    private final VehicleRepository vRepository;
 
-    public ReservationServiceImpl(ReservationRepository rRepository) {
+    public ReservationServiceImpl(ReservationRepository rRepository, VehicleRepository vRepository) {
         this.rRepository = rRepository;
+        this.vRepository = vRepository;
     }
 
     @Override
@@ -68,6 +74,14 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public List<Vehicle> findRentableVehicle(LocalDateTime pickupDateTime, LocalDateTime returnDateTime) {
+        if (pickupDateTime == null || returnDateTime == null || !pickupDateTime.isBefore(returnDateTime)) {
+            throw new IllegalArgumentException("時間區間不正確");
+        }
+        return vRepository.findRentableVehicle(pickupDateTime, returnDateTime);
+    }
+
+    @Override
     public List<Reservation> findAll() {
         return rRepository.findAll();
     }
@@ -86,8 +100,18 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public void checkVehicleAvailable(Integer vehicleId, LocalDateTime pickup, LocalDateTime ret, Integer reservationId) {
         List<Reservation> conflicts = rRepository.findConflictingReservations(vehicleId, pickup, ret, reservationId);
-        if(!conflicts.isEmpty()) {
-            throw  new RuntimeException("車輛在所選時間已被預約");
+        if (!conflicts.isEmpty()) {
+            throw new RuntimeException("車輛在所選時間已被預約");
         }
+    }
+
+    public Map<String, Integer> reservationDashBoard() {
+        Map<String, Integer> map = new LinkedHashMap<>();
+        map.put("已預定", Optional.ofNullable(rRepository.countUpcomingReservations()).orElse(0));
+        map.put("出租中", Optional.ofNullable(rRepository.countOngoingReservations()).orElse(0));
+        map.put("已還車", Optional.ofNullable(rRepository.countReturnedToday()).orElse(0));
+        map.put("逾期", Optional.ofNullable(rRepository.countOverdueReservations()).orElse(0));
+        map.put("取消", Optional.ofNullable(rRepository.countCancelledReservations()).orElse(0));
+        return map;
     }
 }

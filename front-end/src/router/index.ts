@@ -1,51 +1,45 @@
-import { createRouter, createWebHistory } from 'vue-router'
-
-import CarRentFrontHomepage from "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue";
-import CarSelect from "@/components/carRent/frontpageComponent/CarSelect.vue";
-import CarDetail from "@/components/carRent/frontpageComponent/CarDetail.vue";
-import CarRentBackHomepage from "@/components/carRent/backpageComponent/CarRentBackHomepage.vue";
-import CarRentReservation from "@/components/carRent/backpageComponent/CarRentReservation.vue";
-import Vehicle from "@/components/carRent/backpageComponent/Vehicle.vue";
-
+import {createRouter, createWebHistory} from 'vue-router'
 
 const routes = [
-  {
-    path: '/car-rent',
-    name: 'CarRentFrontHomepage',
-    component: CarRentFrontHomepage
-  },
-  {
-    path: '/car-rent/car-select',
-    name: 'CarSelect',
-    component: CarSelect
-  },
-  {
-    path: '/car-rent/car-detail',
-    name: 'CarDetail',
-    component: CarDetail,
-    props: true
-  },
-  {
-    path: '/car-rent/back-homepage',
-    name: 'CarRentBackHomepage',
-    component:CarRentBackHomepage
-  },
-  {
-    path: "/car-rent/reservations/:id",
-    name: "CarRentReservationDetail",
-    component: CarRentReservation,
-    props: true
-  },
-  {
-    path: "/car-rent/vehicles/:id",
-    name: "VehicleDetail",
-    component: Vehicle,
-    props: true
-  }
+    {
+        path: '/car-rent/front-homepage',
+        component: () => import('@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue'),
+        children: [
+            {
+                path: 'car-select',
+                name: 'CarSelect',
+                component: () => import('@/components/carRent/frontpageComponent/CarSelect.vue')
+            },
+            {
+                path: 'car-detail/:id',
+                name: 'CarDetail',
+                component: () => import('@/components/carRent/frontpageComponent/CarDetail.vue'),
+                props: true
+            }
+        ]
+    },
+    {
+        path: '/car-rent/back-homepage',
+        component: () => import('@/components/carRent/backpageComponent/CarRentBackHomepage.vue'),
+        children: [
+            {
+                path: 'reservations/:id',
+                name: 'CarRentReservationDetail',
+                component: () => import('@/components/carRent/backpageComponent/CarRentReservation.vue'),
+                props: true
+            },
+            {
+                path: 'vehicles/:id',
+                name: 'VehicleDetail',
+                component: () => import('@/components/carRent/backpageComponent/Vehicle.vue'),
+                props: true
+            }
+        ]
+    }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
+    history: createWebHistory(),
+    routes
 })
 export default router;

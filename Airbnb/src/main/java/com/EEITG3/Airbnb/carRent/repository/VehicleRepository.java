@@ -15,7 +15,7 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Integer> {
     @Query("""
                 SELECT v FROM Vehicle v
                 WHERE v.vehicleId NOT IN (
-                    SELECT v.vehicleId FROM Reservation r
+                    SELECT r.vehicle.vehicleId FROM Reservation r
                     WHERE NOT (
                         r.returnDate <= :pickupDateTime OR r.pickupDate >= :returnDateTime
                     )
@@ -25,4 +25,5 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Integer> {
             @Param("pickupDateTime") LocalDateTime pickupDateTime,
             @Param("returnDateTime") LocalDateTime returnDateTime
     );
+
 }

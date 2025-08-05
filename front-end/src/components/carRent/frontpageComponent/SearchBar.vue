@@ -13,17 +13,27 @@ const formData = reactive({
 })
 
 function onSubmit() {
+  const pickupDateTime = formData.pickupDate && formData.pickupTime
+      ? formData.pickupDate + 'T' + formData.pickupTime
+      : null;
+  const returnDateTime = formData.returnDate && formData.returnTime
+      ? formData.returnDate + 'T' + formData.returnTime
+      : null;
+
+  if (!pickupDateTime || !returnDateTime) {
+    alert("請填寫完整的日期與時間");
+    return;
+  }
+
   router.push({
-    path: '/car-rent/car-Select',
+    path: '/car-rent/front-homepage/car-select',
     query: {
       location: formData.location,
-      pickupDate: formData.pickupDate,
-      pickupTime: formData.pickupTime,
-      returnDate: formData.returnDate,
-      returnTime: formData.returnTime,
+      pickupDateTime,
+      returnDateTime,
       ageChecked: formData.ageChecked ? 'true' : 'false'
     }
-  })
+  });
 }
 
 const timeOptions = computed(function () {
