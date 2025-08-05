@@ -5,6 +5,7 @@ import com.EEITG3.Airbnb.carRent.entity.Vehicle;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface VehicleService {
     //<車輛>
@@ -30,4 +31,6 @@ public interface VehicleService {
     //刪除
     public Integer deleteById(Integer id) throws Exception;
 
+//    chart.js圓餅圖
+    public Map<String, Integer> getVehicleStatusSummary();
 }

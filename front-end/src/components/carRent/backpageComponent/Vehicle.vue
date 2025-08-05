@@ -266,9 +266,9 @@ const deleteVehicle = async () => {
                 <td>
                   <span v-if="!isEditing">{{ vehicle.status }}</span>
                   <select v-else class="form-select input-short editable" v-model="vehicle.status">
-                  <option value="可租用">可用</option>
-                  <option value="已預約">維修中</option>
-                  <option value="維修中">下架</option>
+                  <option value="可租用">可租用</option>
+                  <option value="維修中">維修中</option>
+                  <option value="下架">下架</option>
                   </select>
                 </td>
               </tr>
