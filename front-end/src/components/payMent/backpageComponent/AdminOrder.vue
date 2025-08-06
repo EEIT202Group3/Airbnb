@@ -13,7 +13,7 @@
             type="input"
           ></v-text-field>
 
-          <v-btn class="search-btn" @click="fetchOrders">查詢</v-btn>
+          <v-btn class="search-btn" @click="fetchOrders()">查詢</v-btn>
         </div>
 
         <!-- 顯示訂單表格 -->
@@ -133,6 +133,7 @@ const orderDetail = ref<any | null>(null);
 const detailDialog = ref(false);
 
 //查詢訂單明細
+//Service
 async function fetchOrderDetail(bookingId: string) {
   try {
     const res = await axios.get("/admingetorderdetail/admindetail", {
@@ -146,6 +147,7 @@ async function fetchOrderDetail(bookingId: string) {
   }
 }
 //查詢全部
+//2
 const headers = [
   { title: "用戶名稱", key: "username" },
   { title: "房源名稱", key: "housename" },
@@ -160,15 +162,18 @@ const headers = [
   { title: "明細", key: "actions", sortable: false },
 ];
 
+//Service
 async function fetchOrders() {
   if (!customerId.value) {
     alert("請輸入用戶 ID");
     return;
   }
   try {
-    const res = await axios.get("/admingetorderdetail/adminbyCustomer", {
+    const res = await axios.get("api", {
       params: { customerId: customerId.value },
+      withCredentials: true,
     });
+    console.log(res);
     orders.value = Array.isArray(res.data) ? res.data : [];
   } catch (error) {
     console.error("查詢失敗", error);
@@ -179,25 +184,33 @@ async function fetchOrders() {
   }
 }
 
+//2
 function formatDate(dateString: string) {
   if (!dateString) return "";
   return dateString.split("T")[0];
 }
 
+//1
 function clearOrders() {
   orders.value = [];
   searched.value = false;
 }
 
+//2
 const bookingStatusOptions = ["待入住", "已入住", "已完成", "已取消"];
 const bookingMethodOptions = ["現金", "信用卡", "Line Pay"];
+//2
 const mentStatusOptions = ["待付款", "已付款"];
 
+//2
 const newBookingStatus = ref("");
 const newBookingMethod = ref("");
+
+//2
 const newMentStatus = ref("");
 
 // 更新訂單狀態
+//Service
 async function updateBookingStatus() {
   try {
     await axios.post("/admingetorderdetail/updatebookingstatus", null, {
@@ -214,6 +227,7 @@ async function updateBookingStatus() {
   }
 }
 // 更新付款狀態
+//Service
 async function updateMentStatus() {
   try {
     await axios.post("/admingetorderdetail/updatementstatus", null, {
