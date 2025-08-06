@@ -93,6 +93,9 @@ async function login() {
       <v-list-item to="/hosts"
         ><v-icon icon="mdi-home-account"></v-icon>房東</v-list-item
       >
+        <v-list-item to="/addEquipment"
+        ><v-icon icon="mdi-home-account"></v-icon>新增房源</v-list-item
+      >
       <v-list-item to="/AdminOrder"
         ><v-icon icon="mdi-invoice-text-multiple-outline"></v-icon
         >訂單管理系統</v-list-item
