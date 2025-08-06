@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 將 /images/** 映射到本機磁碟位置
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:/Users/youm/pohto/")
+                .addResourceLocations("file:D:/pohto/")
                 .setCachePeriod(3600); 
     }
 }

@@ -19,7 +19,7 @@ public class EquipmentController {
     private EquipmentService equipmentService;
 
     //查詢全部設備
-    @GetMapping("/admins/equipment/all")
+    @GetMapping("/equipment/all")
     public List<EquipmentBean> getAllEquipments() {
         return equipmentService.getAllEquipments();
     }

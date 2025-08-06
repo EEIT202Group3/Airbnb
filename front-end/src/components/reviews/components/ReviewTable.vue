@@ -213,7 +213,7 @@ const viewReview = async (item) => {
   loading.value = true;
   try {
     const resp = await axios.get(
-      `http://localhost:8080/api/reviews/get/${id}`
+      `http://localhost:8080/api/admins/reviews/get/${id}`
       , { withCredentials: true }
     );
     selectedReview.value = resp.data;
@@ -251,7 +251,7 @@ const update = async (item) => {
   console.log("update", id);
   try {
     const resp = await axios.get(
-      `http://localhost:8080/api/reviews/get/${id}`,
+      `http://localhost:8080/api/admins/reviews/get/${id}`,
       { withCredentials: true }
     );
     selectedReview.value = resp.data;
@@ -284,7 +284,7 @@ const updateConfirm = async (item) => {
   console.log(u);
   try {
     const res = await axios.patch(
-      `http://localhost:8080/api/reviews/update/${u.reviewId}`,
+      `http://localhost:8080/api/admins/reviews/update/${u.reviewId}`,
       formData,
       { withCredentials: true }
     );
