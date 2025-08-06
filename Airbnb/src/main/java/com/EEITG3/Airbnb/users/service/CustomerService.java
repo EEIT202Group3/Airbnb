@@ -27,5 +27,5 @@ public interface CustomerService {
 	//找全部客戶
 	List<Customer> findAllCustomers();
 	//停權、啟用
-	Customer permission(String status,String customerId);
+	Customer permission(String status,String customerEmail);
 }

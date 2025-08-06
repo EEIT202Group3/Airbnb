@@ -80,18 +80,28 @@ public class CustomerController {
 		}
 	}
 	
+	//找個人資料
+	@GetMapping("/customers/current")
+	public Customer getCurrentCustomer(@AuthenticationPrincipal CustomerDetails customerDetails) {
+		return service.currentCustomer(customerDetails);
+	}
+	
 	//找全部客戶資料
 	@GetMapping("/admins/customers")
 	public List<Customer> getAllCustomers(){
 		return service.findAllCustomers();
 	}
 	
-	//找目前客戶的資料
-	@GetMapping("/customers/current")
-	public Customer getCurrentCustomer(@AuthenticationPrincipal CustomerDetails customerDetails) {
-		return service.currentCustomer(customerDetails);
-	}
-	
-
-	
+	//更改權限
+	@PatchMapping("/admins/customers/updatePermission")
+	public ResponseEntity<?> updatePermission(@RequestBody Map<String, Object> data){
+		try {
+			String status = (String) data.get("status");
+			String email = (String) data.get("email");
+			service.permission(status, email);
+			return ResponseEntity.ok(Map.of("message","success"));
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
+	}	
 }

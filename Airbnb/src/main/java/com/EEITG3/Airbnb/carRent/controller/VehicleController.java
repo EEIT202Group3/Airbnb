@@ -107,4 +107,10 @@ public class VehicleController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/status-summary")
+    public Map<String, Integer> getStatusSummary() {
+        return vService.getVehicleStatusSummary();
+    }
+
 }

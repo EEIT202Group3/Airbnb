@@ -12,6 +12,7 @@ const routes = [
             },
             {
                 path: 'customers',
+                name:'CustomerList',
                 component: () => import('@/components/users/CustomerList.vue')
             },
             {

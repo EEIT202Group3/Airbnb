@@ -3,8 +3,18 @@ import Sidebar from "@/components/carRent/backpageComponent/Sidebar.vue";
 import {ref, onMounted} from "vue";
 import {useRoute} from "vue-router";
 import router from "@/router";
-
+import { watch } from "vue";
 import api from "@/api";
+import {
+  Chart,
+  DoughnutController,
+  ArcElement,
+  Tooltip,
+  Legend,
+  Title
+} from "chart.js";
+
+Chart.register(DoughnutController, ArcElement, Tooltip, Legend, Title);
 
 const route = useRoute();
 const showSidebar = ref(false);
@@ -68,6 +78,64 @@ onMounted(async () => {
     reservationSummary.value = res.data;
   } catch (err) {
     console.error("取得 dashboard 資料失敗：", err);
+  }
+});
+
+// 車輛圓餅圖
+const chartCanvas = ref<HTMLCanvasElement | null>(null);
+let chartInstance: Chart | null = null;
+
+const loadVehicleStatusChart = async () => {
+  try {
+    const res = await api.get("/vehicles/status-summary");
+    const summary = res.data;
+
+    const labels = Object.keys(summary);
+    const data = Object.values(summary);
+
+    if (chartInstance) {
+      chartInstance.destroy(); // 避免重複畫
+    }
+
+    chartInstance = new Chart(chartCanvas.value!, {
+      type: "doughnut",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "車輛狀態",
+            data,
+            backgroundColor: [
+              "#198754", // 可租用
+              "#0d6efd", // 維修中
+              "#dc3545", // 下架
+            ],
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom"
+          }
+        }
+      }
+    });
+  } catch (err) {
+    console.error("載入車輛統計失敗", err);
+  }
+};
+
+onMounted(() => {
+  loadVehicleStatusChart();
+});
+
+// 回首頁重新執行圖表
+watch(() => route.path, (newPath) => {
+  if (newPath === "/car-rent/back-homepage") {
+    loadVehicleStatusChart();
   }
 });
 </script>
@@ -136,22 +204,12 @@ onMounted(async () => {
               <div class="d-flex justify-content-between">
                 <h6 class="card-title">車輛資訊</h6>
                 <select class="form-select form-select-sm w-auto">
-                  <option>All Vehicle Types</option>
+                  <option>所有車種</option>
                 </select>
               </div>
-              <div class="my-3 text-center">
-                <div
-                    style="width: 160px; height: 160px; margin: 0 auto; background-color: #eee; border-radius: 50%; line-height: 160px;">
-                  **串Chart.js
-                </div>
+              <div class="chart-wrapper">
+                <canvas ref="chartCanvas"></canvas>
               </div>
-              <ul class="list-unstyled small">
-                <li><span class="badge bg-success me-2">&nbsp;</span>可租用</li>
-                <li><span class="badge bg-primary me-2">&nbsp;</span>維修中</li>
-                <li><span class="badge bg-info me-2">&nbsp;</span>停用</li>
-                <li><span class="badge bg-warning me-2">&nbsp;</span>已出租</li>
-                <li><span class="badge bg-danger me-2">&nbsp;</span>下架</li>
-              </ul>
             </div>
           </div>
         </div>
@@ -218,5 +276,15 @@ onMounted(async () => {
   margin: auto;
   padding: 20px;
   width: calc(100% - 200px);
+}
+
+.chart-wrapper {
+  max-width: 250px;
+  margin: auto;
+}
+
+canvas {
+  width: 100% !important;
+  height: auto !important;
 }
 </style>

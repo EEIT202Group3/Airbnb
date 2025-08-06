@@ -1,26 +1,40 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { getCurrentAdmin } from "@/service/user/AdminService";
-import { useRouter } from "vue-router";
+
+import { ref,onMounted } from 'vue';
+import { getCurrentAdmin } from '@/service/user/AdminService';
+import { useRouter } from 'vue-router';
+import { useAdminStore } from '@/stores/user/adminStore';
 const loginDialog = ref(false);
+const adminStore = useAdminStore();
 const formData = ref({
   adminId: "",
   password: "",
 });
-const adminDetails = ref(null);
 const router = useRouter();
 
-async function logout() {
-  try {
-    const response = await fetch("http://localhost:8080/api/admins/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    if (response.ok) {
-      adminDetails.value = null;
-      alert("登出成功");
-    } else {
-      alert("登出失敗");
+onMounted(async()=>{
+    if(!adminStore.admin){
+        const result = await getCurrentAdmin();
+        adminStore.admin = result;
+    }
+})
+
+async function logout(){
+    try {
+        const response = await fetch('http://localhost:8080/api/admins/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        if (response.ok) {
+            adminStore.admin=null;
+            alert("登出成功");
+        } else {
+            alert("登出失敗");
+        }
+        router.push({name:'Homepage'})
+    } catch (error) {
+        console.error("登出錯誤：", error);
+
     }
     router.push({ name: "Homepage" });
   } catch (error) {
@@ -28,22 +42,27 @@ async function logout() {
   }
 }
 async function login() {
-  loginDialog.value = false;
-  try {
-    const response = await fetch("http://localhost:8080/api/admins/login", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        adminId: formData.value.adminId,
-        password: formData.value.password,
-      }),
-    });
-    if (response.ok) {
-      adminDetails.value = await getCurrentAdmin();
-      router.push({ name: "Homepage" });
+    loginDialog.value = false;
+    try {
+        const response = await fetch('http://localhost:8080/api/admins/login', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                adminId: formData.value.adminId,
+                password: formData.value.password
+            })
+        });
+        if(response.ok){
+            adminStore.admin = await getCurrentAdmin();
+            router.push({name:'Homepage'});
+        }
+    } catch (error) {
+        console.error("發生錯誤：", error);
+        alert('無法連線後端伺服器');
+        router.push({name:'Homepage'});
     }
   } catch (error) {
     console.error("發生錯誤：", error);
@@ -109,6 +128,7 @@ async function login() {
       </form>
     </v-card>
   </v-dialog>
+
 </template>
 <style scoped>
 </style>

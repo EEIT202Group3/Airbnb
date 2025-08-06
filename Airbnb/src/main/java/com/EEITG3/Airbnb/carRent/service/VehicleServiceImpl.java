@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +105,24 @@ public class VehicleServiceImpl implements VehicleService {
         vRepository.deleteById(id);
         System.out.println("成功刪除ID:" + id);
         return id;
+    }
+
+    @Override
+    public Map<String, Integer> getVehicleStatusSummary() {
+        List<Vehicle> vehicles = vRepository.findAll();
+
+        Map<String, Integer> summary = new LinkedHashMap<>(); // 保持順序
+        summary.put("可租用", 0);
+        summary.put("維修中", 0);
+        summary.put("下架", 0);
+
+        for (Vehicle v : vehicles) {
+            String status = v.getStatus();
+            if (status != null && summary.containsKey(status)) {
+                summary.put(status, summary.get(status) + 1);
+            }
+        }
+        return summary;
     }
 
     public void checkPlateNoAvailable(String plateNo, Integer excludeId) {

@@ -10,3 +10,21 @@ export async function getAllCustomers() {
     }
     return await response.json();
 }
+
+export async function permission(status, customerEmail) {
+    const data = {
+        'status': status,
+        'email': customerEmail
+    }
+    const response = await fetch(`${BASE_URL}/api/admins/customers/updatePermission`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    if (response.status === 400) {
+        alert('請求錯誤');
+        return null;
+    }
+    return await response.json();
+}

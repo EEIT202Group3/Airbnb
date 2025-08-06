@@ -87,9 +87,9 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 	
 	@Override
-	public Customer permission(String status, String customerId) {
+	public Customer permission(String status, String customerEmail) {
 		//先找到客戶
-		Optional<Customer> temp = repo.findById(customerId);
+		Optional<Customer> temp = repo.findCustomerByEmail(customerEmail);
 		Customer customer = new Customer();
 		if(temp.isPresent()) {
 			customer = temp.get();
@@ -97,11 +97,11 @@ public class CustomerServiceImpl implements CustomerService {
 		//看前端傳來的指令是什麼，執行對應動作
 		switch (status){
 		case "ACTIVE": {
-			customer.setIsActive(true);
+			customer.setActive(true);
 			break;
 		}
 		case "SUSPEND": {
-			customer.setIsActive(false);
+			customer.setActive(false);
 			break;
 		}
 		default:
