@@ -1,14 +1,21 @@
+import axios from "axios";
+
 const BASE_URL = 'http://localhost:8080';
 export async function getAllCustomers() {
-    const response = await fetch(`${BASE_URL}/api/admins/customers`, {
-        method: 'GET',
-        credentials: 'include',
-    });
-    if (response.status === 401 || response.status === 403) {
-        alert('請先登入');
-        return null;
+    try {
+        const response = await axios.get(`${BASE_URL}/api/admins/customers`, {
+            withCredentials: true,
+        });
+        return response.data
+    } catch (error) {
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            alert('請先登入');
+            return null;
+        } else {
+            console.error('取得客戶資料失敗', error);
+            throw error;
+        }
     }
-    return await response.json();
 }
 
 export async function permission(status, customerEmail) {
