@@ -123,7 +123,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import axios from "axios";
+import api from "@/api";
 import layout from "@/layouts/layout.vue";
 
 const customerId = ref("");
@@ -136,14 +136,20 @@ const detailDialog = ref(false);
 //Service
 async function fetchOrderDetail(bookingId: string) {
   try {
-    const res = await axios.get("/admingetorderdetail/admindetail", {
+    const response = await api.get("/admingetorderdetail/admindetail", {
       params: { bookingId: bookingId },
+      withCredentials:true,
     });
-    orderDetail.value = res.data;
+    orderDetail.value = response.data;
     detailDialog.value = true;
   } catch (error) {
-    console.error("取得明細失敗", error);
-    alert("取得明細失敗");
+    if(error.response && (error.response.status === 401||error.response.status === 403)){
+      alert('請先登入');
+      return null;
+    }else{
+      console.error('取得資料失敗', error);
+      throw error;
+    }
   }
 }
 //查詢全部
@@ -169,16 +175,21 @@ async function fetchOrders() {
     return;
   }
   try {
-    const res = await axios.get("api", {
+    const res = await api.get("/api/admins/admingetorderdetail/adminbyCustomer", {
       params: { customerId: customerId.value },
       withCredentials: true,
     });
-    console.log(res);
+    console.log(res.data);
     orders.value = Array.isArray(res.data) ? res.data : [];
   } catch (error) {
-    console.error("查詢失敗", error);
-    orders.value = [];
-    alert("查詢失敗，請檢查 ID 或 API 設定");
+    if(error.response&&(error.response.status===401||error.response.status===403)){
+      console.error("未登入或沒有權限", error);
+      alert("請先登入");
+      orders.value = [];
+    }else{
+      console.error('取得資料失敗', error);
+      throw error;
+    }
   } finally {
     searched.value = true;
   }

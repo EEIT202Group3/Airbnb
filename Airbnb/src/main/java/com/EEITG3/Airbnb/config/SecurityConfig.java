@@ -180,25 +180,25 @@ public class SecurityConfig{
                 .build();
 	}
 	
-//	@Bean
-//	@Order(4)
-//	public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
-//	    return http
-//	        .securityMatcher("/api/**")
-//	        .csrf(csrf -> csrf.disable())
-//	        .cors(Customizer.withDefaults())
-//	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-//	        .authorizeHttpRequests(auth -> auth
-//	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-//	            .anyRequest().permitAll())
-//	        .build();
-//	}
+	@Bean
+	@Order(4)
+	public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
+	    return http
+	        .securityMatcher("/**")
+	        .csrf(csrf -> csrf.disable())
+	        .cors(Customizer.withDefaults())
+	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+	        .authorizeHttpRequests(auth -> auth
+	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+	            .anyRequest().permitAll())
+	        .build();
+	}
 	
 	//CORS 設定
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174"));
+		config.addAllowedOriginPattern("http://localhost:*");
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true);
