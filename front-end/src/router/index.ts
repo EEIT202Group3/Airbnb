@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { components } from 'vuetify/dist/vuetify.js';
 
 const routes = [
     {
@@ -19,6 +20,14 @@ const routes = [
                 path: 'hosts',
                 component: () => import('@/components/users/HostList.vue')
             },
+
+
+            {
+                path: 'addEquipment',
+                component: () => import ('@/components/listing/addEquipment.vue')
+
+            }
+
             {
                 path: "reviews/list",
                 component: () => import('@/components/reviews/views/ReviewView.vue')
@@ -27,6 +36,7 @@ const routes = [
                 path: "reviews/insert",
                 component: () => import('@/components/reviews/components/IReview.vue')
             },
+              
         ]
     },
     {
