@@ -12,13 +12,21 @@ const routes = [
             },
             {
                 path: 'customers',
-                name:'CustomerList',
+                name: 'CustomerList',
                 component: () => import('@/components/users/CustomerList.vue')
             },
             {
                 path: 'hosts',
                 component: () => import('@/components/users/HostList.vue')
-            }
+            },
+            {
+                path: "reviews/list",
+                component: () => import('@/components/reviews/views/ReviewView.vue')
+            },
+            {
+                path: "reviews/insert",
+                component: () => import('@/components/reviews/components/IReview.vue')
+            },
         ]
     },
     {

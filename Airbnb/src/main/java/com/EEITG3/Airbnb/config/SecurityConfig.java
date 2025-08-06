@@ -218,6 +218,10 @@ public class SecurityConfig{
                 registry.addResourceHandler("/images/**")
                         .addResourceLocations("file:/Users/youm/pohto/")
                         .setCachePeriod(3600);
+                
+                registry.addResourceHandler("/reviews/**")
+                .addResourceLocations("file:C:/temp/upload/")
+                .setCachePeriod(3600);
             }
         };
     }
