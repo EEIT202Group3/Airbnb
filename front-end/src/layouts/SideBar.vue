@@ -37,9 +37,6 @@ async function logout(){
 
     }
     router.push({ name: "Homepage" });
-  } catch (error) {
-    console.error("登出錯誤：", error);
-  }
 }
 async function login() {
     loginDialog.value = false;
@@ -64,11 +61,6 @@ async function login() {
         alert('無法連線後端伺服器');
         router.push({name:'Homepage'});
     }
-  } catch (error) {
-    console.error("發生錯誤：", error);
-    alert("無法連線後端伺服器");
-    router.push({ name: "Homepage" });
-  }
 }
 </script>
 <template>
@@ -88,9 +80,9 @@ async function login() {
   </v-app-bar>
   <v-navigation-drawer>
     <v-list nav>
-      <v-list-item v-if="adminDetails">
-        <div>{{ adminDetails.adminId }}</div>
-        <div>{{ adminDetails.username }}</div>
+      <v-list-item v-if="adminStore.admin">
+        <div>{{ adminStore.admin.adminId }}</div>
+        <div>{{ adminStore.admin.username }}</div>
       </v-list-item>
       <v-list-item v-else>
         <div>未登入</div>
