@@ -20,18 +20,25 @@ export async function getAllCustomers() {
 
 export async function permission(status, customerEmail) {
     const data = {
-        'status': status,
-        'email': customerEmail
+        status: status,
+        email: customerEmail,
+    };
+
+    try {
+        const response = await axios.patch(`${BASE_URL}/api/admins/customers/updatePermission`, data, {
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.status === 400) {
+            alert('請求錯誤');
+            return null
+        } else {
+            console.error('更新權限失敗', error);
+            throw error;
+        }
     }
-    const response = await fetch(`${BASE_URL}/api/admins/customers/updatePermission`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
-    if (response.status === 400) {
-        alert('請求錯誤');
-        return null;
-    }
-    return await response.json();
 }

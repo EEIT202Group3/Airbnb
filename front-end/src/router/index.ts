@@ -13,7 +13,7 @@ const routes = [
             },
             {
                 path: 'customers',
-                name:'CustomerList',
+                name: 'CustomerList',
                 component: () => import('@/components/users/CustomerList.vue')
             },
             {
@@ -21,11 +21,22 @@ const routes = [
                 component: () => import('@/components/users/HostList.vue')
             },
 
+
             {
                 path: 'addEquipment',
                 component: () => import ('@/components/listing/addEquipment.vue')
 
             }
+
+            {
+                path: "reviews/list",
+                component: () => import('@/components/reviews/views/ReviewView.vue')
+            },
+            {
+                path: "reviews/insert",
+                component: () => import('@/components/reviews/components/IReview.vue')
+            },
+              
         ]
     },
     {
