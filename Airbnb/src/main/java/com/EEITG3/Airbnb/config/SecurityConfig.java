@@ -123,7 +123,7 @@ public class SecurityConfig{
 		jdbcUserDetailsManager.setUsersByUsernameQuery(
 				"SELECT admin_id AS username, password, is_active AS enabled FROM admins WHERE admin_id = ?");
 		jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
-				"SeLECT admin_id AS username, authority FROM authorities WHERE admin_id=?");
+				"SELECT admin_id AS username, authority FROM authorities WHERE admin_id=?");
 		//避免用到其他人的provider，所以在內部設定provider
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider(jdbcUserDetailsManager);
         provider.setPasswordEncoder(passwordEncoder());
@@ -163,9 +163,17 @@ public class SecurityConfig{
                 .exceptionHandling(ex -> ex
                     .authenticationEntryPoint((request, response, authException) -> {
                     	response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    	response.setContentType("application/json;charset=UTF-8");
+                        response.getWriter().write("{\"error\": \"請先登入\"}");
+                        response.getWriter().flush();
+                        response.getWriter().close();
                     })
                     .accessDeniedHandler((request, response, accessDeniedException) -> {
                     	response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    	response.setContentType("application/json;charset=UTF-8");
+                        response.getWriter().write("{\"error\": \"未授權\"}");
+                        response.getWriter().flush();
+                        response.getWriter().close();
                     })
                 )
                 .csrf(csrf -> csrf.disable())
@@ -176,7 +184,7 @@ public class SecurityConfig{
 	@Order(4)
 	public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
 	    return http
-	        .securityMatcher("/api/**")
+	        .securityMatcher("/**")
 	        .csrf(csrf -> csrf.disable())
 	        .cors(Customizer.withDefaults())
 	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
@@ -190,7 +198,7 @@ public class SecurityConfig{
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174"));
+		config.addAllowedOriginPattern("http://localhost:*");
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true);

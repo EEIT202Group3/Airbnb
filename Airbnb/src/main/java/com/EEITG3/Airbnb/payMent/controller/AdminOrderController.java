@@ -20,7 +20,7 @@ import com.EEITG3.Airbnb.users.entity.Customer;
 import com.EEITG3.Airbnb.users.repository.CustomerRepository;
 
 @RestController
-@RequestMapping("/admingetorderdetail")
+@RequestMapping("/api/admins/admingetorderdetail")
 public class AdminOrderController {
 
 	@Autowired

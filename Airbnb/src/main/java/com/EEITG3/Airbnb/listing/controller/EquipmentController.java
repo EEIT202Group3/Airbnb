@@ -10,7 +10,7 @@ import com.EEITG3.Airbnb.listing.service.EquipmentService;
 import com.EEITG3.Airbnb.listing.entity.EquipmentBean;
 
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin
 @RestController
 @RequestMapping("/equipment")
 public class EquipmentController {
