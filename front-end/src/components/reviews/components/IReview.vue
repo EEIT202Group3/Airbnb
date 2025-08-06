@@ -110,7 +110,7 @@ const submit = async () => {
   });
   try {
     const res = await axios.post(
-      "http://localhost:8080/api/reviews/insert",
+      "http://localhost:8080/api/admins/reviews/insert",
       formData,
       {
         withCredentials: true,

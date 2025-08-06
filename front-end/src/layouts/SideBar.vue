@@ -71,7 +71,8 @@ const reviewLinks = [{
       { path: "/reviews/list", name: "查看評論" },
     ],
   }]
-const carRentBackLinks = [
+
+  const carRentBackLinks = [
   {
     name: "租車後台",
     icon: "mdi-car-cog",
@@ -113,7 +114,7 @@ const carRentBackLinks = [
         ><v-icon icon="mdi-home-account"></v-icon>房東</v-list-item
       >
         <v-list-item to="/addEquipment"
-        ><v-icon icon="mdi-home-account"></v-icon>新增房源</v-list-item
+        ><v-icon icon="mdi-home-account"></v-icon>新增設備</v-list-item
       >
       <v-list-item to="/AdminOrder"
         ><v-icon icon="mdi-invoice-text-multiple-outline"></v-icon
@@ -138,6 +139,23 @@ const carRentBackLinks = [
       router
     />
   </v-list-group>
+   <v-list-group
+          v-for="link in carRentBackLinks"
+          :key="link.name"
+          :prepend-icon="link.icon"
+          :value="link.name"
+      >
+        <template v-slot:activator="{ props }">
+          <v-list-item v-bind="props" :title="link.name" />
+        </template>
+        <v-list-item
+            v-for="child in link.children"
+            :key="child.path"
+            :to="child.path"
+            :title="child.name"
+            router
+        />
+      </v-list-group>
 </v-list>
       <v-list-group
           v-for="link in carRentBackLinks"

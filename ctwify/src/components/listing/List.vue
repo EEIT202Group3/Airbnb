@@ -37,7 +37,7 @@ export default {
     return {
       houseList: [],
       loading: false,
-      hostId: "6d4d8eb1-4e79-4c3e-9a1c-820ebcb8a8ee",
+      hostId: "8D7CC70F-6369-4A41-9A58-05F97ABFB688",
     };
   },
   methods: {

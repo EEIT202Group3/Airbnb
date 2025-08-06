@@ -22,7 +22,7 @@ import com.EEITG3.Airbnb.reviews.service.ReviewService;
 
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api")
 public class ReviewController {
 	/*
 	 * reviews Controller
@@ -31,7 +31,7 @@ public class ReviewController {
 	@Autowired
 	private ReviewService rService;
 
-	@GetMapping
+	@GetMapping("/admins/reviews")
 	public List<Review> getAllReviews(
 			@RequestParam(required = false) String type,
 		    @RequestParam(required = false) String keyword) { 
@@ -47,12 +47,12 @@ public class ReviewController {
 		return rService.findByListId(id);
 	}
 
-	@GetMapping("/get/{id}")
+	@GetMapping("/admins/reviews/get/{id}")
 	public Review getReviewById(@PathVariable Integer id) {
 		return rService.findByReviewID(id); // 找不到可回 null 或拋異常
 	}
 
-	@DeleteMapping("/del/{id}")
+	@DeleteMapping("/admins/reviews/del/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable Integer id) {
 		System.out.println("此api接收參數:" + id);
 		try {
@@ -68,7 +68,7 @@ public class ReviewController {
 	 * 呼叫service.insert 傳入參數，儲存review對象進行 repo.save(reviews) 用util 處理上傳圖片
 	 */
 
-	@PostMapping("/insert")
+	@PostMapping("/admins/reviews/insert")
 	public ResponseEntity<?> insertReview(
 		@RequestParam Integer listId, 
 		@RequestParam String bookingId,
@@ -103,7 +103,7 @@ public class ReviewController {
 		return rService.updateReview(reviewId,listId, bookingId, custId, hostId, reviewDate, cleanScore, commScore, valueScore, cusComm, hostComm);
 	}
 	
-	@PatchMapping(value= "/update/{id}")
+	@PatchMapping(value= "/admins/reviews/update/{id}")
 	public ResponseEntity<?> patchReview(
 			@PathVariable("id") Integer reviewId,
 			@RequestParam int cleanScore, 

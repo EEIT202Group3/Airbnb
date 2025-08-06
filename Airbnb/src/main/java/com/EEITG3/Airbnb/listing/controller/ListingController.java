@@ -133,6 +133,7 @@ public class ListingController {
         } catch (MultipartException e) {
             return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("上傳檔案過大或格式錯誤: " + e.getMessage());
         } catch (Exception e) {
+        	e.printStackTrace();
             return ResponseEntity.internalServerError().body("建立房源失敗: " + e.getMessage());
         }
     }

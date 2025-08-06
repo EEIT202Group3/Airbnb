@@ -127,6 +127,7 @@
 import Navbar from '@/layouts/Navbar.vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { withCtx } from 'vue';
 
 export default {
   components: { Navbar },
@@ -162,7 +163,7 @@ export default {
 
       equipList: [],
       form: {
-        hostId: "6d4d8eb1-4e79-4c3e-9a1c-820ebcb8a8ee",
+        hostId: "8D7CC70F-6369-4A41-9A58-05F97ABFB688",
         houseName: "",
         detailAddress: "",
         room: "",
@@ -185,7 +186,7 @@ export default {
 
     async fetchEquipments() {
       try {
-        const res = await axios.get("http://localhost:8080/equipment/all");
+        const res = await axios.get("http://localhost:8080/api/equipment/all",{withCredentials:true})
         this.equipList = res.data;
       } catch (err) {
         console.error("設備讀取失敗", err);
@@ -230,7 +231,7 @@ export default {
           headers: { "Content-Type": "multipart/form-data" }
         });
         Swal.fire("成功", "房源新增成功", "success");
-        this.$router.push('/list');
+        this.$router.push('/');
         this.resetForm();
       } catch (error) {
         Swal.fire("錯誤", "新增失敗，請檢查輸入", "error");

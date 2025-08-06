@@ -54,7 +54,7 @@ import axios from "axios";
 const reviews = ref([]);
 // 封裝取得數據方法
 const fetchReviews = async (keyword = "", type = "") => {
-  const res = await axios.get("http://localhost:8080/api/reviews", {
+  const res = await axios.get("http://localhost:8080/api/admins/reviews", {
     params: {
       keyword,
       type,
@@ -87,7 +87,7 @@ const handleDelete = async (reviewId) => {
   console.log(reviewId);
 
   try {
-    await axios.delete(`http://localhost:8080/api/reviews/del/${reviewId}`, {
+    await axios.delete(`http://localhost:8080/api/admins/reviews/del/${reviewId}`, {
       withCredentials: true,
     });
     await fetchReviews(); // 刪除成功後局部刷新 table
