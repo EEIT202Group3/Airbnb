@@ -24,9 +24,9 @@ const routes = [
 
             {
                 path: 'addEquipment',
-                component: () => import ('@/components/listing/addEquipment.vue')
+                component: () => import('@/components/listing/addEquipment.vue')
 
-            }
+            },
 
             {
                 path: "reviews/list",
@@ -36,7 +36,7 @@ const routes = [
                 path: "reviews/insert",
                 component: () => import('@/components/reviews/components/IReview.vue')
             },
-              
+
         ]
     },
     {

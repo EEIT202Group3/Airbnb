@@ -129,12 +129,6 @@ const reviewLinks = [{
     />
   </v-list-group>
 </v-list>
-<v-list-item to="/AdminOrder"
-        ><v-icon icon="mdi-invoice-text-multiple-outline"></v-icon
-        >訂單管理系統</v-list-item
-      >
-
-
     </v-list>
   </v-navigation-drawer>
   <!-- 登入表單 -->
