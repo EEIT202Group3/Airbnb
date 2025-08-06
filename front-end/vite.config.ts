@@ -15,4 +15,12 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    proxy: {
+      '/admingetorderdetail': {
+        target: 'http://localhost:8080', // 後端 API 的位置
+        changeOrigin: true
+      }
+    }
+  }
 })

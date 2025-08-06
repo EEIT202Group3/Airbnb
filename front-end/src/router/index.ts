@@ -55,6 +55,17 @@ const routes = [
                 props: true
             }
         ]
+    },
+    {
+        path: '/AdminOrder',
+        component: () => import('@/layouts/layout.vue'),
+        children: [
+            {
+                path: '',
+                name: 'AdminOrderAll',
+                component: () => import('@/components/payMent/backpageComponent/AdminOrder.vue')
+            }
+        ]
     }
 ]
 

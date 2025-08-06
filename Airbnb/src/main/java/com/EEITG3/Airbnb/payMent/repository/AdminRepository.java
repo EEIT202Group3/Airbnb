@@ -16,7 +16,7 @@ public interface AdminRepository extends JpaRepository<Order, String> {
 	@Query("SELECT o FROM Order o WHERE o.customerId = :customerId")
 	List<Order> findByCustomerCustomerId(String customerId);
 
-	// @Query("SELECT o FROM Order o WHERE o.booking_id = :booking_id")
+	 @Query("SELECT o FROM Order o WHERE o.bookingId = :bookingId")
 	Optional<Order> findByBookingId(String bookingId);
 	
 	// 修改訂單狀態
