@@ -75,5 +75,117 @@ public class Review {
 	
 	@Column(name="image3")
 	private String image3;
+
+	public int getReviewId() {
+		return reviewId;
+	}
+
+	public void setReviewId(int reviewId) {
+		this.reviewId = reviewId;
+	}
+
+	public String getBookingId() {
+		return bookingId;
+	}
+
+	public void setBookingId(String bookingId) {
+		this.bookingId = bookingId;
+	}
+
+	public String getHostId() {
+		return hostId;
+	}
+
+	public void setHostId(String hostId) {
+		this.hostId = hostId;
+	}
+
+	public String getCustId() {
+		return custId;
+	}
+
+	public void setCustId(String custId) {
+		this.custId = custId;
+	}
+
+	public int getListId() {
+		return listId;
+	}
+
+	public void setListId(int listId) {
+		this.listId = listId;
+	}
+
+	public int getCleanScore() {
+		return cleanScore;
+	}
+
+	public void setCleanScore(int cleanScore) {
+		this.cleanScore = cleanScore;
+	}
+
+	public int getCommScore() {
+		return commScore;
+	}
+
+	public void setCommScore(int commScore) {
+		this.commScore = commScore;
+	}
+
+	public int getValueScore() {
+		return valueScore;
+	}
+
+	public void setValueScore(int valueScore) {
+		this.valueScore = valueScore;
+	}
+
+	public String getCusComm() {
+		return cusComm;
+	}
+
+	public void setCusComm(String cusComm) {
+		this.cusComm = cusComm;
+	}
+
+	public String getHostComm() {
+		return hostComm;
+	}
+
+	public void setHostComm(String hostComm) {
+		this.hostComm = hostComm;
+	}
+
+	public String getReviewDate() {
+		return reviewDate;
+	}
+
+	public void setReviewDate(String reviewDate) {
+		this.reviewDate = reviewDate;
+	}
+
+	public String getImage1() {
+		return image1;
+	}
+
+	public void setImage1(String image1) {
+		this.image1 = image1;
+	}
+
+	public String getImage2() {
+		return image2;
+	}
+
+	public void setImage2(String image2) {
+		this.image2 = image2;
+	}
+
+	public String getImage3() {
+		return image3;
+	}
+
+	public void setImage3(String image3) {
+		this.image3 = image3;
+	}
 	
 }

@@ -15,6 +15,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  /*
   server: {
     proxy: {
       '/admingetorderdetail': {
@@ -23,4 +24,5 @@ export default defineConfig({
       }
     }
   }
+    */
 })
