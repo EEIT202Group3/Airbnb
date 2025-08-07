@@ -77,6 +77,24 @@ public class HostController {
 		return ResponseEntity.ok("驗證成功");
 	}
 	
+	//房東登出
+	@PostMapping("/hosts/logout")
+	public ResponseEntity<?> logout(HttpServletResponse response){
+		CookieUtil.deleteHostCookie(response);
+		return ResponseEntity.ok("登出成功");
+	}
+	
+	//房東更新資料
+	@PatchMapping("/hosts/update")
+	public ResponseEntity<?> update(@RequestBody Map<String, Object> patchPayload, @AuthenticationPrincipal HostDetails hostDetails){
+		try {
+			Host host = service.hostUpdate(patchPayload, hostDetails);
+			return ResponseEntity.ok(host);
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
+	
 	
 	
 	//找個人資料

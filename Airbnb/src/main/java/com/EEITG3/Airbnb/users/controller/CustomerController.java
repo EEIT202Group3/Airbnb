@@ -79,6 +79,13 @@ public class CustomerController {
 		return ResponseEntity.ok("驗證成功");
 	}
 	
+	//客戶登出
+	@PostMapping("/customers/logout")
+	public ResponseEntity<?> logout(HttpServletResponse response){
+		CookieUtil.deleteCustomerCookie(response);
+		return ResponseEntity.ok("登出成功");
+	}
+	
 	//客戶更新資料
 	@PatchMapping("/customers/update")
 	public ResponseEntity<?> update(@RequestBody Map<String, Object> patchPayload, @AuthenticationPrincipal CustomerDetails customerDetails) {
