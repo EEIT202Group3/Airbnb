@@ -24,9 +24,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import com.EEITG3.Airbnb.jwt.JwtFilter;
 import com.EEITG3.Airbnb.users.service.CustomerDetailsService;
 import com.EEITG3.Airbnb.users.service.HostDetailsService;
@@ -109,7 +106,7 @@ public class SecurityConfig{
 				.authorizeHttpRequests(configurer->
 					configurer
 					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-					.requestMatchers("/api/hosts/login","/api/hosts/signup").permitAll()
+					.requestMatchers("/api/hosts/login","/api/hosts/signup","/api/hosts/verify").permitAll()
 					.anyRequest().hasRole("HOST"))
 				.build();	
 	}

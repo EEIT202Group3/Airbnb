@@ -86,7 +86,7 @@ public class CustomerServiceImpl implements CustomerService {
 		//存入資料庫
 		repo.save(customer);
 		//發送驗證信
-		emailService.sendVerificationEmail(customer.getEmail(), token, customer.getUsername());
+		emailService.sendCustomerVerificationEmail(customer.getEmail(), token, customer.getUsername());
 	}
 	
 	@Override
@@ -176,8 +176,8 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public List<Customer> findLikeByPhone(String phone) {
-		String likeUsername = "%"+phone+"%";
-		return repo.findLikeByUsername(likeUsername);
+		String likePhone = "%"+phone+"%";
+		return repo.findLikeByPhone(likePhone);
 	}
 	
 }

@@ -33,6 +33,10 @@ public class Host {
 	private boolean isActive = true;
 	@Column(name = "created_at")
 	private LocalDateTime createAt = LocalDateTime.now();
+	@Column(name = "is_verified")
+	private boolean isVerified = false;
+	@Column(name = "verification_token")
+	private String verificationToken;
 	
 	public Host() {}
 	public Host(String email, String password, String username, String phone) {
@@ -96,6 +100,18 @@ public class Host {
 	}
 	public void setCreateAt(LocalDateTime createAt) {
 		this.createAt = createAt;
+	}
+	public boolean isVerified() {
+		return isVerified;
+	}
+	public void setVerified(boolean isVerified) {
+		this.isVerified = isVerified;
+	}
+	public String getVerificationToken() {
+		return verificationToken;
+	}
+	public void setVerificationToken(String verificationToken) {
+		this.verificationToken = verificationToken;
 	}
 	
 	@Override

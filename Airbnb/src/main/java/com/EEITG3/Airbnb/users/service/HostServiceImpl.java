@@ -3,6 +3,7 @@ package com.EEITG3.Airbnb.users.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.EEITG3.Airbnb.jwt.EmailService;
 import com.EEITG3.Airbnb.jwt.JwtService;
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
@@ -29,39 +31,66 @@ public class HostServiceImpl implements HostService {
 	private JwtService jwtService;
 	private AuthenticationManager authManager;
 	private PasswordEncoder encoder;
+	private EmailService emailService;
 	
 	@Autowired
 	public HostServiceImpl(HostRepository repo, ObjectMapper objectMapper, JwtService jwtService,
-			AuthenticationManager authManager, PasswordEncoder encoder) {
+			AuthenticationManager authManager, PasswordEncoder encoder, EmailService emailService) {
 		super();
 		this.repo = repo;
 		this.objectMapper = objectMapper;
 		this.jwtService = jwtService;
 		this.authManager = authManager;
 		this.encoder = encoder;
+		this.emailService = emailService;
 	}
 
 	@Override
 	public String hostLogin(LogInRequest request) {
 		Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-		if(authentication.isAuthenticated()) {
-			return jwtService.generateToken(request.getEmail(), "ROLE_HOST");
-		} else {
+		if(!authentication.isAuthenticated()) {
 			throw new BadCredentialsException("驗證失敗");
 		}
+		Optional<Host> temp = repo.findHostByEmail(request.getEmail());
+		if(!temp.isPresent()) {
+			throw new BadCredentialsException("帳號不存在");
+		}
+		Host host = temp.get();
+		if(!host.isVerified()) {
+			throw new BadCredentialsException("請先完成驗證");
+		}
+		return jwtService.generateToken(request.getEmail(), "ROLE_HOST");
 	}
 
 	@Override
-	public String hostSignUp(SignUpRequest request) {
+	public void hostSignUp(SignUpRequest request) {
 		Optional<Host> temp = repo.findHostByEmail(request.getEmail());
 		if(temp.isPresent()) {
 			throw new IllegalArgumentException("已註冊");
 		}
 		String encodedPassword = encoder.encode(request.getPassword());
 		Host host = new Host(request.getEmail(),encodedPassword,request.getUsername(),request.getPhone());
+		String token = UUID.randomUUID().toString();
+		host.setVerificationToken(token);
+		host.setVerified(false);
 		repo.save(host);
-		return jwtService.generateToken(host.getEmail(),"ROLE_HOST");
+		emailService.sendHostVerificationEmail(host.getEmail(), token, host.getUsername());
 	}
+	
+	@Override
+	public String verify(String token) {
+		Optional<Host> temp = repo.findHostByToken(token);
+		if(!temp.isPresent()) {
+			throw new RuntimeException("無效的連結");
+		}
+		Host host = temp.get();
+		host.setVerificationToken(null);
+		host.setVerified(true);
+		repo.save(host);
+		return jwtService.generateToken(host.getEmail(), "ROLE_HOST");
+	}
+	
+	
 
 	@Override
 	public Host currentHost(HostDetails hostDetails) {
@@ -117,4 +146,24 @@ public class HostServiceImpl implements HostService {
 		//把更新後的狀態存回資料庫、回傳更新後的資料
 		return repo.save(host);
 	}
+
+	@Override
+	public List<Host> findLikeByEmail(String email) {
+		String likeEmail = "%"+email+"%";
+		return repo.findLikeByEmail(likeEmail);
+	}
+
+	@Override
+	public List<Host> findLikeByUsername(String username) {
+		String likeUsername = "%"+username+"%";
+		return repo.findLikeByUsername(likeUsername);
+	}
+
+	@Override
+	public List<Host> findLikeByPhone(String phone) {
+		String likePhone = "%"+phone+"%";
+		return repo.findLikeByPhone(likePhone);
+	}
+
+	
 }
