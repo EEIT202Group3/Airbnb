@@ -3,8 +3,17 @@ import { ref,onMounted } from 'vue';
 import { getAllCustomers } from '@/service/user/CustomerService';
 import { permission } from '@/service/user/CustomerService';
 import { useRouter } from 'vue-router';
+import { findLike } from '@/service/user/CustomerService';
 const router = useRouter();
 const customers = ref([]);
+const keyword = ref();
+const context = ref();
+
+const options = [
+    {title:'郵件',value:'email'},
+    {title:'使用者',value:'username'},
+    {title:'電話',value:'phone'},
+];
 onMounted(
     async()=>{
         const result = await getAllCustomers();
@@ -30,11 +39,37 @@ async function updatePermission(active,email){
         alert('更新失敗')
     }
 }
+async function search(){
+    customers.value = await findLike(keyword.value,context.value);
+}
 
 
 </script>
 <template>
     <h1>客戶清單</h1>
+    <v-row>
+        <v-col cols="2" style="padding-right: 0px;margin-right: 0px;">
+            <v-select
+                v-model="keyword"
+                label="搜尋條件"
+                :items="options"
+                item-title="title"
+                item-value="value"
+                variant="solo"
+            ></v-select>
+        </v-col>
+        <v-col cols="8" style="padding-left: 0px;margin-left: 0px;">
+            <v-text-field 
+                v-model="context"
+                label="輸入"
+                variant="solo"
+            ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+            <v-icon icon="mdi-magnify" @click="search()" style="margin-top: 18px;"></v-icon>
+        </v-col>
+
+    </v-row>
     <v-table v-if="!(customers===null)">
         <thead>
             <tr>
