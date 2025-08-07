@@ -62,6 +62,26 @@ async function login() {
         router.push({name:'Homepage'});
     }
 }
+
+const reviewLinks = [{
+    name: "評論",
+    icon: "mdi-comment-outline",
+    children: [
+      { path: "/reviews/insert", name: "撰寫評論" },
+      { path: "/reviews/list", name: "查看評論" },
+    ],
+  }]
+
+  const carRentBackLinks = [
+  {
+    name: "租車後台",
+    icon: "mdi-car-cog",
+    children: [
+      { path: "/car-rent/back-homepage/reservations/1", name: "訂單詳情" },
+      { path: "/car-rent/back-homepage/vehicles/1", name: "車輛詳情" },
+    ],
+  },
+];
 </script>
 <template>
   <v-app-bar>
@@ -93,10 +113,67 @@ async function login() {
       <v-list-item to="/hosts"
         ><v-icon icon="mdi-home-account"></v-icon>房東</v-list-item
       >
+        <v-list-item to="/addEquipment"
+        ><v-icon icon="mdi-home-account"></v-icon>新增設備</v-list-item
+      >
       <v-list-item to="/AdminOrder"
         ><v-icon icon="mdi-invoice-text-multiple-outline"></v-icon
         >訂單管理系統</v-list-item
       >
+      <v-list>
+  <v-list-group
+    v-for="link in reviewLinks"
+    :key="link.name"
+    :prepend-icon="link.icon"
+    :value="link.name"
+  >
+    <template v-slot:activator="{ props }">
+      <v-list-item v-bind="props" :title="link.name" />
+    </template>
+
+    <v-list-item
+      v-for="child in link.children"
+      :key="child.path"
+      :to="child.path"
+      :title="child.name"
+      router
+    />
+  </v-list-group>
+   <v-list-group
+          v-for="link in carRentBackLinks"
+          :key="link.name"
+          :prepend-icon="link.icon"
+          :value="link.name"
+      >
+        <template v-slot:activator="{ props }">
+          <v-list-item v-bind="props" :title="link.name" />
+        </template>
+        <v-list-item
+            v-for="child in link.children"
+            :key="child.path"
+            :to="child.path"
+            :title="child.name"
+            router
+        />
+      </v-list-group>
+</v-list>
+      <v-list-group
+          v-for="link in carRentBackLinks"
+          :key="link.name"
+          :prepend-icon="link.icon"
+          :value="link.name"
+      >
+        <template v-slot:activator="{ props }">
+          <v-list-item v-bind="props" :title="link.name" />
+        </template>
+        <v-list-item
+            v-for="child in link.children"
+            :key="child.path"
+            :to="child.path"
+            :title="child.name"
+            router
+        />
+      </v-list-group>
     </v-list>
   </v-navigation-drawer>
   <!-- 登入表單 -->

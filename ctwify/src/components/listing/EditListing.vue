@@ -128,7 +128,7 @@ const fetchListing = async () => {
 }
 //顯示全部設備
 const fetchEquipments = async () => {
-  const res = await axios.get('http://localhost:8080/equipment/all')
+  const res = await axios.get('http://localhost:8080/api/equipment/all')
   equipmentList.value = res.data
 }
 

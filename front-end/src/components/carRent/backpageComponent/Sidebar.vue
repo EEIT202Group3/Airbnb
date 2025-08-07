@@ -24,6 +24,10 @@ const props = defineProps<{
       <router-link class="menu-link" to="/car-rent/back-homepage/vehicles/1">
         <i class="fa-solid fa-car-side me-2"></i> 車輛管理
       </router-link>
+      <hr />
+      <router-link class="menu-link" to="/">
+        <i class="fa-solid fa-car-side me-2"></i> 回首頁
+      </router-link>
     </div>
   </div>
 </template>

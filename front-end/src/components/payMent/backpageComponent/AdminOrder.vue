@@ -126,12 +126,14 @@ import { ref } from "vue";
 import api from "@/api";
 import axios from "axios";
 import layout from "@/layouts/layout.vue";
+import { useRouter } from "vue-router";
 
 const customerId = ref("");
 const orders = ref<any[]>([]);
 const searched = ref(false);
 const orderDetail = ref<any | null>(null);
 const detailDialog = ref(false);
+const router = useRouter();
 
 //查詢訂單明細
 //Service
@@ -199,8 +201,9 @@ async function fetchOrders() {
       console.error("未登入或沒有權限", error);
       alert("請先登入");
       orders.value = [];
-    } else {
-      console.error("取得資料失敗", error);
+      router.push({name:'Homepage'});
+    }else{
+      console.error('取得資料失敗', error);
       throw error;
     }
   } finally {

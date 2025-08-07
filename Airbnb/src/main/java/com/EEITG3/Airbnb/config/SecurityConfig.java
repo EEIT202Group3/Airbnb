@@ -208,17 +208,4 @@ public class SecurityConfig{
 
 		return source;
 	}
-	
-	// 修維的圖片 API
-	@Bean
-    public WebMvcConfigurer resourceConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addResourceHandlers(ResourceHandlerRegistry registry) {
-                registry.addResourceHandler("/images/**")
-                        .addResourceLocations("file:/Users/youm/pohto/")
-                        .setCachePeriod(3600);
-            }
-        };
-    }
 }

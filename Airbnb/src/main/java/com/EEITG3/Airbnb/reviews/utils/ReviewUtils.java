@@ -33,7 +33,7 @@ public class ReviewUtils {
                 String fileName = UUID.randomUUID() + "_" + mf.getOriginalFilename(); // 避免覆蓋
                 File saveFilePath = new File(saveFileDir, fileName);
                 System.out.println("Utils.uploadImg()" + saveFileDir + fileName);
-                imgList.add(saveFileDir + fileName);
+                imgList.add(fileName);
 
                 try {
                     mf.transferTo(saveFilePath);
