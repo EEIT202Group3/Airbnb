@@ -124,6 +124,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import api from "@/api";
+import axios from "axios";
 import layout from "@/layouts/layout.vue";
 import { useRouter } from "vue-router";
 
@@ -138,18 +139,24 @@ const router = useRouter();
 //Service
 async function fetchOrderDetail(bookingId: string) {
   try {
-    const response = await api.get("/admingetorderdetail/admindetail", {
-      params: { bookingId: bookingId },
-      withCredentials:true,
-    });
+    const response = await api.get(
+      "/api/admins/admingetorderdetail/admindetail",
+      {
+        params: { bookingId: bookingId },
+        withCredentials: true,
+      }
+    );
     orderDetail.value = response.data;
     detailDialog.value = true;
   } catch (error) {
-    if(error.response && (error.response.status === 401||error.response.status === 403)){
-      alert('請先登入');
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      alert("請先登入");
       return null;
-    }else{
-      console.error('取得資料失敗', error);
+    } else {
+      console.error("取得資料失敗", error);
       throw error;
     }
   }
@@ -177,14 +184,20 @@ async function fetchOrders() {
     return;
   }
   try {
-    const res = await api.get("/api/admins/admingetorderdetail/adminbyCustomer", {
-      params: { customerId: customerId.value },
-      withCredentials: true,
-    });
+    const res = await api.get(
+      "/api/admins/admingetorderdetail/adminbyCustomer",
+      {
+        params: { customerId: customerId.value },
+        withCredentials: true,
+      }
+    );
     console.log(res.data);
     orders.value = Array.isArray(res.data) ? res.data : [];
   } catch (error) {
-    if(error.response&&(error.response.status===401||error.response.status===403)){
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
       console.error("未登入或沒有權限", error);
       alert("請先登入");
       orders.value = [];
@@ -227,12 +240,17 @@ const newMentStatus = ref("");
 //Service
 async function updateBookingStatus() {
   try {
-    await axios.post("/admingetorderdetail/updatebookingstatus", null, {
-      params: {
-        bookingId: orderDetail.value.bookingId,
-        bookingStatus: newBookingStatus.value,
-      },
-    });
+    await api.post(
+      "/api/admins/admingetorderdetail/updatebookingstatus",
+      null,
+      {
+        params: {
+          bookingId: orderDetail.value.bookingId,
+          bookingStatus: newBookingStatus.value,
+        },
+        withCredentials: true,
+      }
+    );
     alert("訂單狀態更新成功");
     orderDetail.value.bookingStatus = newBookingStatus.value;
   } catch (error) {
@@ -244,11 +262,12 @@ async function updateBookingStatus() {
 //Service
 async function updateMentStatus() {
   try {
-    await axios.post("/admingetorderdetail/updatementstatus", null, {
+    await api.post("/api/admins/admingetorderdetail/updatementstatus", null, {
       params: {
         bookingId: orderDetail.value.bookingId,
         mentStatus: newMentStatus.value,
       },
+      withCredentials: true,
     });
     alert("付款狀態更新成功");
     orderDetail.value.mentStatus = newMentStatus.value;
