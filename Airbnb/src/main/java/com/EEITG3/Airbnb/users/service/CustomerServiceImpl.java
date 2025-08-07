@@ -104,7 +104,17 @@ public class CustomerServiceImpl implements CustomerService {
 		repo.save(customer);
 		return jwtService.generateToken(customer.getEmail(), "ROLE_CUSTOMER");
 	}
-
+	
+	@Override
+	public Customer currentCustomer(CustomerDetails customerDetails) {
+		Optional<Customer> temp = repo.findCustomerByEmail(customerDetails.getUsername());
+		if(!temp.isPresent()) {
+			throw new RuntimeException("找不到客戶");
+		}
+		Customer customer = temp.get();
+		return customer;
+	}
+	
 	@Override
 	public Customer customerUpdate(Map<String, Object> patchPayload, CustomerDetails customerDetails) {
 		Optional<Customer> temp = repo.findCustomerByEmail(customerDetails.getUsername());
@@ -120,6 +130,11 @@ public class CustomerServiceImpl implements CustomerService {
 		ObjectNode patchNode = objectMapper.convertValue(patchPayload, ObjectNode.class);
 		customerNode.setAll(patchNode);
 		return objectMapper.convertValue(customerNode, Customer.class);
+	}
+	
+	@Override
+	public List<Customer> findAllCustomers() {
+		return repo.findAll();
 	}
 	
 	@Override
@@ -146,20 +161,23 @@ public class CustomerServiceImpl implements CustomerService {
 		//把更新後的狀態存回資料庫、回傳更新後的資料
 		return repo.save(customer);
 	}
-
+	
 	@Override
-	public List<Customer> findAllCustomers() {
-		return repo.findAll();
+	public List<Customer> findLikeByEmail(String email) {
+		String likeEmail = "%"+email+"%";
+		return repo.findLikeByEmail(likeEmail);
 	}
 
 	@Override
-	public Customer currentCustomer(CustomerDetails customerDetails) {
-		Optional<Customer> temp = repo.findCustomerByEmail(customerDetails.getUsername());
-		if(!temp.isPresent()) {
-			throw new RuntimeException("找不到客戶");
-		}
-		Customer customer = temp.get();
-		return customer;
+	public List<Customer> findLikeByUsername(String username) {
+		String likeUsername = "%"+username+"%";
+		return repo.findLikeByUsername(likeUsername);
 	}
 
+	@Override
+	public List<Customer> findLikeByPhone(String phone) {
+		String likeUsername = "%"+phone+"%";
+		return repo.findLikeByUsername(likeUsername);
+	}
+	
 }

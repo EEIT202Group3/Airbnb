@@ -1,5 +1,6 @@
 package com.EEITG3.Airbnb.users.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ public class CustomerController {
 		this.service = service;
 	}
 	
+//前台部分
 	//客戶登入
 	@PostMapping("/customers/login")
 	public ResponseEntity<?> logIn(@RequestBody LogInRequest request, HttpServletResponse response) {
@@ -96,7 +98,7 @@ public class CustomerController {
 	
 	
 	
-	
+//後台部分
 	//找全部客戶資料
 	@GetMapping("/admins/customers")
 	public List<Customer> getAllCustomers(){
@@ -116,5 +118,45 @@ public class CustomerController {
 		}
 	}
 	
-	
+	//模糊搜尋
+	@GetMapping("/admins/customers/findlike")
+	public ResponseEntity<?> getCustomersByEmail(@RequestParam String keyword, @RequestParam String context){
+		System.out.println("收到資料："+keyword+";"+context);
+		List<Customer> customers = new ArrayList<Customer>();
+		switch (keyword) {
+			case("email"):{
+				customers = service.findLikeByEmail(context);
+				break;
+			}
+			case("username"):{
+				customers = service.findLikeByUsername(context);
+				break;
+			}
+			case("phone"):{
+				customers = service.findLikeByPhone(context);
+				break;
+			}
+			default:{
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("\"message\":\"keyword輸入錯誤\"");
+			}
+		}
+		if(customers.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("\"message\":\"找不到客戶\"");
+		}
+		return ResponseEntity.ok(customers);
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
