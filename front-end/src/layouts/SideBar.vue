@@ -54,6 +54,7 @@ async function login() {
         });
         if(response.ok){
             adminStore.admin = await getCurrentAdmin();
+            alert('登入成功')
             router.push({name:'Homepage'});
         }
     } catch (error) {
@@ -157,23 +158,7 @@ const reviewLinks = [{
         />
       </v-list-group>
 </v-list>
-      <v-list-group
-          v-for="link in carRentBackLinks"
-          :key="link.name"
-          :prepend-icon="link.icon"
-          :value="link.name"
-      >
-        <template v-slot:activator="{ props }">
-          <v-list-item v-bind="props" :title="link.name" />
-        </template>
-        <v-list-item
-            v-for="child in link.children"
-            :key="child.path"
-            :to="child.path"
-            :title="child.name"
-            router
-        />
-      </v-list-group>
+      
     </v-list>
   </v-navigation-drawer>
   <!-- 登入表單 -->

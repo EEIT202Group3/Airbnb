@@ -6,13 +6,14 @@ import { useRouter } from 'vue-router';
 import { findLike } from '@/service/user/CustomerService';
 const router = useRouter();
 const customers = ref([]);
-const keyword = ref();
-const context = ref();
+const keyword = ref(null);
+const context = ref(null);
 
 const options = [
     {title:'郵件',value:'email'},
     {title:'使用者',value:'username'},
     {title:'電話',value:'phone'},
+    {title:'全部',value:'reset'},
 ];
 onMounted(
     async()=>{
@@ -40,7 +41,24 @@ async function updatePermission(active,email){
     }
 }
 async function search(){
-    customers.value = await findLike(keyword.value,context.value);
+    if(keyword.value==='reset'){
+        customers.value = await getAllCustomers();
+        return;
+    }
+    if(keyword.value===null){
+        alert('請選擇搜尋條件');
+        return;
+    }else if(context.value===null){
+        alert('請輸入資料')
+        return;
+    }else{
+        const data = await findLike(keyword.value,context.value);
+        if(!data){
+            alert('查無結果');
+            return;
+        }
+        customers.value = data;
+    }
 }
 
 
@@ -63,6 +81,7 @@ async function search(){
                 v-model="context"
                 label="輸入"
                 variant="solo"
+                required
             ></v-text-field>
         </v-col>
         <v-col cols="2">
@@ -75,6 +94,7 @@ async function search(){
             <tr>
                 <th>email</th>
                 <th>username</th>
+                <th>phone</th>
                 <th>createAt</th>
                 <th>isActive</th>
                 <th></th>
@@ -84,6 +104,7 @@ async function search(){
             <tr v-for="customer in customers">
                 <td>{{ customer.email }}</td>
                 <td>{{ customer.username }}</td>
+                <td>{{ customer.phone }}</td>
                 <td>{{ customer.createAt }}</td>
                 <td v-if="customer.active" style="color: green;">啟用中</td>
                 <td v-else style="color: red;">停權中</td>
