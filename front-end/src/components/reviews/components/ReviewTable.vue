@@ -42,7 +42,7 @@
           :width="252"
           aspect-ratio="4/3"
           cover
-           :src= "`http://localhost:8080/reviews/${selectedReview.image1}`"
+           :src= "`http://localhost:8080/images/${selectedReview.image1}`"
         ></v-img>
         </div>
         <div><strong>圖片2：</strong>
@@ -50,7 +50,7 @@
           :width="252"
           aspect-ratio="4/3"
           cover
-           :src= "`http://localhost:8080/reviews/${selectedReview.image2}`"
+           :src= "`http://localhost:8080/images/${selectedReview.image2}`"
         ></v-img>
         </div>
         <div><strong>圖片3：</strong>
@@ -58,7 +58,7 @@
           :width="252"
           aspect-ratio="4/3"
           cover
-           :src= "`http://localhost:8080/reviews/${selectedReview.image3}`"
+           :src= "`http://localhost:8080/images/${selectedReview.image3}`"
         ></v-img>
         </div>
       </v-card-text>
@@ -218,8 +218,6 @@ const viewReview = async (item) => {
     );
     selectedReview.value = resp.data;
     viewDialog.value = true;
-    console.log(selectedReview.value.image1);
-    console.log(`/reviews/${selectedReview.value.image1}`);
     
   } catch (err) {
     console.error("取得評論失敗:", err);

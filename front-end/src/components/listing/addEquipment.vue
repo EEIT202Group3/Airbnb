@@ -8,7 +8,7 @@ const router = useRouter();
 
 // 取得設備清單
 const fetchEquipments = async () => {
-    const res = await fetch('http://localhost:8080/api/admins/equipment/all',{
+    const res = await fetch('http://localhost:8080/api/equipment/all',{
       method:'GET',
       credentials:'include'
     })

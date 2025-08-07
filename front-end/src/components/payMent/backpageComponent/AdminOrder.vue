@@ -173,7 +173,7 @@ const headers = [
   { title: "預訂狀態", key: "bookingstatus" },
   { title: "入住日期", key: "checkindate" },
   { title: "退房日期", key: "checkoutdate" },
-  { title: "總金額", key: "totalamount" },
+  { title: "總金額", key: "total" },
   { title: "明細", key: "actions", sortable: false },
 ];
 

@@ -35,7 +35,7 @@ public class AdminOrderService {
 			dto.setPeople(order.getPeople());
 			dto.setBookingstatus(order.getBookingstatus());
 			dto.setUsername(order.getUsername());
-			dto.setTotalamount(order.getTotalamount());
+			dto.setTotal(order.getTotal());
 			dto.setCheckindate(order.getCheckindate());
 			dto.setCheckoutdate(order.getCheckoutdate());
 			return dto;
