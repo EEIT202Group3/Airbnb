@@ -120,8 +120,7 @@ public class CustomerController {
 	
 	//模糊搜尋
 	@GetMapping("/admins/customers/findlike")
-	public ResponseEntity<?> getCustomersByEmail(@RequestParam String keyword, @RequestParam String context){
-		System.out.println("收到資料："+keyword+";"+context);
+	public ResponseEntity<?> findCustomerLike(@RequestParam String keyword, @RequestParam String context){
 		List<Customer> customers = new ArrayList<Customer>();
 		switch (keyword) {
 			case("email"):{
