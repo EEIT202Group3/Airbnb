@@ -47,25 +47,24 @@ export async function permission(status, customerEmail) {
 }
 
 //模糊搜尋
-export async function findLike(keyword,context){
+export async function findLike(keyword, context) {
     try {
-        const response = await axios .get(`${BASE_URL}/admins/customers/findlike`,{
-            params:{
-                keyword:keyword,
-                context:context,
+        const response = await axios.get(`${BASE_URL}/api/admins/customers/findlike`, {
+            params: {
+                keyword: keyword,
+                context: context,
             },
-            withCredentials:true,
+            withCredentials: true,
         });
         return response.data;
     } catch (error) {
-        if(error.response && (error.response.status === 401 || error.response.status === 403)){
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
             alert('請先登入');
             return null;
-        }else if(error.response.status === 404){
-            alert('找不到資料')
+        } else if (error.response.status === 404) {
             return null;
-        }else{
-            console.error('查詢失敗',error)
+        } else {
+            console.error('查詢失敗', error)
             throw error;
         }
     }
