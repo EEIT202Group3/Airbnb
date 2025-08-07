@@ -13,4 +13,7 @@ public interface CustomerRepository extends JpaRepository<Customer, String> {
 	//透過 email 找 Customer
 	@Query("SELECT c FROM Customer c WHERE c.email = :email")
 	Optional<Customer> findCustomerByEmail(@Param("email") String email);
+	
+	@Query("SELECT c FROM Customer c WHERE c.verificationToken = :token")
+	Optional<Customer> findCustomerByToken(@Param("token") String token);
 }

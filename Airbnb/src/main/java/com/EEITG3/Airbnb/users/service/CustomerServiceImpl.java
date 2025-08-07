@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.EEITG3.Airbnb.jwt.EmailService;
 import com.EEITG3.Airbnb.jwt.JwtService;
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
@@ -30,30 +32,43 @@ public class CustomerServiceImpl implements CustomerService {
 	private JwtService jwtService;
 	private AuthenticationManager authManager;
 	private PasswordEncoder encoder;
+	private EmailService emailService;
 	
 	@Autowired
 	public CustomerServiceImpl(CustomerRepository repo, ObjectMapper objectMapper, JwtService jwtService,
-			AuthenticationManager authManager, PasswordEncoder encoder) {
+			AuthenticationManager authManager, PasswordEncoder encoder, EmailService emailService) {
 		super();
 		this.repo = repo;
 		this.objectMapper = objectMapper;
 		this.jwtService = jwtService;
 		this.authManager = authManager;
 		this.encoder = encoder;
+		this.emailService = emailService;
 	}
 	
 	@Override
 	public String customerLogin(LogInRequest request) {
 		Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-		if(authentication.isAuthenticated()) {
-			return jwtService.generateToken(request.getEmail(),"ROLE_CUSTOMER");
-		} else {
+		//如果驗證沒通過，拋出Exception，驗證失敗
+		if(!authentication.isAuthenticated()) {
 			throw new BadCredentialsException("驗證失敗");
 		}
+		//如果找不到帳戶，拋出Exception，帳號不存在
+		Optional<Customer> temp = repo.findCustomerByEmail(request.getEmail());
+		if(!temp.isPresent()) {
+			throw new BadCredentialsException("帳號不存在");
+		}
+		Customer customer = temp.get();
+		//如果沒有驗證過，拋出Exception，請先完成驗證
+		if(!customer.isVerified()) {
+			throw new BadCredentialsException("請先完成驗證");
+		}
+		//上面的三個驗證都過了，產生JWT並回傳
+		return jwtService.generateToken(customer.getEmail(), "ROLE_CUSTOMER");
 	}
 
 	@Override
-	public String customerSignup(SignUpRequest request) {
+	public void customerSignup(SignUpRequest request) {
 		Optional<Customer> temp = repo.findCustomerByEmail(request.getEmail());
 		//表示已經有註冊過了
 		if(temp.isPresent()) {
@@ -63,10 +78,31 @@ public class CustomerServiceImpl implements CustomerService {
 		String encodedPassword = encoder.encode(request.getPassword());
 		//用request收到的資料建立新的entity
 		Customer customer = new Customer(request.getEmail(),encodedPassword,request.getUsername(),request.getPhone());
+		//產生驗證信用的Token
+		String token = UUID.randomUUID().toString();
+		//設定驗證相關資料
+		customer.setVerificationToken(token);
+		customer.setVerified(false);
 		//存入資料庫
 		repo.save(customer);
-		//用這個使用者生成token
-		return jwtService.generateToken(customer.getEmail(),"ROLE_CUSTOMER");
+		//發送驗證信
+		emailService.sendVerificationEmail(customer.getEmail(), token, customer.getUsername());
+	}
+	
+	@Override
+	public String verify(String token) {
+		Optional<Customer> temp = repo.findCustomerByToken(token);
+		
+		//無法透過token找到客戶(驗證沒過)
+		if(!temp.isPresent()) {
+			throw new RuntimeException("無效的連結");
+		}
+		//驗證過了，把已驗證設為true其他資料清掉
+		Customer customer = temp.get();	
+		customer.setVerified(true);
+		customer.setVerificationToken(null);
+		repo.save(customer);
+		return jwtService.generateToken(customer.getEmail(), "ROLE_CUSTOMER");
 	}
 
 	@Override
@@ -126,5 +162,4 @@ public class CustomerServiceImpl implements CustomerService {
 		return customer;
 	}
 
-	
 }

@@ -16,11 +16,13 @@ public interface CustomerService {
 	//客戶登入
 	String customerLogin(LogInRequest request);
 	//客戶註冊
-	String customerSignup(SignUpRequest request);
+	void customerSignup(SignUpRequest request);
 	//查看個人資料
 	Customer currentCustomer(CustomerDetails customerDetails);
 	//客戶更新資料
 	Customer customerUpdate(Map<String, Object> patchPayload, CustomerDetails customerDetails);
+	//接收驗證信
+	String verify(String token);
 	//登出
 	
 	//後台功能

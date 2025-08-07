@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.EEITG3.Airbnb.users.CookieUtil;
@@ -52,7 +53,7 @@ public class CustomerController {
 	
 	//客戶註冊
 	@PostMapping("/customers/signup")
-	public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request,BindingResult bindingResult, HttpServletResponse response) {
+	public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request,BindingResult bindingResult) {
 		if(bindingResult.hasErrors()) {
 			StringBuilder errorMessage = new StringBuilder();
 			List<FieldError> errors = bindingResult.getFieldErrors();
@@ -64,9 +65,16 @@ public class CustomerController {
 			}
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 		}
-		String token = service.customerSignup(request);
-		CookieUtil.saveCustomerCookie(response, token);
-		return ResponseEntity.status(HttpStatus.CREATED).body(token);
+		service.customerSignup(request);
+		return ResponseEntity.ok("已送出驗證信");
+	}
+	
+	//接收驗證信
+	@GetMapping("/customers/verify")
+	public ResponseEntity<?> verify(@RequestParam("token") String token, HttpServletResponse response){
+		String jwt = service.verify(token);
+		CookieUtil.saveCustomerCookie(response, jwt);
+		return ResponseEntity.ok("驗證成功");
 	}
 	
 	//客戶更新資料
@@ -86,6 +94,9 @@ public class CustomerController {
 		return service.currentCustomer(customerDetails);
 	}
 	
+	
+	
+	
 	//找全部客戶資料
 	@GetMapping("/admins/customers")
 	public List<Customer> getAllCustomers(){
@@ -103,5 +114,7 @@ public class CustomerController {
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
-	}	
+	}
+	
+	
 }
