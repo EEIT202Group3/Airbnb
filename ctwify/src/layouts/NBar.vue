@@ -1,3 +1,9 @@
+<script setup>
+import { ref } from 'vue';
+import LoginSignup from '@/components/user/LoginSignup.vue';
+const showAuthPage = ref(false);
+</script>
+
 <template>
   <v-app-bar app color="white" flat class="elevation-1">
     <!-- Logo -->
@@ -13,8 +19,8 @@
     <v-btn text to="/">規劃行程</v-btn>
 
     <!-- 登入 / 註冊 -->
-    <router-link to="/login" class="text-decoration-none" color="black">
-      <v-btn to="/login" variant="text" class="d-flex align-center text-black">
+    <router-link class="text-decoration-none" color="black">
+      <v-btn variant="text" class="d-flex align-center text-black" @click="showAuthPage=true">
         <v-icon class="me-1" color="black">mdi-account-circle-outline</v-icon>
         登入 / 註冊
       </v-btn>
@@ -27,9 +33,9 @@
         </v-btn>
       </template>
       <v-list>
-        <v-list-item to="/">
-          <v-list-item-title>旅遊指南</v-list-item-title>
-        </v-list-item>
+        <v-list-item to="/customer">
+            <v-list-item-title>客戶首頁</v-list-item-title>
+          </v-list-item>
         <v-list-item to="/">
           <v-list-item-title>租車服務</v-list-item-title>
         </v-list-item>
@@ -48,9 +54,10 @@
       </v-list>
     </v-menu>
   </v-app-bar>
+  <v-dialog v-model="showAuthPage" max-width="420" scrollable>
+      <LoginSignup asDialog/>
+  </v-dialog>
 </template>
-
-<script setup></script>
 
 <style scoped>
 .v-btn:hover {
