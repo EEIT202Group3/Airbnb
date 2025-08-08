@@ -43,7 +43,7 @@ const searchReservation = async () => {
     });
     console.log(res.data);
     reservation.value = res.data;
-    await router.push(`/car-rent/back-homepage/reservations/${res.data.reservationId}`)
+    await router.push(`/car-rent/reservations/${res.data.reservationId}`)
   } catch (err) {
     errorMess.value = "查無資料";
   }
@@ -64,7 +64,7 @@ const searchVehicle = async () => {
       }
     });
     console.log(res.data);
-    await router.push(`/car-rent/back-homepage/vehicles/${res.data.vehicleId}`)
+    await router.push(`/car-rent/vehicles/${res.data.vehicleId}`)
   } catch (err) {
     errorMess2.value = "查無資料";
   }

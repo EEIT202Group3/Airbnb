@@ -36,42 +36,19 @@ const routes = [
                 path: "reviews/insert",
                 component: () => import('@/components/reviews/components/IReview.vue')
             },
+            {
+                path: 'car-rent/back-homepage',
+                component: () => import('@/components/carRent/backpageComponent/CarRentBackHomepage.vue')
+            },
+            {
+                path: 'car-rent/reservations/:id',
+                component: () => import('@/components/carRent/backpageComponent/CarRentReservation.vue'), props: true
+            },
+            {
+                path: 'car-rent/vehicles/:id',
+                component: () => import('@/components/carRent/backpageComponent/Vehicle.vue'), props: true
+            },
 
-        ]
-    },
-    {
-        path: '/car-rent/front-homepage',
-        component: () => import('@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue'),
-        children: [
-            {
-                path: 'car-select',
-                name: 'CarSelect',
-                component: () => import('@/components/carRent/frontpageComponent/CarSelect.vue')
-            },
-            {
-                path: 'car-detail/:id',
-                name: 'CarDetail',
-                component: () => import('@/components/carRent/frontpageComponent/CarDetail.vue'),
-                props: true
-            }
-        ]
-    },
-    {
-        path: '/car-rent/back-homepage',
-        component: () => import('@/components/carRent/backpageComponent/CarRentBackHomepage.vue'),
-        children: [
-            {
-                path: 'reservations/:id',
-                name: 'CarRentReservationDetail',
-                component: () => import('@/components/carRent/backpageComponent/CarRentReservation.vue'),
-                props: true
-            },
-            {
-                path: 'vehicles/:id',
-                name: 'VehicleDetail',
-                component: () => import('@/components/carRent/backpageComponent/Vehicle.vue'),
-                props: true
-            }
         ]
     },
     {

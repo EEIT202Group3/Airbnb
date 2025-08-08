@@ -69,26 +69,26 @@ public class EcpayController {
 		response.getWriter().write(html.toString());
 	}
 	//綠界回傳付款成功通知(後端背景用)
-	@PostMapping("/return")
-	public ResponseEntity<String> handleReturn(@RequestParam Map<String, String> data){
-		boolean valid = EcpayUtil.verifyCheckMacValue(data);
-		if(!valid) return ResponseEntity.badRequest().body("CheckMacValue 錯誤");
-		
-		String rtnCode =data.get("RtnCode");
-		if("1".equals(rtnCode)) {
-			String tradeNo = data.get("MerchantTradeNo");
-			
-			//用paymentId找出訂單
-			Order order = orderRepository.findyByPaymentId(tradeNo)
-					.orElseThrow(()-> new RuntimeException("找不到對應的付款訂單:" + tradeNo));
-			order.setMentstatus("已付款");
-			order.setPaidtime(LocalDateTime.now());
-			order.setMentstatus("已完成");
-			orderRepository.save(order);
-			
-			System.out.println("訂單[" + order.getBookingid() + "] 已完成付款");
-			
-		}
-		return ResponseEntity.ok("1|OK");
-	}
+//	@PostMapping("/return")
+//	public ResponseEntity<String> handleReturn(@RequestParam Map<String, String> data){
+//		boolean valid = EcpayUtil.verifyCheckMacValue(data);
+//		if(!valid) return ResponseEntity.badRequest().body("CheckMacValue 錯誤");
+//
+//		String rtnCode =data.get("RtnCode");
+//		if("1".equals(rtnCode)) {
+//			String tradeNo = data.get("MerchantTradeNo");
+//
+//			//用paymentId找出訂單
+//			Order order = orderRepository.findyByPaymentId(tradeNo)
+//					.orElseThrow(()-> new RuntimeException("找不到對應的付款訂單:" + tradeNo));
+//			order.setMentstatus("已付款");
+//			order.setPaidtime(LocalDateTime.now());
+//			order.setMentstatus("已完成");
+//			orderRepository.save(order);
+//
+//			System.out.println("訂單[" + order.getBookingid() + "] 已完成付款");
+//
+//		}
+//		return ResponseEntity.ok("1|OK");
+//	}
 }

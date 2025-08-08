@@ -88,7 +88,7 @@ const insertReservation = async () => {
     alert("新增成功");
     insertReservationMode.value = false;
     isEditing.value = false;
-    await router.push(`/car-rent/back-homepage/reservations/${newId}`);
+    await router.push(`/car-rent/reservations/${newId}`);
   } catch (err) {
     const msg = err?.response?.data?.message || "更新失敗，請稍後再試";
     if (msg.includes("該車牌已被登入")) {

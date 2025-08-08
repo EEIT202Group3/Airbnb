@@ -56,7 +56,7 @@ const insertVehicle = async () => {
     const newId = res.data.vehicleId;
     insertVehicleMode.value = false;
     isEditing.value = false;
-    await router.push(`/car-rent/back-homepage/vehicles/${newId}`);
+    await router.push(`/car-rent/vehicles/${newId}`);
   } catch (err) {
     const msg = err?.response?.data?.message || "更新失敗，請稍後再試";
     if (msg.includes("車輛在所選時間已被預約")) {
@@ -97,35 +97,35 @@ const deleteVehicle = async () => {
 };
 
 // 圖片上傳
-  const handleFileChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files.length > 0) {
-      selectedFile.value = target.files[0];
-    }
-  };
-  const submitForm = async () => {
-    if (!selectedFile.value) {
-      alert("請先選擇圖片！");
-      return;
-    }
+const handleFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    selectedFile.value = target.files[0];
+  }
+};
+const submitForm = async () => {
+  if (!selectedFile.value) {
+    alert("請先選擇圖片！");
+    return;
+  }
 
-    const formData = new FormData();
-    formData.append("image", selectedFile.value);
+  const formData = new FormData();
+  formData.append("image", selectedFile.value);
 
-    try {
-      const res = await api.post("/vehicles/upload-image", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      const uploadedFileName = res.data.filename;
-      vehicle.value.image = uploadedFileName;
+  try {
+    const res = await api.post("/vehicles/upload-image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    const uploadedFileName = res.data.filename;
+    vehicle.value.image = uploadedFileName;
 
-      alert("圖片上傳成功！");
-    } catch (err) {
-      alert("圖片上傳失敗：" + err);
-    }
-  };
+    alert("圖片上傳成功！");
+  } catch (err) {
+    alert("圖片上傳失敗：" + err);
+  }
+};
 
 </script>
 
@@ -266,9 +266,9 @@ const deleteVehicle = async () => {
                 <td>
                   <span v-if="!isEditing">{{ vehicle.status }}</span>
                   <select v-else class="form-select input-short editable" v-model="vehicle.status">
-                  <option value="可租用">可租用</option>
-                  <option value="維修中">維修中</option>
-                  <option value="下架">下架</option>
+                    <option value="可租用">可租用</option>
+                    <option value="維修中">維修中</option>
+                    <option value="下架">下架</option>
                   </select>
                 </td>
               </tr>
