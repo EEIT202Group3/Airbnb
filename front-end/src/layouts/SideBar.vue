@@ -2,7 +2,7 @@
 
 import { ref,onMounted } from 'vue';
 import { getCurrentAdmin } from '@/service/user/AdminService';
-import { useRouter } from 'vue-router';
+import { useRouter,useRoute } from 'vue-router';
 import { useAdminStore } from '@/stores/user/adminStore';
 const loginDialog = ref(false);
 const adminStore = useAdminStore();
@@ -11,6 +11,34 @@ const formData = ref({
   password: "",
 });
 const router = useRouter();
+const route = useRoute();
+const isOpen = ref(false);
+const isActive = (to?: string) => to && route.path === to
+const items = [
+  {title:'客戶清單', icon:'mdi-account', to:'/customers'},
+  {title:'房東清單', icon:'mdi-home-account', to:'/hosts'},
+]
+
+
+// const reviewLinks = [{
+//     name: "評論",
+//     icon: "mdi-comment-outline",
+//     children: [
+//       { path: "/reviews/insert", name: "撰寫評論" },
+//       { path: "/reviews/list", name: "查看評論" },
+//     ],
+//   }]
+
+//   const carRentBackLinks = [
+//   {
+//     name: "租車後台",
+//     icon: "mdi-car-cog",
+//     children: [
+//       { path: "/car-rent/back-homepage/reservations/1", name: "訂單詳情" },
+//       { path: "/car-rent/back-homepage/vehicles/1", name: "車輛詳情" },
+//     ],
+//   },
+// ];
 
 onMounted(async()=>{
     if(!adminStore.admin){
@@ -64,27 +92,121 @@ async function login() {
     }
 }
 
-const reviewLinks = [{
-    name: "評論",
-    icon: "mdi-comment-outline",
-    children: [
-      { path: "/reviews/insert", name: "撰寫評論" },
-      { path: "/reviews/list", name: "查看評論" },
-    ],
-  }]
 
-  const carRentBackLinks = [
-  {
-    name: "租車後台",
-    icon: "mdi-car-cog",
-    children: [
-      { path: "/car-rent/back-homepage/reservations/1", name: "訂單詳情" },
-      { path: "/car-rent/back-homepage/vehicles/1", name: "車輛詳情" },
-    ],
-  },
-];
 </script>
+
 <template>
+  <v-navigation-drawer
+    app
+    permanent
+    width="300"
+    class="pa-4"
+  >
+    <!-- Logo / Title -->
+    <div class="d-flex align-center mb-6" style="margin-bottom: 0px; padding-bottom: 0px;">
+      <v-avatar color="white" size="110" rounded="circle">
+        <v-img src="../src/icon/logo.png"></v-img>
+      </v-avatar>
+      <div class="ml-3">
+        <div class="sidebar-title">Ctwify</div>
+        <div class="sidebar-subtitle">DASHBOARD</div>
+      </div>
+    </div>
+
+    <v-list density="comfortable" nav>
+      <v-list-item 
+        v-if="adminStore.admin"
+        :title="adminStore.admin.username"
+        :subtitle="adminStore.admin.adminId"
+      >
+        <template #append>
+          <v-btn
+            variant="text"
+            prepend-icon="mdi-logout"
+            @click="logout()"
+          >
+            登出
+          </v-btn>
+        </template>
+      </v-list-item>
+      <v-list-item
+        v-else
+        link
+        class="rounded-lg mb-1 sidebar-item"
+        prepend-icon="mdi-login"
+        title="登入"
+        @click="loginDialog = true"
+      />
+      <template v-for="item in items" :key="item.title">
+        <!-- 有子選單 -->
+        <v-list-group
+          v-if="item.children"
+          v-model="isOpen"
+          prepend-icon="mdi-shield-check"
+        >
+          <template #activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              :title="item.title"
+              class="rounded-lg sidebar-item"
+              :class="{ 'active-item': item.children.some(c => isActive(c.to)) }"
+            />
+          </template>
+
+          <v-list-item
+            v-for="child in item.children"
+            :key="child.title"
+            :to="child.to"
+            link
+            class="rounded-lg ml-2 sidebar-item"
+            :class="{ 'active-item': isActive(child.to) }"
+            :title="child.title"
+          />
+        </v-list-group>
+
+        <!-- 單一項目 -->
+        <v-list-item
+          v-else
+          :to="item.to"
+          link
+          class="rounded-lg mb-1 sidebar-item"
+          :prepend-icon="item.icon"
+          :title="item.title"
+          :class="{ 'active-item': isActive(item.to) }"
+        />
+      </template>
+    </v-list>
+  </v-navigation-drawer>
+  <v-dialog v-model="loginDialog">
+    <v-card class="pa-6 mx-auto" style="width: 25%; height: auto">
+      <form @submit.prevent="login">
+        <v-text-field
+          v-model="formData.adminId"
+          label="員工編號"
+          prepend-icon="mdi-account"
+          required
+        ></v-text-field>
+        <v-text-field
+          v-model="formData.password"
+          label="密碼"
+          prepend-icon="mdi-lock"
+          type="password"
+          required
+        ></v-text-field>
+        <v-btn type="submit">送出</v-btn>
+      </form>
+    </v-card>
+  </v-dialog>
+</template>
+
+
+
+
+
+
+
+
+<!-- <template>
   <v-app-bar>
     <v-menu>
       <template v-slot:activator="{ props }">
@@ -160,29 +282,35 @@ const reviewLinks = [{
 </v-list>
       
     </v-list>
-  </v-navigation-drawer>
+  </v-navigation-drawer> -->
   <!-- 登入表單 -->
-  <v-dialog v-model="loginDialog">
-    <v-card class="pa-6 mx-auto" style="width: 25%; height: auto">
-      <form @submit.prevent="login">
-        <v-text-field
-          v-model="formData.adminId"
-          label="員工編號"
-          prepend-icon="mdi-account"
-          required
-        ></v-text-field>
-        <v-text-field
-          v-model="formData.password"
-          label="密碼"
-          prepend-icon="mdi-lock"
-          type="password"
-          required
-        ></v-text-field>
-        <v-btn type="submit">送出</v-btn>
-      </form>
-    </v-card>
-  </v-dialog>
+  
 
-</template>
+<!-- </template> -->
 <style scoped>
+/* 標題字體 */
+.sidebar-title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+/* 副標題字體 */
+.sidebar-subtitle {
+  font-size: 1rem;
+  color: rgba(0,0,0,0.6);
+}
+
+/* item字體 */
+.sidebar-item {
+  font-size: 2rem;
+}
+
+/* 設定目前路由的顏色 */
+.active-item {
+  background: #ff9800 !important;
+  color: white !important;
+}
+.active-item .v-list-item-title,
+.active-item .v-icon {
+  color: white !important;
+}
 </style>
