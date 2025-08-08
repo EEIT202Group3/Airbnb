@@ -81,10 +81,10 @@ public class Order implements java.io.Serializable {
 	    private Integer price;              // 房租金額
 
 	    @Column(name = "total_amount")
-	    private BigDecimal totalAmount;    // 租車金額
+	    private BigDecimal total;    // 租車金額
 
 	    @Column(name = "total")
-	    private BigDecimal total;              // 總金額
+	    private BigDecimal totalAmount;              // 總金額
 
 	    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	    @Column(name = "paid_time")
@@ -153,11 +153,11 @@ public class Order implements java.io.Serializable {
 		public Integer getPrice() {return price;}
 		public void setPrice(Integer price) {this.price = price;}
 
-		public BigDecimal getTotalamount() {return totalAmount;}
-		public void setTotalamount(BigDecimal totalAmount) {this.totalAmount = totalAmount;}
-
 		public BigDecimal getTotal() {return total;}
 		public void setTotal(BigDecimal total) {this.total = total;}
+
+		public BigDecimal getTotalamount() {return totalAmount;}
+		public void setTotalamount(BigDecimal totalAmount) {this.totalAmount = totalAmount;}
 
 		public LocalDateTime getPaidtime() {return paidTime;}
 		public void setPaidtime(LocalDateTime paidTime) {this.paidTime = paidTime;}

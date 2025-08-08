@@ -31,7 +31,7 @@ import jakarta.transaction.Transactional;
 
 //接收 /ordersconfirm 的 POST 請求
 @RestController
-@RequestMapping("/orderconfirm")
+@RequestMapping("/api/orderconfirm")
 @Transactional
 public class OrderConfirm {
 
@@ -48,8 +48,15 @@ public class OrderConfirm {
 	private CustomerRepository customerRepository;
 
 	@PostMapping("/preview")
-	public ResponseEntity<?> previewOrder(@RequestBody OrderRequestDto dto, @CookieValue(value = "jwt_customer") String token) {
-		String email = jwtService.extractEmail(token);
+	public ResponseEntity<?> previewOrder(@RequestBody OrderRequestDto dto, @CookieValue(value = "jwt_customer", required = false) String token) {
+		//String email = jwtService.extractEmail(token);
+		//測試用
+		String email ;
+		if(token==null || token.isEmpty()) {
+			email="sa@gmail.com";
+		}else {
+			email=jwtService.extractEmail(token);
+		}
 		LisBean listing = listRepository.findById(dto.getListid()).orElseThrow(() -> new RuntimeException("房源不存在"));
 		Customer customer = customerRepository.findCustomerByEmail(email)
 				.orElseThrow(() -> new RuntimeException("會員不存在"));
