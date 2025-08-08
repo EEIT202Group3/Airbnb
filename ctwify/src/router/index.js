@@ -14,6 +14,33 @@ import PaymentPage from '../components/payment/PaymentPage.vue';
 import PaymentSuccessPage from '../components/payment/PaymentSuccessPage.vue';
 
 const routes = [
+  {
+    path: '/',
+    component: () => import("@/layouts/MainLayout.vue"),
+    children: [
+      {
+        path: '/customer',
+        component: () => import("@/components/user/customer/CustomerPage.vue"),
+        children: [
+          {
+            path: '',
+            component: () => import('@/components/user/customer/CustomerInfo.vue'),
+            name: 'CustomerInfo',
+          },
+          {
+            path: '/history',
+            component: () => import('@/components/user/customer/TripHistory.vue'),
+            name: 'TripHistory',
+          },
+        ]
+      },
+      {
+        path: '/login',
+        component: () => import('@/components/user/LoginSignup.vue')
+      }
+    ]
+  }
+
   // {
   //   path: "/main",
   //   component: () => import("@/layouts/MainLayout.vue"),
@@ -43,12 +70,12 @@ const routes = [
   // { path: "/listing/detail/:id", component: Detail },
   // { path: "/listing/edit/:id", component: Edit },
 
-  { path: '/', component: ListingPage, name: 'listing' },
-  { path: '/booking', component: BookingPage, name: 'booking' },
-  { path: '/confirmation', component: ConfirmationPage, name: 'confirmation' },
-  { path: '/ecpay', component: Ecpay, name: 'ecpay' },
-  { path: '/payment', component: PaymentPage, name: 'payment' },
-  { path: '/payment-success', component: PaymentSuccessPage, name: 'paymentSuccess' },
+  // { path: '/', component: ListingPage, name: 'listing' },
+  // { path: '/booking', component: BookingPage, name: 'booking' },
+  // { path: '/confirmation', component: ConfirmationPage, name: 'confirmation' },
+  // { path: '/ecpay', component: Ecpay, name: 'ecpay' },
+  // { path: '/payment', component: PaymentPage, name: 'payment' },
+  // { path: '/payment-success', component: PaymentSuccessPage, name: 'paymentSuccess' },
 
 ];
 
