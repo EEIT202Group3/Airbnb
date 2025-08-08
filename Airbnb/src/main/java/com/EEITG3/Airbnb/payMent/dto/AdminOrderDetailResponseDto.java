@@ -17,8 +17,8 @@ public class AdminOrderDetailResponseDto {
 	private Integer locationId;        
 	private String paymentId;         
 	private Integer price;        
-	private BigDecimal totalAmount;
 	private BigDecimal total;             
+	private BigDecimal totalAmount;
 	private LocalDateTime paidTime;       
 	private String bookingStatus;   
 	private String bookingMethod;    

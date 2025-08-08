@@ -15,7 +15,7 @@ public class AdminOrderAllResponseDto {
     private String bookingstatus;
     private LocalDateTime checkindate;
     private LocalDateTime checkoutdate;
-    private BigDecimal total;
+    private BigDecimal totalamount;
     public String getBookingId() {
     	return bookingId;
     }
@@ -82,11 +82,11 @@ public class AdminOrderAllResponseDto {
 	public void setCheckoutdate(LocalDateTime checkoutdate) {
 		this.checkoutdate = checkoutdate;
 	}
-	public BigDecimal getTotal() {
-		return total;
+	public BigDecimal getTotalamount() {
+		return totalamount;
 	}
-	public void setTotal(BigDecimal total) {
-		this.total = total;
+	public void setTotalamount(BigDecimal totalamount) {
+		this.totalamount = totalamount;
 	}
 
 }

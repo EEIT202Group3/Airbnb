@@ -17,6 +17,6 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 
 	// @Query("SELECT o FROM Order o WHERE o.booking_id = :booking_id")
 	Optional<Order> findByBookingId(String bookingId);
-
 	
+	//Optional<Order> findyByPaymentId(String paymentId);
 }
