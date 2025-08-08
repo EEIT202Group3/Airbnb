@@ -198,12 +198,6 @@ const selectedReview = ref(null);
 const viewDialog = ref(false);
 const loading = ref(false);
 
-const avg =
-  (selectedReview.commScore +
-    selectedReview.cleanScore +
-    selectedReview.valueScore) /
-  3;
-
 // 顯示單筆評論
 const viewReview = async (item) => {
   const id = item.reviewId;

@@ -1,9 +1,8 @@
 <script setup lang="ts">
-
-import { ref,onMounted } from 'vue';
-import { getCurrentAdmin } from '@/service/user/AdminService';
-import { useRouter,useRoute } from 'vue-router';
-import { useAdminStore } from '@/stores/user/adminStore';
+import { ref, onMounted } from "vue";
+import { getCurrentAdmin } from "@/service/user/AdminService";
+import { useRouter, useRoute } from "vue-router";
+import { useAdminStore } from "@/stores/user/adminStore";
 const loginDialog = ref(false);
 const adminStore = useAdminStore();
 const formData = ref({
@@ -13,12 +12,12 @@ const formData = ref({
 const router = useRouter();
 const route = useRoute();
 const isOpen = ref(false);
-const isActive = (to?: string) => to && route.path === to
+const isActive = (to?: string) => to && route.path === to;
 const items = [
-  {title:'客戶清單', icon:'mdi-account', to:'/customers'},
-  {title:'房東清單', icon:'mdi-home-account', to:'/hosts'},
-]
-
+  { title: "客戶清單", icon: "mdi-account", to: "/customers" },
+  { title: "房東清單", icon: "mdi-home-account", to: "/hosts" },
+  { title: "評論清單", icon: "mdi-comment", to: "/reviews/list" },
+];
 
 // const reviewLinks = [{
 //     name: "評論",
@@ -40,70 +39,65 @@ const items = [
 //   },
 // ];
 
-onMounted(async()=>{
-    if(!adminStore.admin){
-        const result = await getCurrentAdmin();
-        adminStore.admin = result;
-    }
-})
+onMounted(async () => {
+  if (!adminStore.admin) {
+    const result = await getCurrentAdmin();
+    adminStore.admin = result;
+  }
+});
 
-async function logout(){
-    try {
-        const response = await fetch('http://localhost:8080/api/admins/logout', {
-            method: 'POST',
-            credentials: 'include'
-        });
-        if (response.ok) {
-            adminStore.admin=null;
-            alert("登出成功");
-        } else {
-            alert("登出失敗");
-        }
-        router.push({name:'Homepage'})
-    } catch (error) {
-        console.error("登出錯誤：", error);
-
+async function logout() {
+  try {
+    const response = await fetch("http://localhost:8080/api/admins/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    if (response.ok) {
+      adminStore.admin = null;
+      alert("登出成功");
+    } else {
+      alert("登出失敗");
     }
     router.push({ name: "Homepage" });
+  } catch (error) {
+    console.error("登出錯誤：", error);
+  }
+  router.push({ name: "Homepage" });
 }
 async function login() {
-    loginDialog.value = false;
-    try {
-        const response = await fetch('http://localhost:8080/api/admins/login', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                adminId: formData.value.adminId,
-                password: formData.value.password
-            })
-        });
-        if(response.ok){
-            adminStore.admin = await getCurrentAdmin();
-            alert('登入成功')
-            router.push({name:'Homepage'});
-        }
-    } catch (error) {
-        console.error("發生錯誤：", error);
-        alert('無法連線後端伺服器');
-        router.push({name:'Homepage'});
+  loginDialog.value = false;
+  try {
+    const response = await fetch("http://localhost:8080/api/admins/login", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        adminId: formData.value.adminId,
+        password: formData.value.password,
+      }),
+    });
+    if (response.ok) {
+      adminStore.admin = await getCurrentAdmin();
+      alert("登入成功");
+      router.push({ name: "Homepage" });
     }
+  } catch (error) {
+    console.error("發生錯誤：", error);
+    alert("無法連線後端伺服器");
+    router.push({ name: "Homepage" });
+  }
 }
-
-
 </script>
 
 <template>
-  <v-navigation-drawer
-    app
-    permanent
-    width="300"
-    class="pa-4"
-  >
+  <v-navigation-drawer app permanent width="300" class="pa-4">
     <!-- Logo / Title -->
-    <div class="d-flex align-center mb-6" style="margin-bottom: 0px; padding-bottom: 0px;">
+    <div
+      class="d-flex align-center mb-6"
+      style="margin-bottom: 0px; padding-bottom: 0px"
+    >
       <v-avatar color="white" size="110" rounded="circle">
         <v-img src="../src/icon/logo.png"></v-img>
       </v-avatar>
@@ -114,17 +108,13 @@ async function login() {
     </div>
 
     <v-list density="comfortable" nav>
-      <v-list-item 
+      <v-list-item
         v-if="adminStore.admin"
         :title="adminStore.admin.username"
         :subtitle="adminStore.admin.adminId"
       >
         <template #append>
-          <v-btn
-            variant="text"
-            prepend-icon="mdi-logout"
-            @click="logout()"
-          >
+          <v-btn variant="text" prepend-icon="mdi-logout" @click="logout()">
             登出
           </v-btn>
         </template>
@@ -149,7 +139,9 @@ async function login() {
               v-bind="props"
               :title="item.title"
               class="rounded-lg sidebar-item"
-              :class="{ 'active-item': item.children.some(c => isActive(c.to)) }"
+              :class="{
+                'active-item': item.children.some((c) => isActive(c.to)),
+              }"
             />
           </template>
 
@@ -198,13 +190,6 @@ async function login() {
     </v-card>
   </v-dialog>
 </template>
-
-
-
-
-
-
-
 
 <!-- <template>
   <v-app-bar>
@@ -283,8 +268,7 @@ async function login() {
       
     </v-list>
   </v-navigation-drawer> -->
-  <!-- 登入表單 -->
-  
+<!-- 登入表單 -->
 
 <!-- </template> -->
 <style scoped>
@@ -296,7 +280,7 @@ async function login() {
 /* 副標題字體 */
 .sidebar-subtitle {
   font-size: 1rem;
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 /* item字體 */
