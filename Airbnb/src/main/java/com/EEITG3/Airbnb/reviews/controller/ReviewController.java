@@ -31,7 +31,7 @@ public class ReviewController {
 	@Autowired
 	private ReviewService rService;
 
-	@GetMapping("/admins/reviews")
+	@GetMapping("/reviews")
 	public List<Review> getAllReviews(
 			@RequestParam(required = false) String type,
 		    @RequestParam(required = false) String keyword) { 
@@ -50,6 +50,10 @@ public class ReviewController {
 	@GetMapping("/admins/reviews/get/{id}")
 	public Review getReviewById(@PathVariable Integer id) {
 		return rService.findByReviewID(id); // 找不到可回 null 或拋異常
+	}
+	@GetMapping("/reviews/getByCust/{id}")
+	public List<Review> getAllReviewsByCustId(@PathVariable String id){
+		return rService.findByCustId(id);
 	}
 
 	@DeleteMapping("/admins/reviews/del/{id}")

@@ -37,29 +37,32 @@
         <div><strong>性價比：</strong>{{ selectedReview.valueScore }}</div>
         <div><strong>房客評論：</strong>{{ selectedReview.cusComm }}</div>
         <div><strong>房東評論：</strong>{{ selectedReview.hostComm }}</div>
-        <div><strong>圖片1：</strong>
-        <v-img
-          :width="252"
-          aspect-ratio="4/3"
-          cover
-           :src= "`http://localhost:8080/images/${selectedReview.image1}`"
-        ></v-img>
+        <div>
+          <strong>圖片1：</strong>
+          <v-img
+            :width="252"
+            aspect-ratio="4/3"
+            cover
+            :src="`http://localhost:8080/images/${selectedReview.image1}`"
+          ></v-img>
         </div>
-        <div><strong>圖片2：</strong>
-        <v-img
-          :width="252"
-          aspect-ratio="4/3"
-          cover
-           :src= "`http://localhost:8080/images/${selectedReview.image2}`"
-        ></v-img>
+        <div>
+          <strong>圖片2：</strong>
+          <v-img
+            :width="252"
+            aspect-ratio="4/3"
+            cover
+            :src="`http://localhost:8080/images/${selectedReview.image2}`"
+          ></v-img>
         </div>
-        <div><strong>圖片3：</strong>
-        <v-img
-          :width="252"
-          aspect-ratio="4/3"
-          cover
-           :src= "`http://localhost:8080/images/${selectedReview.image3}`"
-        ></v-img>
+        <div>
+          <strong>圖片3：</strong>
+          <v-img
+            :width="252"
+            aspect-ratio="4/3"
+            cover
+            :src="`http://localhost:8080/images/${selectedReview.image3}`"
+          ></v-img>
         </div>
       </v-card-text>
       <v-card-text v-else> 找不到該筆資料。 </v-card-text>
@@ -86,7 +89,6 @@
         <div><strong>評論日期：</strong>{{ selectedReview.reviewDate }}</div>
         <div>
           <!-- 乾淨評分 -->
-          <strong>乾淨評分：</strong>{{ selectedReview.cleanScore }}
           <div>
             <v-rating
               v-model="selectedReview.cleanScore"
@@ -127,23 +129,26 @@
             ></v-rating>
           </div>
         </div>
-
-        <!-- 房客評論 -->
-        <v-textarea
-          v-model="selectedReview.cusComm"
-          label="房客評論"
-          outlined
-          rows="3"
-          auto-grow
-        ></v-textarea>
-        <!-- 房東評論 -->
-        <v-textarea
-          v-model="selectedReview.hostComm"
-          label="房東評論"
-          outlined
-          rows="3"
-          auto-grow
-        ></v-textarea>
+        <div>
+          <!-- 房客評論 -->
+          <v-textarea
+            v-model="selectedReview.cusComm"
+            label="房客評論"
+            outlined
+            rows="3"
+            auto-grow
+          ></v-textarea>
+        </div>
+        <div>
+          <!-- 房東評論 -->
+          <v-textarea
+            v-model="selectedReview.hostComm"
+            label="房東評論"
+            outlined
+            rows="3"
+            auto-grow
+          ></v-textarea>
+        </div>
       </v-card-text>
       <v-card-text v-else> 找不到該筆資料。 </v-card-text>
       <v-card-actions>
@@ -202,17 +207,15 @@ const loading = ref(false);
 const viewReview = async (item) => {
   const id = item.reviewId;
   console.log("正在讀取評論 ID:", id);
-  
-  
+
   loading.value = true;
   try {
     const resp = await axios.get(
-      `http://localhost:8080/api/admins/reviews/get/${id}`
-      , { withCredentials: true }
+      `http://localhost:8080/api/admins/reviews/get/${id}`,
+      { withCredentials: true }
     );
     selectedReview.value = resp.data;
     viewDialog.value = true;
-    
   } catch (err) {
     console.error("取得評論失敗:", err);
     selectedReview.value = null;

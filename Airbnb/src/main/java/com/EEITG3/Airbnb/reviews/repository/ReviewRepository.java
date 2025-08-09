@@ -26,5 +26,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		       "   OR (:type = 'custId' AND CAST(r.custId AS string) LIKE %:keyword%) " +
 		       "   OR (:type = 'listId' AND CAST(r.listId AS string) LIKE %:keyword%)")
 		List<Review> findByTypeAndKeyword(@Param("type") String type, @Param("keyword") String keyword);
+	
+//	@Query("SELECT r, l.list_id, l.photo1 FROM Review r JOIN ")
 
 }
