@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
 @Entity
 @Table(name = "listings")
 public class LisBean {
@@ -13,69 +12,66 @@ public class LisBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "list_id")
-    private Integer listId; 		// 房源ID
+    private Integer listId; // 房源ID
 
     @Column(name = "host_id", nullable = false, columnDefinition = "uniqueidentifier")
-    private UUID host_Id;  	    // 房東會員ID
+    private UUID host_Id; // 房東會員ID
 
     @Column(name = "review_count", nullable = false)
-    private int reviewCount = 0;   // 評價數(根據評價那邊的平均分數去連結reviewCount 以平均分數高低去排序房源排列的優先順序)
+    private int reviewCount = 0; // 評價數
 
-    @Column(name = "house_name")    
-    private String house_Name;	   //房子名稱
+    @Column(name = "house_name")
+    private String house_Name; // 房子名稱
 
     @Column(name = "ads")
-    private String ads;            //地址
+    private String ads; // 地址
 
     @Column(name = "room")
-    private String room;	  	   //房型
+    private String room; // 房型
 
     @Column(name = "bed")
-    private String bed;			   //床位
+    private String bed; // 床位
 
-    @Column(name = "describe")	   
-    private String describe;	   //描述
+    @Column(name = "describe")
+    private String describe; // 描述
 
     @Column(name = "tel")
-    private String tel;			   //電話
+    private String tel; // 電話
 
     @Column(name = "ppl")
-    private int ppl;			   //人數
+    private int ppl; // 人數
 
     @Column(name = "price")
-    private int price; 			   //價格
+    private int price; // 價格
 
     @Column(name = "photo1")
-    private String photo1;		   //圖片1~10
-
+    private String photo1;
     @Column(name = "photo2")
     private String photo2;
-
     @Column(name = "photo3")
     private String photo3;
-
     @Column(name = "photo4")
     private String photo4;
-
     @Column(name = "photo5")
     private String photo5;
-
     @Column(name = "photo6")
     private String photo6;
-
     @Column(name = "photo7")
     private String photo7;
-
     @Column(name = "photo8")
     private String photo8;
-
     @Column(name = "photo9")
     private String photo9;
-
     @Column(name = "photo10")
     private String photo10;
 
-    //資料關聯
+    @Column(name = "approved", nullable = true)  
+    private Boolean approved; // true=通過, false=拒絕, null=待審核
+
+    @Column(name = "published", nullable = false)
+    private Boolean published = true; // true=上架, false=下架
+
+    // 多對多關聯：房源設備
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
     @JoinTable(
         name = "Listings_Equipment",
@@ -83,7 +79,6 @@ public class LisBean {
         inverseJoinColumns = @JoinColumn(name = "equip_id")
     )
     private List<EquipmentBean> equipments = new ArrayList<>();
-
 
     public LisBean() {}
 
@@ -99,9 +94,12 @@ public class LisBean {
         this.ppl = ppl;
         this.price = price;
         this.reviewCount = 0;
+        this.approved = null; // 新增時預設待審核
+        this.published = true; // 預設上架
     }
 
-    //連接房源與設備相關
+   
+
     public Integer getListId() { return listId; }
     public void setListId(Integer listId) { this.listId = listId; }
 
@@ -164,9 +162,13 @@ public class LisBean {
 
     public String getPhoto10() { return photo10; }
     public void setPhoto10(String photo10) { this.photo10 = photo10; }
-    
-    
-    //讀取 equipments 屬性的讀取與設定功能
+
     public List<EquipmentBean> getEquipments() { return equipments; }
     public void setEquipments(List<EquipmentBean> equipments) { this.equipments = equipments; }
+
+    public Boolean getApproved() { return approved; }
+    public void setApproved(Boolean approved) { this.approved = approved; }
+
+    public Boolean getPublished() { return published; }
+    public void setPublished(Boolean published) { this.published = published; }
 }

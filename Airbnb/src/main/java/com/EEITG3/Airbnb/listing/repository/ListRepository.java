@@ -20,4 +20,14 @@ public interface ListRepository extends JpaRepository<LisBean,Integer>{
 	 @Query("SELECT l FROM LisBean l WHERE l.host_Id = :hostId")
 	 List<LisBean> findByHostId(@Param("hostId") UUID hostId);
 	 
+	 List<LisBean> findByApprovedFalse();
+	 
+	 @Query("SELECT l FROM LisBean l WHERE l.approved = false OR l.approved IS NULL")
+	 
+	 List<LisBean> findPendingListings();
+	 
+	 List<LisBean> findByPublishedTrue();
+	 
+	 List<LisBean> findByApprovedTrueAndPublishedTrue();
+	 
 }

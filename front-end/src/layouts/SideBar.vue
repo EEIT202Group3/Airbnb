@@ -62,15 +62,6 @@ async function login() {
         router.push({name:'Homepage'});
     }
 }
-
-const reviewLinks = [{
-    name: "評論",
-    icon: "mdi-comment-outline",
-    children: [
-      { path: "/reviews/insert", name: "撰寫評論" },
-      { path: "/reviews/list", name: "查看評論" },
-    ],
-  }]
 </script>
 <template>
   <v-app-bar>
@@ -103,39 +94,17 @@ const reviewLinks = [{
         ><v-icon icon="mdi-home-account"></v-icon>房東</v-list-item
       >
         <v-list-item to="/addEquipment"
-        ><v-icon icon="mdi-home-account"></v-icon>新增房源</v-list-item
+        ><v-icon icon="mdi-home-account"></v-icon>新增設備</v-list-item
+      >
+        >
+        <v-list-item to="/approveListing"
+        ><v-icon icon="mdi-home-account"></v-icon>房源審核</v-list-item
       >
       <v-list-item to="/AdminOrder"
         ><v-icon icon="mdi-invoice-text-multiple-outline"></v-icon
         >訂單管理系統</v-list-item
       >
-      <v-list>
-  <v-list-group
-    v-for="link in reviewLinks"
-    :key="link.name"
-    :prepend-icon="link.icon"
-    :value="link.name"
-  >
-    <template v-slot:activator="{ props }">
-      <v-list-item v-bind="props" :title="link.name" />
-    </template>
-
-    <v-list-item
-      v-for="child in link.children"
-      :key="child.path"
-      :to="child.path"
-      :title="child.name"
-      router
-    />
-  </v-list-group>
-</v-list>
-<v-list-item to="/AdminOrder"
-        ><v-icon icon="mdi-invoice-text-multiple-outline"></v-icon
-        >訂單管理系統</v-list-item
-      >
-
-
-    </v-list>
+    </v-list>   
   </v-navigation-drawer>
   <!-- 登入表單 -->
   <v-dialog v-model="loginDialog">
@@ -154,7 +123,7 @@ const reviewLinks = [{
           type="password"
           required
         ></v-text-field>
-        <v-btn type="submit">送出</v-btn>
+        <v-btn type="submit">送出</v-btn>npm 
       </form>
     </v-card>
   </v-dialog>

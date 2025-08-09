@@ -26,7 +26,13 @@ const routes = [
                 path: 'addEquipment',
                 component: () => import ('@/components/listing/addEquipment.vue')
 
-            }
+            },
+            {
+                 path: 'approveListing',
+                component: () => import ('@/components/listing/ApproveListing.vue')
+
+            },
+            
 
             {
                 path: "reviews/list",
