@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const showSidebar = ref(false);
 import Sidebar from "@/components/carRent/backpageComponent/Sidebar.vue";
-import {onMounted, ref} from "vue";
+import {onMounted, ref, computed, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import api from "@/api";
 
@@ -20,6 +20,7 @@ const reservation = ref<any>({
   location: "",
   status: ""
 });
+
 onMounted(async () => {
   const id = route.params.id;
   try {
@@ -30,10 +31,10 @@ onMounted(async () => {
   }
 });
 
-// 刪除訂單
+// 刪除預約
 const isEditing = ref(false);
 const deleteReservation = async () => {
-  if (!confirm("確定要刪除此筆訂單嗎？")) return;
+  if (!confirm("確定要刪除此筆預約嗎？")) return;
   try {
     const id = reservation.value.reservationId;
     await api.delete(`/reservations/delete/${id}`);
@@ -43,15 +44,15 @@ const deleteReservation = async () => {
     console.log("刪除失敗", err);
     alert("刪除失敗，請稍後再試");
   }
-}
+};
 
-// 修改訂單
+// 修改預約
 const saveEditing = async () => {
   try {
     await api.put(`/reservations/update`, reservation.value);
     alert("修改成功");
     isEditing.value = false;
-  } catch (err) {
+  } catch (err: any) {
     const msg = err?.response?.data?.message || "修改失敗，請稍後再試";
     if (msg.includes("該車牌已被登入")) {
       alert("該車牌已被登入，請再次檢查車牌資訊");
@@ -59,8 +60,10 @@ const saveEditing = async () => {
       alert(msg);
     }
   }
-}
+};
+
 // 新增模式
+const insertReservationMode = ref(false);
 const startInsertReservation = () => {
   reservation.value = {
     license: "",
@@ -77,10 +80,9 @@ const startInsertReservation = () => {
   };
   insertReservationMode.value = true;
   isEditing.value = true;
-}
+};
 
-// 新增訂單
-const insertReservationMode = ref(false);
+// 新增預約
 const insertReservation = async () => {
   try {
     const response = await api.post(`/reservations/insert`, reservation.value);
@@ -89,7 +91,7 @@ const insertReservation = async () => {
     insertReservationMode.value = false;
     isEditing.value = false;
     await router.push(`/car-rent/reservations/${newId}`);
-  } catch (err) {
+  } catch (err: any) {
     const msg = err?.response?.data?.message || "更新失敗，請稍後再試";
     if (msg.includes("該車牌已被登入")) {
       alert("該車牌已被登入，請再次檢查車牌資訊");
@@ -99,306 +101,557 @@ const insertReservation = async () => {
   }
 };
 
-// 完成訂單
+// 完成預約
 function finishedReservation() {
-  reservation.value.status = "完成訂單";
+  reservation.value.status = "完成預約";
   saveEditing();
-  alert("訂單已標記為完成");
+  alert("預約已標記為完成");
+}
+
+const currentTab = ref<'summary' | 'note'>('summary');
+const activeField = ref<string | null>(null);
+const isInlineEditable = computed(() => isEditing.value || insertReservationMode.value);
+
+// 點擊時顯示框線
+watch([isEditing, insertReservationMode], () => {
+  activeField.value = null;
+});
+
+// 排版時間
+function formatDateTime(dt?: string) {
+  if (!dt) return '—';
+  return dt.replace('T', ' ').slice(0, 16);
 }
 </script>
 
 <template>
-  <div class="container-fluid" v-if="reservation">
-    <div class="container-fluid">
-      <div class="row">
-        <main class="main-content">
-          <button class="btn btn-outline-dark m-2" @click="showSidebar = true">
-            <i class="fa-solid fa-bars"></i> 功能選單
-          </button>
-          <Sidebar :visible="showSidebar" :close="() => showSidebar = false"/>
+  <div v-if="reservation">
+    <v-container fluid class="px-6 py-4 main-content">
+      <!-- 功能選單 -->
+      <v-btn
+          variant="outlined"
+          class="ma-2"
+          prepend-icon="mdi-menu"
+          @click="showSidebar = true"
+      >
+        功能選單
+      </v-btn>
+      <Sidebar :visible="showSidebar" :close="() => (showSidebar = false)"/>
 
-          <div class="bg-white p-4 rounded shadow-sm">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+      <v-card class="pa-4 bg-white" elevation="1">
 
-              <h4 class="fw-bold">訂單一覽</h4>
-              <div id="action-buttons">
-                <button class="btn btn-outline-primary btn-sm"
-                        v-if="!insertReservationMode && !isEditing"
-                        @click="finishedReservation">
-                  完成訂單
-                </button>
-                <button class="btn btn-primary btn-sm" v-if="isEditing && !insertReservationMode"
-                        @click="saveEditing">確定儲存
-                </button>
-                <button class="btn btn-outline-success btn-sm"
-                        v-if="!insertReservationMode && !isEditing"
-                        @click="startInsertReservation">
-                  新增訂單
-                </button>
-                <button class="btn btn-primary btn-sm"
-                        v-if="insertReservationMode"
-                        @click="insertReservation">
-                  確定新增
-                </button>
-                <button class="btn btn-outline-secondary btn-sm"
-                        v-if="insertReservationMode"
-                        @click="insertReservationMode = false; isEditing = false">
-                  取消
-                </button>
-                <button class="btn btn-outline-secondary btn-sm" v-if="!insertReservationMode && !insertReservationMode"
-                        @click="isEditing = !isEditing">
-                  {{ isEditing ? "取消 " : "編輯" }}
-                </button>
-                <button class="btn btn-danger btn-sm" @click="deleteReservation">刪除訂單</button>
-              </div>
-            </div>
+        <div class="d-flex align-center justify-space-between mb-3">
+          <div class="text-h5 font-weight-bold">預約一覽</div>
+          <div id="action-buttons" class="d-flex flex-wrap" style="gap:.5rem;">
+            <v-btn
+                v-if="!insertReservationMode && !isEditing"
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-check"
+                @click="finishedReservation"
+            >完成預約
+            </v-btn>
 
-            <!-- 分頁按鈕 -->
-            <ul class="nav nav-tabs mb-3" id="infoTabs" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary"
-                        type="button" role="tab">摘要
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="note-tab" data-bs-toggle="tab" data-bs-target="#note"
-                        type="button" role="tab">備註
-                </button>
-              </li>
-            </ul>
+            <v-btn
+                v-if="isEditing && !insertReservationMode"
+                color="primary"
+                size="small"
+                prepend-icon="mdi-content-save"
+                @click="saveEditing"
+            >確定儲存
+            </v-btn>
 
-            <!-- 分頁內容 -->
-            <div class="tab-content" id="infoTabsContent">
-              <!-- 摘要 -->
-              <div class="tab-pane fade show active" id="summary" role="tabpanel">
-                <div class="row">
-                  <!-- 個人資料 -->
-                  <div class="col-md-6 mb-3">
-                    <div class="card h-100">
-                      <div class="card-body">
-                        <h5 class="card-title">個人資料</h5>
-                        <table class="table table-bordered table-sm">
-                          <tbody>
-                          <tr>
-                            <td>駕照號碼</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.license }}</span>
-                              <input v-else class="form-control input-short editable" type="text"
-                                     v-model="reservation.license"/>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>姓名</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.driverName }}</span>
-                              <input v-else class="form-control input-short editable" type="text"
-                                     v-model="reservation.driverName"/>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>電話</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.driverPhone }}</span>
-                              <input v-else class="form-control input-short editable" type="text"
-                                     v-model="reservation.driverPhone"/>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>電子信箱</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.driverEmail }}</span>
-                              <input v-else class="form-control input-short editable" type="text"
-                                     v-model="reservation.driverEmail"/>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>年齡</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.driverAge }}</span>
-                              <input v-else class="form-control input-short editable" type="number"
-                                     v-model="reservation.driverAge"/>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>租屋訂單編號</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.bookingId }}</span>
-                              <input v-else class="form-control input-short editable" type="text"
-                                     v-model="reservation.bookingId"/>
-                            </td>
-                          </tr>
-                          </tbody>
+            <v-btn
+                v-if="!insertReservationMode && !isEditing"
+                variant="outlined"
+                color="success"
+                size="small"
+                prepend-icon="mdi-plus"
+                @click="startInsertReservation"
+            >新增預約
+            </v-btn>
 
-                        </table>
-                      </div>
-                    </div>
-                  </div>
+            <v-btn
+                v-if="insertReservationMode"
+                color="primary"
+                size="small"
+                prepend-icon="mdi-check-bold"
+                @click="insertReservation"
+            >確定新增
+            </v-btn>
 
-                  <!-- 訂單摘要 -->
-                  <div class="col-md-6 mb-3">
-                    <div class="card h-100">
-                      <div class="card-body">
-                        <h5 class="card-title">本次訂單摘要</h5>
-                        <table class="table table-bordered table-sm">
-                          <tbody>
-                          <tr>
-                            <td>訂單編號</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.reservationId }}</span>
-                              <input v-else type="text" class="form-control input-short"
-                                     v-model="reservation.reservationId" disabled placeholder="不可自行輸入">
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>訂單建立時間</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.createdAt }}</span>
-                              <input v-else type="text" class="form-control input-short editable"
-                                     v-model="reservation.createdAt" disabled placeholder="不可自行輸入">
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>訂單總金額</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.totalAmount }}</span>
-                              <input v-else type="number" class="form-control input-short editable"
-                                     v-model="reservation.totalAmount">
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>預約時間</td>
-                            <td>
-                              <div class="datetime-group" v-if="!isEditing">
-                                {{ reservation.pickupDate }} ～ {{ reservation.returnDate }}
-                              </div>
-                              <div class="datetime-group" v-else>
-                                <input type="datetime-local" class="form-control input-short editable"
-                                       v-model="reservation.pickupDate">
-                                <span>～</span>
-                                <input type="datetime-local" class="form-control input-short editable"
-                                       v-model="reservation.returnDate">
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>租用車輛</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.vehicleId }}</span>
-                              <input v-else type="text" class="form-control input-short editable"
-                                     v-model="reservation.vehicleId">
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>租車地點</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.locationId }}</span>
-                              <input v-else type="text" class="form-control input-short editable"
-                                     v-model="reservation.locationId">
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>付款狀態</td>
-                            <td>
-                              <span v-if="!isEditing">{{ reservation.status }}</span>
-                              <select v-else class="form-select input-short editable" v-model="reservation.status">
-                                <option value="未付款">未付款</option>
-                                <option value="已付款">已付款</option>
-                                <option value="取消訂單">取消訂單</option>
-                                <option value="完成訂單" disabled class="text-info">完成訂單</option>
-                              </select>
-                            </td>
-                          </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <v-btn
+                v-if="insertReservationMode"
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-close"
+                @click="insertReservationMode = false; isEditing = false"
+            >取消
+            </v-btn>
 
-              <!-- 備註 -->
-              <div class="tab-pane fade" id="note" role="tabpanel">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">備註</h5>
-                    <textarea class="form-control" rows="6"
-                              placeholder="輸入關於此使用者的備註..."></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <v-btn
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-pencil"
+                @click="isEditing = !isEditing"
+            >{{ isEditing ? "取消" : "編輯" }}
+            </v-btn>
+
+            <v-btn
+                color="error"
+                size="small"
+                prepend-icon="mdi-delete"
+                @click="deleteReservation"
+            >刪除預約
+            </v-btn>
           </div>
-        </main>
-      </div>
-    </div>
+        </div>
+
+        <!-- 分頁 -->
+        <v-tabs
+            v-model="currentTab"
+            density="comfortable"
+            color="primary"
+        >
+          <v-tab value="summary">摘要</v-tab>
+          <v-tab value="note">備註</v-tab>
+        </v-tabs>
+
+        <v-window v-model="currentTab" class="mt-3">
+          <!-- 摘要 -->
+          <
+          <v-window-item value="summary">
+            <v-row dense align="stretch">
+              <!-- 個人資料 -->
+              <v-col cols="12" md="6" class="d-flex">
+                <v-card class="bg-white flex-grow-1" elevation="1">
+                  <v-card-title class="text-subtitle-1">個人資料</v-card-title>
+                  <v-card-text>
+                    <v-table density="compact" class="text-no-wrap">
+                      <colgroup>
+                        <col class="label-col"/>
+                        <col/>
+                      </colgroup>
+                      <tbody>
+
+                      <tr>
+                        <td class="label-cell">駕照號碼</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'license')"
+                                @click="isInlineEditable && (activeField = 'license')"
+                            >
+                              {{ reservation.license || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'license'"
+                                v-model="reservation.license"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">姓名</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'driverName')"
+                                @click="isInlineEditable && (activeField = 'driverName')"
+                            >
+                              {{ reservation.driverName || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'driverName'"
+                                v-model="reservation.driverName"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">電話</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'driverPhone')"
+                                @click="isInlineEditable && (activeField = 'driverPhone')"
+                            >
+                              {{ reservation.driverPhone || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'driverPhone'"
+                                v-model="reservation.driverPhone"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">電子信箱</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'driverEmail')"
+                                @click="isInlineEditable && (activeField = 'driverEmail')"
+                            >
+                              {{ reservation.driverEmail || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'driverEmail'"
+                                v-model="reservation.driverEmail"
+                                type="email"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">年齡</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'driverAge')"
+                                @click="isInlineEditable && (activeField = 'driverAge')"
+                            >
+                              {{ reservation.driverAge ?? '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'driverAge'"
+                                v-model.number="reservation.driverAge"
+                                type="number"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">租屋訂單編號</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'bookingId')"
+                                @click="isInlineEditable && (activeField = 'bookingId')"
+                            >
+                              {{ reservation.bookingId || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'bookingId'"
+                                v-model="reservation.bookingId"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </v-table>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+
+              <!-- 本次預約摘要 -->
+              <v-col cols="12" md="6" class="d-flex">
+                <v-card class="bg-white flex-grow-1" elevation="1">
+                  <v-card-title class="text-subtitle-1">本次預約摘要</v-card-title>
+                  <v-card-text>
+                    <v-table density="compact" class="text-no-wrap">
+                      <colgroup>
+                        <col class="label-col"/>
+                        <col/>
+                      </colgroup>
+                      <tbody>
+
+                      <tr>
+                        <td class="label-cell">預約編號</td>
+                        <td>
+                          <div class="fe-wrapper disabled">
+                            <div class="fe-display">{{ reservation.reservationId ?? '—' }}</div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">預約建立時間</td>
+                        <td>
+                          <div class="fe-wrapper disabled">
+                            <div class="fe-display">{{ formatDateTime(reservation.createdAt) }}</div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">預約總金額</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'totalAmount')"
+                                @click="isInlineEditable && (activeField = 'totalAmount')"
+                            >
+                              {{ reservation.totalAmount ?? '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'totalAmount'"
+                                v-model.number="reservation.totalAmount"
+                                type="number"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">預約時間</td>
+                        <td>
+                          <div class="fe-wrapper">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && (activeField === 'pickupDate' || activeField === 'returnDate'))"
+                                @click="isInlineEditable && (activeField = 'pickupDate')"
+                            >
+                              {{ formatDateTime(reservation.pickupDate) }} ～ {{
+                                formatDateTime(reservation.returnDate)
+                              }}
+                            </div>
+                            <div
+                                class="datetime-edit"
+                                v-show="isInlineEditable && (activeField === 'pickupDate' || activeField === 'returnDate')"
+                            >
+                              <v-text-field
+                                  v-model="reservation.pickupDate"
+                                  type="datetime-local"
+                                  density="comfortable"
+                                  variant="outlined"
+                                  hide-details
+                                  class="fe-input"
+                                  @focus="activeField = 'pickupDate'"
+                                  @blur="activeField = null"
+                              />
+                              <span class="mx-2">～</span>
+                              <v-text-field
+                                  v-model="reservation.returnDate"
+                                  type="datetime-local"
+                                  density="comfortable"
+                                  variant="outlined"
+                                  hide-details
+                                  class="fe-input"
+                                  @focus="activeField = 'returnDate'"
+                                  @blur="activeField = null"
+                              />
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">租用車輛</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'vehicleId')"
+                                @click="isInlineEditable && (activeField = 'vehicleId')"
+                            >
+                              {{ reservation.vehicleId ?? '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'vehicleId'"
+                                v-model="reservation.vehicleId"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">租車地點</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'locationId')"
+                                @click="isInlineEditable && (activeField = 'locationId')"
+                            >
+                              {{ reservation.locationId ?? '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'locationId'"
+                                v-model="reservation.locationId"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">付款狀態</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'status')"
+                                @click="isInlineEditable && (activeField = 'status')"
+                            >
+                              {{ reservation.status || '—' }}
+                            </div>
+                            <v-select
+                                v-show="isInlineEditable && activeField === 'status'"
+                                v-model="reservation.status"
+                                :items="[
+                        { title: '未付款', value: '未付款' },
+                        { title: '已付款', value: '已付款' },
+                        { title: '取消預約', value: '取消預約' }
+                      ]"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </v-table>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-window-item>
+
+          <v-window-item value="note">
+            <v-card variant="tonal">
+              <v-card-title class="text-subtitle-1">備註</v-card-title>
+              <v-card-text>
+                <v-textarea
+                    rows="6"
+                    auto-grow
+                    placeholder="輸入關於此使用者的備註..."
+                    variant="outlined"
+                    density="comfortable"
+                />
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+        </v-window>
+      </v-card>
+    </v-container>
   </div>
 
   <div v-else class="text-center mt-5">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="mt-3">載入中...</p>
+    <v-progress-circular indeterminate/>
+    <div class="mt-3">載入中...</div>
   </div>
-
 </template>
 
 <style scoped>
-body {
-  background-color: #f8f9fa;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
+.bg-white {
+  background-color: #fff !important;
 }
 
-.sidebar a {
-  display: block;
-  padding: 10px 15px;
-  color: #333;
-  text-decoration: none;
+.label-col {
+  width: 140px;
 }
 
-.sidebar a:hover {
-  background-color: #f0f0f0;
-}
-
-.sidebar a i {
-  margin-right: 6px;
-}
-
-.main-content {
-  margin: auto;
-  padding: 20px;
-  width: calc(100% - 200px);
-
-}
-
-.form-control[readonly] {
-  background-color: #f9f9f9;
-}
-
-.input-short {
-  max-width: 100%;
-}
-
-.datetime-group {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.table td {
+.label-cell {
+  color: rgba(0, 0, 0, .6);
+  font-weight: 500;
+  text-align: right;
+  padding-right: 12px;
   white-space: nowrap;
-  width: 1%;
   vertical-align: middle;
 }
 
-.table input.form-control {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
+:deep(.v-table .v-table__wrapper table td),
+:deep(.v-table .v-table__wrapper table th) {
+  border-bottom: 1px solid rgba(0, 0, 0, .06);
 }
 
-#action-buttons button {
-  white-space: nowrap;
-  margin-left: 0.5rem;
+.fe-wrapper {
+  display: block;
+  width: 100%;
 }
+
+.fe-input {
+  width: 100%;
+}
+
+.fe-display {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  min-height: 56px;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.is-editable .fe-display {
+  cursor: pointer;
+}
+
+.fe-wrapper.disabled .fe-display {
+  color: rgba(0, 0, 0, .45);
+}
+
+.datetime-edit {
+  display: flex;
+  align-items: center;
+}
+
+.datetime-edit .fe-input {
+  flex: 1 1 0;
+}
+
 </style>
