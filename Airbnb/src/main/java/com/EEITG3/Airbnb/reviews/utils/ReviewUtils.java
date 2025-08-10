@@ -18,7 +18,7 @@ public class ReviewUtils {
 
     public List<String> uploadImg(List<MultipartFile> images){
     	
-    	String saveFileDir = "c:/temp/upload/";
+    	String saveFileDir = "D:/pohto/";
     	File dir = new File(saveFileDir);
     	if (!dir.exists()) {
     		dir.mkdirs();

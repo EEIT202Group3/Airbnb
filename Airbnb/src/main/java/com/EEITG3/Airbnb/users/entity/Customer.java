@@ -38,6 +38,12 @@ public class Customer {
 	
 	@Column(name = "created_at")
 	private LocalDateTime createAt = LocalDateTime.now();
+	
+	@Column(name = "is_verified")
+	private boolean isVerified = false;
+	
+	@Column(name = "verification_token")
+	private String verificationToken;
 
 	public Customer() {}
 	
@@ -112,6 +118,22 @@ public class Customer {
 
 	public void setCreateAt(LocalDateTime createAt) {
 		this.createAt = createAt;
+	}
+
+	public boolean isVerified() {
+		return isVerified;
+	}
+
+	public void setVerified(boolean isVerified) {
+		this.isVerified = isVerified;
+	}
+
+	public String getVerificationToken() {
+		return verificationToken;
+	}
+
+	public void setVerificationToken(String verificationToken) {
+		this.verificationToken = verificationToken;
 	}
 
 	@Override

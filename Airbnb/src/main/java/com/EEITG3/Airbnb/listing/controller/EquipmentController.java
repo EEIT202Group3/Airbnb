@@ -12,20 +12,20 @@ import com.EEITG3.Airbnb.listing.entity.EquipmentBean;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/equipment")
+@RequestMapping("/api")
 public class EquipmentController {
 
     @Autowired
     private EquipmentService equipmentService;
 
     //查詢全部設備
-    @GetMapping("/all")
+    @GetMapping("/equipment/all")
     public List<EquipmentBean> getAllEquipments() {
         return equipmentService.getAllEquipments();
     }
 
     //新增設備
-    @PostMapping("/add")
+    @PostMapping("/equipment/add")
     public String addEquipment(@RequestParam String equipName) {
     	System.out.println("成功新增的設備:"+equipName);
         boolean result = equipmentService.insertEquipment(equipName);
@@ -33,7 +33,7 @@ public class EquipmentController {
     }
 
     //刪除設備
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/equipment/delete/{id}")
     public String deleteEquipment(@PathVariable("id") int id) {
     	System.out.println("成功刪除商品ID:"+id);
         boolean result = equipmentService.deleteEquipment(id);
@@ -42,13 +42,13 @@ public class EquipmentController {
 
 
     //查詢房源設備名稱
-    @GetMapping("/names/{lisid}")
+    @GetMapping("/equipment/names/{lisid}")
     public List<String> getEquipNames(@PathVariable("lisid") int lisid) {
         return equipmentService.getEquipmentNamesByListingId(lisid);
     }
 
     //查詢房源設備 ID
-    @GetMapping("/ids/{lisid}")
+    @GetMapping("/equipment/ids/{lisid}")
     public List<Integer> getEquipIds(@PathVariable("lisid") int lisid) {
         return equipmentService.getEquipmentIdsByListingId(lisid);
     }

@@ -1,27 +1,28 @@
 <script setup lang="ts">
 import Sidebar from "@/components/carRent/backpageComponent/Sidebar.vue";
-import {onMounted, ref} from "vue";
+import {onMounted, ref, computed, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import api from "@/api";
 
 const showSidebar = ref(false);
 const route = useRoute();
+const router = useRouter();
 const vehicle = ref<any>(null);
 const isEditing = ref(false);
 const insertVehicleMode = ref(false);
-const router = useRouter();
 const selectedFile = ref<File | null>(null);
+const currentTab = ref<'summary' | 'image' | 'geo'>('summary');
 
 onMounted(async () => {
   const id = route.params.id;
   try {
     const res = await api.get(`/vehicles/${id}`);
     vehicle.value = res.data;
-    console.log(vehicle.value);
   } catch (err) {
     console.error("載入車輛資料失敗：", err);
   }
 });
+
 const emptyVehicle = {
   vehicleId: "",
   plateNo: "",
@@ -41,14 +42,12 @@ const emptyVehicle = {
   image: ""
 };
 
-// 新增模式
 const startInsertVehicle = () => {
   vehicle.value = {...emptyVehicle};
   insertVehicleMode.value = true;
   isEditing.value = true;
 };
 
-// 新增車輛
 const insertVehicle = async () => {
   try {
     const res = await api.post(`/vehicles/insert`, vehicle.value);
@@ -56,35 +55,24 @@ const insertVehicle = async () => {
     const newId = res.data.vehicleId;
     insertVehicleMode.value = false;
     isEditing.value = false;
-    await router.push(`/car-rent/back-homepage/vehicles/${newId}`);
-  } catch (err) {
+    await router.push(`/car-rent/vehicles/${newId}`);
+  } catch (err: any) {
     const msg = err?.response?.data?.message || "更新失敗，請稍後再試";
-    if (msg.includes("車輛在所選時間已被預約")) {
-      alert("此車輛在所選時間已被預約，請選擇其他時間或車輛");
-    } else {
-      alert(msg);
-    }
+    alert(msg);
   }
 };
 
-// 修改車輛
 const saveVehicle = async () => {
   try {
-    console.log("送出的資料：", JSON.stringify(vehicle.value, null, 2));
     await api.put(`/vehicles/update`, vehicle.value);
     alert("修改成功！");
     isEditing.value = false;
-  } catch (err) {
+  } catch (err: any) {
     const msg = err?.response?.data?.message || "更新失敗，請稍後再試";
-    if (msg.includes("車輛在所選時間已被預約")) {
-      alert("此車輛在所選時間已被預約，請選擇其他時間或車輛");
-    } else {
-      alert(msg);
-    }
+    alert(msg);
   }
 };
 
-// 刪除車輛
 const deleteVehicle = async () => {
   if (!confirm("確定要刪除此車輛嗎？")) return;
   try {
@@ -96,211 +84,624 @@ const deleteVehicle = async () => {
   }
 };
 
-// 圖片上傳
-  const handleFileChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files.length > 0) {
-      selectedFile.value = target.files[0];
-    }
-  };
-  const submitForm = async () => {
-    if (!selectedFile.value) {
-      alert("請先選擇圖片！");
-      return;
-    }
+//圖片上傳
+const previewUrl = ref<string | null>(null);
+watch(selectedFile, (f, prev) => {
+  if (prev && previewUrl.value) URL.revokeObjectURL(previewUrl.value);
+  previewUrl.value = f ? URL.createObjectURL(f) : null;
+});
 
-    const formData = new FormData();
-    formData.append("image", selectedFile.value);
+const submitForm = async () => {
+  if (!selectedFile.value) {
+    alert("請先選擇圖片！");
+    return;
+  }
+  const okType = /^image\/(png|jpe?g|webp|gif)$/i.test(selectedFile.value.type);
+  const okSize = selectedFile.value.size <= 2 * 1024 * 1024; // 2MB
+  if (!okType) return alert("只允許 png/jpg/jpeg/webp/gif 圖片");
+  if (!okSize) return alert("圖片大小需 ≤ 2MB");
 
-    try {
-      const res = await api.post("/vehicles/upload-image", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      const uploadedFileName = res.data.filename;
-      vehicle.value.image = uploadedFileName;
+  const formData = new FormData();
+  formData.append("image", selectedFile.value);
 
-      alert("圖片上傳成功！");
-    } catch (err) {
-      alert("圖片上傳失敗：" + err);
-    }
-  };
+  try {
+    const res = await api.post("/vehicles/upload-image", formData, {
+      headers: {"Content-Type": "multipart/form-data"},
+    });
+    vehicle.value.image = res.data.filename;
 
+    selectedFile.value = null;
+    alert("圖片上傳成功！");
+  } catch (err) {
+    alert("圖片上傳失敗：" + err);
+  }
+};
+
+const activeField = ref<string | null>(null);
+const isInlineEditable = computed(() => isEditing.value || insertVehicleMode.value);
+watch([isEditing, insertVehicleMode], () => (activeField.value = null));
 </script>
 
+
 <template>
-  <div class="container-fluid" v-if="vehicle">
-    <main class="main-content">
-      <button class="btn btn-outline-dark m-2" @click="showSidebar = true">
-        <i class="fa-solid fa-bars"></i> 功能選單
-      </button>
-      <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-outline-info btn-sm me-2" v-if="isEditing && !insertVehicleMode" @click="saveVehicle">
-          儲存
-        </button>
-        <button class="btn btn-outline-success btn-sm me-2" v-if="!insertVehicleMode && !isEditing"
-                @click="startInsertVehicle">
-          新增車輛
-        </button>
-        <button class="btn btn-primary btn-sm me-2" v-if="insertVehicleMode" @click="insertVehicle">
-          確定新增
-        </button>
-        <button class="btn btn-outline-secondary btn-sm me-2" v-if="insertVehicleMode"
-                @click="insertVehicleMode = false; isEditing = false">
-          取消新增
-        </button>
-        <button class="btn btn-outline-primary btn-sm me-2" v-if="!insertVehicleMode" @click="isEditing = !isEditing">
-          {{ isEditing ? "取消編輯" : "編輯" }}
-        </button>
-        <button class="btn btn-danger btn-sm" v-if="!insertVehicleMode" @click="deleteVehicle">
-          刪除車輛
-        </button>
-      </div>
-      <Sidebar :visible="showSidebar" :close="() => showSidebar = false"/>
+  <div v-if="vehicle">
+    <v-container fluid class="px-6 py-4 main-content">
+      <!-- 功能選單按鈕 -->
+      <v-btn
+          variant="outlined"
+          class="ma-2"
+          prepend-icon="mdi-menu"
+          @click="showSidebar = true"
+      >
+        功能選單
+      </v-btn>
+      <Sidebar :visible="showSidebar" :close="() => (showSidebar = false)"/>
 
-      <div class="bg-white p-4 rounded shadow-sm">
-        <h4 class="fw-bold mb-4">車輛資訊</h4>
-        <div class="row">
+      <v-card class="pa-4 bg-white" elevation="1">
+        <!-- 標題 + 操作區 -->
+        <div class="d-flex align-center justify-space-between mb-3">
+          <div class="text-h5 font-weight-bold">車輛資訊</div>
+          <div class="d-flex flex-wrap" style="gap:.5rem;">
+            <v-btn
+                v-if="isEditing && !insertVehicleMode"
+                color="primary"
+                size="small"
+                prepend-icon="mdi-content-save"
+                @click="saveVehicle"
+            >儲存
+            </v-btn>
 
-          <!-- 車輛圖片 -->
-          <div class="col-md-3 me-4">
-            <img
-                :src="`/carPicture/${vehicle.image}`"
-                class="img-fluid rounded-circle"
-                alt="車輛圖片"
-            />
+            <v-btn
+                v-if="!insertVehicleMode && !isEditing"
+                variant="outlined"
+                color="success"
+                size="small"
+                prepend-icon="mdi-plus"
+                @click="startInsertVehicle"
+            >新增車輛
+            </v-btn>
 
-            <div v-if="isEditing" class="mt-2">
-              <form @submit.prevent="submitForm">
-                <input type="file" class="form-control mb-2" @change="handleFileChange" />
-                <button type="submit" class="btn btn-sm btn-primary">上傳圖片</button>
-              </form>
-            </div>
-          </div>
+            <v-btn
+                v-if="insertVehicleMode"
+                color="primary"
+                size="small"
+                prepend-icon="mdi-check-bold"
+                @click="insertVehicle"
+            >確定新增
+            </v-btn>
 
-          <!-- 車輛詳細資料 -->
-          <div class="col-md-8">
-            <table class="table table-bordered table-sm">
-              <tbody>
-              <tr>
-                <td>車牌</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.plateNo }}</span>
-                  <input v-else v-model="vehicle.plateNo" class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>品牌</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.brand }}</span>
-                  <input v-else v-model="vehicle.brand" class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>型號</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.model }}</span>
-                  <input v-else v-model="vehicle.model" class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>顏色</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.color }}</span>
-                  <input v-else v-model="vehicle.color" class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>燃料類型</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.fuelType }}</span>
-                  <input v-else v-model="vehicle.fuelType" class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>傳動系統</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.transmission }}</span>
-                  <input v-else v-model="vehicle.transmission" class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>座位數</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.seatCapacity }}</span>
-                  <input v-else type="number" v-model="vehicle.seatCapacity" class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>油量容量</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.fuelCapacity }}</span>
-                  <input v-else type="number" step="0.1" v-model="vehicle.fuelCapacity"
-                         class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>租金（日）</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.dailyRent }}</span>
-                  <input v-else type="number" v-model="vehicle.dailyRent" class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>稅金</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.vehicleTax }}</span>
-                  <input v-else type="number" v-model="vehicle.vehicleTax" class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>里程</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.mileage }}</span>
-                  <input v-else type="number" v-model="vehicle.mileage" class="form-control form-control-sm"/>
-                </td>
-              </tr>
-              <tr>
-                <td>狀態</td>
-                <td>
-                  <span v-if="!isEditing">{{ vehicle.status }}</span>
-                  <select v-else class="form-select input-short editable" v-model="vehicle.status">
-                  <option value="可租用">可租用</option>
-                  <option value="維修中">維修中</option>
-                  <option value="下架">下架</option>
-                  </select>
-                </td>
-              </tr>
-              </tbody>
+            <v-btn
+                v-if="insertVehicleMode"
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-close"
+                @click="insertVehicleMode = false; isEditing = false"
+            >取消
+            </v-btn>
 
-            </table>
+            <v-btn
+                v-if="!insertVehicleMode"
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-pencil"
+                @click="isEditing = !isEditing"
+            >{{ isEditing ? "取消編輯" : "編輯" }}
+            </v-btn>
+
+            <v-btn
+                v-if="!insertVehicleMode"
+                color="error"
+                size="small"
+                prepend-icon="mdi-delete"
+                @click="deleteVehicle"
+            >刪除車輛
+            </v-btn>
           </div>
         </div>
-      </div>
-    </main>
+
+        <!-- 分頁 -->
+        <v-tabs v-model="currentTab" density="comfortable" color="primary">
+          <v-tab value="summary">摘要</v-tab>
+          <v-tab value="image">圖片</v-tab>
+          <v-tab value="geo">位置</v-tab>
+        </v-tabs>
+
+        <v-window v-model="currentTab" class="mt-3">
+          <!-- 摘要 -->
+          <v-window-item value="summary">
+            <v-row dense align="stretch">
+              <!-- 基本資料 -->
+              <v-col cols="12" md="6" class="d-flex">
+                <v-card class="bg-white flex-grow-1" elevation="1">
+                  <v-card-title class="text-subtitle-1">基本資料</v-card-title>
+                  <v-card-text>
+                    <v-table density="compact" class="text-no-wrap">
+                      <colgroup>
+                        <col class="label-col"/>
+                        <col/>
+                      </colgroup>
+                      <tbody>
+                      <tr>
+                        <td class="label-cell">車輛編號</td>
+                        <td>
+                          <div class="fe-wrapper disabled">
+                            <div class="fe-display">{{ vehicle.vehicleId ?? '—' }}</div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">車牌</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'plateNo')"
+                                @click="isInlineEditable && (activeField = 'plateNo')"
+                            >{{ vehicle.plateNo || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'plateNo'"
+                                v-model="vehicle.plateNo"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">品牌</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'brand')"
+                                @click="isInlineEditable && (activeField = 'brand')"
+                            >{{ vehicle.brand || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'brand'"
+                                v-model="vehicle.brand"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">型號</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'model')"
+                                @click="isInlineEditable && (activeField = 'model')"
+                            >{{ vehicle.model || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'model'"
+                                v-model="vehicle.model"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">顏色</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'color')"
+                                @click="isInlineEditable && (activeField = 'color')"
+                            >{{ vehicle.color || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'color'"
+                                v-model="vehicle.color"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">燃料類型</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'fuelType')"
+                                @click="isInlineEditable && (activeField = 'fuelType')"
+                            >{{ vehicle.fuelType || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'fuelType'"
+                                v-model="vehicle.fuelType"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">傳動系統</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'transmission')"
+                                @click="isInlineEditable && (activeField = 'transmission')"
+                            >{{ vehicle.transmission || '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'transmission'"
+                                v-model="vehicle.transmission"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">狀態</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'status')"
+                                @click="isInlineEditable && (activeField = 'status')"
+                            >{{ vehicle.status || '—' }}
+                            </div>
+                            <v-select
+                                v-show="isInlineEditable && activeField === 'status'"
+                                v-model="vehicle.status"
+                                :items="[
+                                { title: '可租用', value: '可租用' },
+                                { title: '維修中', value: '維修中' },
+                                { title: '下架', value: '下架' }
+                              ]"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </v-table>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+
+              <v-col cols="12" md="6" class="d-flex">
+                <v-card class="bg-white flex-grow-1" elevation="1">
+                  <v-card-title class="text-subtitle-1">價格 / 規格</v-card-title>
+                  <v-card-text>
+                    <v-table density="compact" class="text-no-wrap">
+                      <colgroup>
+                        <col class="label-col"/>
+                        <col/>
+                      </colgroup>
+                      <tbody>
+                      <tr>
+                        <td class="label-cell">租金（日）</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'dailyRent')"
+                                @click="isInlineEditable && (activeField = 'dailyRent')"
+                            >{{ vehicle.dailyRent ?? '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'dailyRent'"
+                                v-model.number="vehicle.dailyRent"
+                                type="number"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">稅金</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'vehicleTax')"
+                                @click="isInlineEditable && (activeField = 'vehicleTax')"
+                            >{{ vehicle.vehicleTax ?? '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'vehicleTax'"
+                                v-model.number="vehicle.vehicleTax"
+                                type="number"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">座位數</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'seatCapacity')"
+                                @click="isInlineEditable && (activeField = 'seatCapacity')"
+                            >{{ vehicle.seatCapacity ?? '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'seatCapacity'"
+                                v-model.number="vehicle.seatCapacity"
+                                type="number"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">油箱容量</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'fuelCapacity')"
+                                @click="isInlineEditable && (activeField = 'fuelCapacity')"
+                            >{{ vehicle.fuelCapacity ?? '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'fuelCapacity'"
+                                v-model.number="vehicle.fuelCapacity"
+                                type="number"
+                                step="0.1"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td class="label-cell">里程</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'mileage')"
+                                @click="isInlineEditable && (activeField = 'mileage')"
+                            >{{ vehicle.mileage ?? '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'mileage'"
+                                v-model.number="vehicle.mileage"
+                                type="number"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </v-table>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-window-item>
+
+          <!-- 圖片 -->
+          <v-window-item value="image">
+            <v-row dense>
+              <v-col cols="12" md="4">
+                <v-card elevation="1" class="pa-4 d-flex align-center justify-center">
+                  <v-img
+                      :src="previewUrl || (vehicle.image ? `/carPicture/${vehicle.image}` : undefined)"
+                      width="300"
+                      height="300"
+                      aspect-ratio="1"
+                      cover
+                      class="rounded"
+                  >
+                    <template #placeholder>
+                      <div class="d-flex fill-height align-center justify-center text-medium-emphasis">
+                        無圖片
+                      </div>
+                    </template>
+                  </v-img>
+                </v-card>
+              </v-col>
+
+              <v-col cols="12" md="8">
+                <v-card elevation="1">
+                  <v-card-title class="text-subtitle-1">圖片上傳</v-card-title>
+                  <v-card-text>
+                    <v-file-input
+                        v-model="selectedFile"
+                        :multiple="false"
+                        accept="image/*"
+                        clearable
+                        show-size
+                        prepend-icon="mdi-image"
+                        :disabled="!isInlineEditable"
+                        density="comfortable"
+                        variant="outlined"
+                        label="選擇圖片"
+                        hint="支援單一圖片上傳"
+                        persistent-hint
+                    />
+                    <v-btn
+                        class="mt-3"
+                        color="primary"
+                        :disabled="!isInlineEditable"
+                        prepend-icon="mdi-upload"
+                        @click="submitForm"
+                    >上傳圖片
+                    </v-btn>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-window-item>
+
+          <!-- 位置 -->
+          <v-window-item value="geo">
+            <v-card elevation="1">
+              <v-card-title class="text-subtitle-1">位置資訊</v-card-title>
+              <v-card-text>
+                <v-row dense>
+                  <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model.number="vehicle.latitude"
+                        :readonly="!isInlineEditable"
+                        label="緯度"
+                        type="number"
+                        variant="outlined"
+                        density="comfortable"
+                        hide-details
+                    />
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model.number="vehicle.longitude"
+                        :readonly="!isInlineEditable"
+                        label="經度"
+                        type="number"
+                        variant="outlined"
+                        density="comfortable"
+                        hide-details
+                    />
+                  </v-col>
+                </v-row>
+                <!-- 這裡可接地圖元件，例如 Leaflet/Mapbox，如需我幫你接 Vuetify 內嵌地圖，再說一聲 -->
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+        </v-window>
+      </v-card>
+    </v-container>
   </div>
 
   <div v-else class="text-center mt-5">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="mt-3">載入中...</p>
+    <v-progress-circular indeterminate/>
+    <div class="mt-3">載入中...</div>
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  data() {
+    return {
+      currentTab: 'summary' as 'summary' | 'image' | 'geo'
+    }
+  }
+}
+</script>
+
 <style scoped>
-.main-content {
-  margin: auto;
-  padding: 20px;
+.bg-white {
+  background-color: #fff !important;
 }
 
-.table td {
+.label-col {
+  width: 140px;
+}
+
+.label-cell {
+  color: rgba(0, 0, 0, .6);
+  font-weight: 500;
+  text-align: right;
+  padding-right: 12px;
   white-space: nowrap;
   vertical-align: middle;
 }
 
+:deep(.v-table .v-table__wrapper table td),
+:deep(.v-table .v-table__wrapper table th) {
+  border-bottom: 1px solid rgba(0, 0, 0, .06);
+}
+
+.fe-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.fe-input {
+  width: 100%;
+}
+
+.fe-display {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  min-height: 56px;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.is-editable .fe-display {
+  cursor: pointer;
+}
+
+.fe-wrapper.disabled .fe-display {
+  color: rgba(0, 0, 0, .45);
+}
+
 .main-content {
   margin: auto;
   padding: 20px;
-  width: calc(100% - 200px);
 }
 </style>

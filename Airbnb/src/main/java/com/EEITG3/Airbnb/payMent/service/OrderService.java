@@ -72,8 +72,8 @@ public class OrderService {
 	        order.setBookingstatus("待入住");
 	        order.setPaymentid(UUID.randomUUID().toString());
 	        order.setPrice(dto.getPrice());
-	        order.setTotal(BigDecimal.valueOf(dto.getTotal()));
-	        order.setTotalamount(BigDecimal.valueOf(dto.getPrice() * dto.getDays()));
+	        order.setTotal(BigDecimal.valueOf(dto.getTotal()));//租車金額
+	        order.setTotalamount(BigDecimal.valueOf(dto.getPrice() * dto.getDays()));//總金額
 	        order.setPaidtime(now);
 
 	        return orderRepository.save(order);
@@ -140,7 +140,7 @@ public class OrderService {
 	    	    dto.setPrice(order.getPrice());
 	    	    dto.setBookingstatus(order.getBookingstatus());
 	    	    dto.setMentstatus(order.getMentstatus());
-	    	    dto.setTotal(order.getTotal());
+	    	    dto.setTotalamount(order.getTotalamount());
 	    	    dto.setPaidtime(order.getPaidtime());
 	    	    dto.setBookingmethod(order.getBookingmethod());
 	    	    dto.setBookingstatus(order.getBookingstatus());

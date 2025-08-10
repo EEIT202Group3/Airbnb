@@ -92,7 +92,13 @@ public class ListingService {
 
         
         List<String> photoUrls = new ArrayList<>();
-        String storageDir = "/Users/youm/pohto/";  
+        String storageDir = "D:/pohto";
+//        String storageDir = "C:/upload/photo/";
+//        
+        File dir = new File(storageDir);
+        if(!dir.exists()) {
+        	dir.mkdirs();
+        }  
 
         for (int i = 0; i < photos.size() && i < 10; i++) {
             MultipartFile photo = photos.get(i);
@@ -145,7 +151,13 @@ public class ListingService {
 
         if (photos != null && !photos.isEmpty()) {
             List<String> photoUrls = new ArrayList<>();
-            String storageDir = "/Users/youm/pohto/";
+//            String storageDir = "C:/upload/photo/";
+            String storageDir = "D:/pohto";
+//            
+            File dir = new File(storageDir);
+            if(!dir.exists()) {
+            	dir.mkdirs();
+            }
 
             for (int i = 0; i < photos.size() && i < 10; i++) {
                 MultipartFile photo = photos.get(i);

@@ -37,7 +37,7 @@ export default {
     return {
       houseList: [],
       loading: false,
-      hostId: "6d4d8eb1-4e79-4c3e-9a1c-820ebcb8a8ee",
+      hostId: "8D7CC70F-6369-4A41-9A58-05F97ABFB688",
     };
   },
   methods: {
@@ -81,8 +81,8 @@ export default {
 </script>
 
 <style scoped>
-@import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css";
-@import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css";
+/* @import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"; */
+/* @import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"; */
 @import "/src/assets/listing/list3.css";
 
 </style>

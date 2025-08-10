@@ -24,8 +24,8 @@ const locationList = [{
 
 <template>
   <div v-if="route.path === '/car-rent/front-homepage'">
-  <NavigationBar></NavigationBar>
-  <SearchBar></SearchBar>
+    <NavigationBar></NavigationBar>
+    <SearchBar></SearchBar>
 
     <!-- 熱門地點 -->
     <div class="container mt-5">

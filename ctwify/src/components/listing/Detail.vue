@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Navbar -->
-    <Navbar />
+    <!-- <Navbar /> -->
 
     <div class="come" v-if="listing">
       <h3>{{ listing.houseName }}</h3>

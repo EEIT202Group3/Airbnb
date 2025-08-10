@@ -42,7 +42,7 @@
           :width="252"
           aspect-ratio="4/3"
           cover
-           :src= "`http://localhost:8080/reviews/${selectedReview.image1}`"
+           :src= "`http://localhost:8080/images/${selectedReview.image1}`"
         ></v-img>
         </div>
         <div><strong>圖片2：</strong>
@@ -50,7 +50,7 @@
           :width="252"
           aspect-ratio="4/3"
           cover
-           :src= "`http://localhost:8080/reviews/${selectedReview.image2}`"
+           :src= "`http://localhost:8080/images/${selectedReview.image2}`"
         ></v-img>
         </div>
         <div><strong>圖片3：</strong>
@@ -58,7 +58,7 @@
           :width="252"
           aspect-ratio="4/3"
           cover
-           :src= "`http://localhost:8080/reviews/${selectedReview.image3}`"
+           :src= "`http://localhost:8080/images/${selectedReview.image3}`"
         ></v-img>
         </div>
       </v-card-text>
@@ -198,12 +198,6 @@ const selectedReview = ref(null);
 const viewDialog = ref(false);
 const loading = ref(false);
 
-const avg =
-  (selectedReview.commScore +
-    selectedReview.cleanScore +
-    selectedReview.valueScore) /
-  3;
-
 // 顯示單筆評論
 const viewReview = async (item) => {
   const id = item.reviewId;
@@ -213,13 +207,11 @@ const viewReview = async (item) => {
   loading.value = true;
   try {
     const resp = await axios.get(
-      `http://localhost:8080/api/reviews/get/${id}`
+      `http://localhost:8080/api/admins/reviews/get/${id}`
       , { withCredentials: true }
     );
     selectedReview.value = resp.data;
     viewDialog.value = true;
-    console.log(selectedReview.value.image1);
-    console.log(`/reviews/${selectedReview.value.image1}`);
     
   } catch (err) {
     console.error("取得評論失敗:", err);
@@ -251,7 +243,7 @@ const update = async (item) => {
   console.log("update", id);
   try {
     const resp = await axios.get(
-      `http://localhost:8080/api/reviews/get/${id}`,
+      `http://localhost:8080/api/admins/reviews/get/${id}`,
       { withCredentials: true }
     );
     selectedReview.value = resp.data;
@@ -284,7 +276,7 @@ const updateConfirm = async (item) => {
   console.log(u);
   try {
     const res = await axios.patch(
-      `http://localhost:8080/api/reviews/update/${u.reviewId}`,
+      `http://localhost:8080/api/admins/reviews/update/${u.reviewId}`,
       formData,
       { withCredentials: true }
     );

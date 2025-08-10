@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const BASE_URL = 'http://localhost:8080';
 export async function getAllHosts() {
     const response = await fetch(`${BASE_URL}/api/admins/hosts`, {
@@ -27,4 +29,27 @@ export async function permission(status, hostEmail) {
         return null;
     }
     return await response.json();
+}
+
+export async function findLike(keyword,context){
+    try {
+        const response = await axios.get(`${BASE_URL}/api/admins/hosts/findlike`,{
+            params: {
+                keyword: keyword,
+                context: context,
+            },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            alert('請先登入');
+            return null;
+        } else if (error.response.status === 404) {
+            return null;
+        } else {
+            console.error('查詢失敗', error)
+            throw error;
+        }
+    }
 }

@@ -1,17 +1,22 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 const equipmentList = ref([])
 const newEquipName = ref('')
+const router = useRouter();
 
 // 取得設備清單
 const fetchEquipments = async () => {
-  try {
-    const res = await fetch('http://localhost:8080/equipment/all')
+    const res = await fetch('http://localhost:8080/api/equipment/all',{
+      method:'GET',
+      credentials:'include'
+    })
+    if(res.status===401||res.status===403){
+      alert('請先登入');
+      router.push({name:'Homepage'});
+    }
     equipmentList.value = await res.json()
-  } catch (err) {
-    alert('設備資料載入失敗')
-  }
 }
 
 // 新增設備
@@ -20,7 +25,7 @@ const addEquipment = async () => {
   const params = new URLSearchParams()
   params.append('equipName', newEquipName.value)
 
-  const res = await fetch('http://localhost:8080/equipment/add?' + params.toString(), {
+  const res = await fetch('http://localhost:8080/api/equipment/add?' + params.toString(), {
     method: 'POST'
   })
   const result = await res.text()
@@ -35,7 +40,7 @@ const addEquipment = async () => {
 const deleteEquipment = async (id) => {
   if (!confirm('確定要刪除這個設備嗎？')) return
 
-  const res = await fetch(`http://localhost:8080/equipment/delete/${id}`, {
+  const res = await fetch(`http://localhost:8080/api/equipment/delete/${id}`, {
     method: 'DELETE'
   })
   const result = await res.text()

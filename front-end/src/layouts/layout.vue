@@ -5,7 +5,7 @@ import SideBar from './SideBar.vue';
 <template>
   <v-app>
     <SideBar></SideBar>
-    <v-main style="margin-left: 30px; margin-top: 10px;">
+    <v-main style="margin-left: 30px; margin-top: 50px; margin-right: 30px;">
       <router-view></router-view>
     </v-main>
   </v-app>

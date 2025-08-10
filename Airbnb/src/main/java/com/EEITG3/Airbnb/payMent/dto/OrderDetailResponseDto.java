@@ -3,17 +3,7 @@ package com.EEITG3.Airbnb.payMent.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.EEITG3.Airbnb.listing.entity.LisBean;
-import com.EEITG3.Airbnb.users.entity.Customer;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 public class OrderDetailResponseDto {
 
@@ -30,7 +20,7 @@ public class OrderDetailResponseDto {
     private Integer locationid;        
     private String paymentid;         
     private Integer price;             
-    private BigDecimal total;             
+    private BigDecimal totalamount;             
     private LocalDateTime paidtime;       
     private String bookingstatus;   
     private String bookingmethod;    
@@ -113,11 +103,11 @@ public class OrderDetailResponseDto {
 	public void setPrice(Integer price) {
 		this.price = price;
 	}
-	public BigDecimal getTotal() {
-		return total;
+	public BigDecimal getTotalamount() {
+		return totalamount;
 	}
-	public void setTotal(BigDecimal total) {
-		this.total = total;
+	public void setTotalamount(BigDecimal totalamount) {
+		this.totalamount = totalamount;
 	}
 	public LocalDateTime getPaidtime() {
 		return paidtime;

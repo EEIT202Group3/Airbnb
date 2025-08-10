@@ -1,5 +1,6 @@
 package com.EEITG3.Airbnb.users.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.EEITG3.Airbnb.users.CookieUtil;
@@ -38,6 +40,7 @@ public class CustomerController {
 		this.service = service;
 	}
 	
+//前台部分
 	//客戶登入
 	@PostMapping("/customers/login")
 	public ResponseEntity<?> logIn(@RequestBody LogInRequest request, HttpServletResponse response) {
@@ -52,7 +55,7 @@ public class CustomerController {
 	
 	//客戶註冊
 	@PostMapping("/customers/signup")
-	public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request,BindingResult bindingResult, HttpServletResponse response) {
+	public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request,BindingResult bindingResult) {
 		if(bindingResult.hasErrors()) {
 			StringBuilder errorMessage = new StringBuilder();
 			List<FieldError> errors = bindingResult.getFieldErrors();
@@ -64,9 +67,23 @@ public class CustomerController {
 			}
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 		}
-		String token = service.customerSignup(request);
-		CookieUtil.saveCustomerCookie(response, token);
-		return ResponseEntity.status(HttpStatus.CREATED).body(token);
+		service.customerSignup(request);
+		return ResponseEntity.ok("已送出驗證信");
+	}
+	
+	//接收驗證信
+	@GetMapping("/customers/verify")
+	public ResponseEntity<?> verify(@RequestParam("token") String token, HttpServletResponse response){
+		String jwt = service.verify(token);
+		CookieUtil.saveCustomerCookie(response, jwt);
+		return ResponseEntity.ok("驗證成功");
+	}
+	
+	//客戶登出
+	@PostMapping("/customers/logout")
+	public ResponseEntity<?> logout(HttpServletResponse response){
+		CookieUtil.deleteCustomerCookie(response);
+		return ResponseEntity.ok("登出成功");
 	}
 	
 	//客戶更新資料
@@ -86,6 +103,9 @@ public class CustomerController {
 		return service.currentCustomer(customerDetails);
 	}
 	
+	
+	
+//後台部分
 	//找全部客戶資料
 	@GetMapping("/admins/customers")
 	public List<Customer> getAllCustomers(){
@@ -103,5 +123,46 @@ public class CustomerController {
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
-	}	
+	}
+	
+	//模糊搜尋
+	@GetMapping("/admins/customers/findlike")
+	public ResponseEntity<?> findCustomerLike(@RequestParam String keyword, @RequestParam String context){
+		List<Customer> customers = new ArrayList<Customer>();
+		switch (keyword) {
+			case("email"):{
+				customers = service.findLikeByEmail(context);
+				break;
+			}
+			case("username"):{
+				customers = service.findLikeByUsername(context);
+				break;
+			}
+			case("phone"):{
+				customers = service.findLikeByPhone(context);
+				break;
+			}
+			default:{
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("\"message\":\"keyword輸入錯誤\"");
+			}
+		}
+		if(customers.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("\"message\":\"找不到客戶\"");
+		}
+		return ResponseEntity.ok(customers);
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

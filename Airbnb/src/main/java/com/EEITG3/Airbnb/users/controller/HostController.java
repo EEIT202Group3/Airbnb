@@ -1,5 +1,6 @@
 package com.EEITG3.Airbnb.users.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.EEITG3.Airbnb.users.CookieUtil;
@@ -36,6 +38,7 @@ public class HostController {
 		this.service = service;
 	}
 	
+//前台功能
 	//房東登入
 	@PostMapping("/hosts/login")
 	public ResponseEntity<?> logIn(@RequestBody LogInRequest request, HttpServletResponse response){
@@ -62,10 +65,37 @@ public class HostController {
 			}
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 		}
-		String token = service.hostSignUp(request);
-		CookieUtil.saveHostCookie(response, token);
-		return ResponseEntity.status(HttpStatus.CREATED).body(token);
+		service.hostSignUp(request);
+		return ResponseEntity.ok("已送出驗證信");
 	}
+	
+	//接收驗證信
+	@GetMapping("/hosts/verify")
+	public ResponseEntity<?> verify(@RequestParam("token") String token, HttpServletResponse response){
+		String jwt = service.verify(token);
+		CookieUtil.saveHostCookie(response, jwt);
+		return ResponseEntity.ok("驗證成功");
+	}
+	
+	//房東登出
+	@PostMapping("/hosts/logout")
+	public ResponseEntity<?> logout(HttpServletResponse response){
+		CookieUtil.deleteHostCookie(response);
+		return ResponseEntity.ok("登出成功");
+	}
+	
+	//房東更新資料
+	@PatchMapping("/hosts/update")
+	public ResponseEntity<?> update(@RequestBody Map<String, Object> patchPayload, @AuthenticationPrincipal HostDetails hostDetails){
+		try {
+			Host host = service.hostUpdate(patchPayload, hostDetails);
+			return ResponseEntity.ok(host);
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
+	
+	
 	
 	//找個人資料
 	@GetMapping("/hosts/current")
@@ -74,11 +104,13 @@ public class HostController {
 		return ResponseEntity.ok(result);
 	}
 	
+//後台功能
 	//找全部房東
 	@GetMapping("/admins/hosts")
 	public List<Host> getAllHost(){
 		return service.findAllHosts();
 	}
+	
 	//更改權限
 	@PatchMapping("/admins/hosts/updatePermission")
 	public ResponseEntity<?> updatePermission(@RequestBody Map<String, Object> data){
@@ -90,6 +122,33 @@ public class HostController {
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
+	}
+	
+	//模糊查詢
+	@GetMapping("/admins/hosts/findlike")
+	public ResponseEntity<?> findHostLike(@RequestParam String keyword, @RequestParam String context){
+		List<Host> hosts = new ArrayList<Host>();
+		switch(keyword) {
+			case("email"):{
+				hosts = service.findLikeByEmail(context);
+				break;
+			}
+			case("username"):{
+				hosts = service.findLikeByUsername(context);
+				break;
+			}
+			case("phone"):{
+				hosts = service.findLikeByPhone(context);
+				break;
+			}
+			default:{
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("\"message\":\"keyword輸入錯誤\"");
+			}
+		}
+		if(hosts.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("\"message\":\"找不到客戶\"");
+		}
+		return ResponseEntity.ok(hosts);
 	}
 	
 }

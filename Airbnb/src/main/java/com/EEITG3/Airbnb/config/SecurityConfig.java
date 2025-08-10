@@ -24,9 +24,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import com.EEITG3.Airbnb.jwt.JwtFilter;
 import com.EEITG3.Airbnb.users.service.CustomerDetailsService;
 import com.EEITG3.Airbnb.users.service.HostDetailsService;
@@ -92,7 +89,7 @@ public class SecurityConfig{
 				.authorizeHttpRequests(configurer->
 					configurer
 					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-					.requestMatchers("/api/customers/login","/api/customers/signup").permitAll()
+					.requestMatchers("/api/customers/login","/api/customers/signup","api/customers/verify").permitAll()
 					.anyRequest().hasRole("CUSTOMER"))
 				.build();	
 	}
@@ -109,7 +106,7 @@ public class SecurityConfig{
 				.authorizeHttpRequests(configurer->
 					configurer
 					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-					.requestMatchers("/api/hosts/login","/api/hosts/signup").permitAll()
+					.requestMatchers("/api/hosts/login","/api/hosts/signup","/api/hosts/verify").permitAll()
 					.anyRequest().hasRole("HOST"))
 				.build();	
 	}
@@ -208,21 +205,4 @@ public class SecurityConfig{
 
 		return source;
 	}
-	
-	// 修維的圖片 API
-	@Bean
-    public WebMvcConfigurer resourceConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addResourceHandlers(ResourceHandlerRegistry registry) {
-                registry.addResourceHandler("/images/**")
-                        .addResourceLocations("file:/Users/youm/pohto/")
-                        .setCachePeriod(3600);
-                
-                registry.addResourceHandler("/reviews/**")
-                .addResourceLocations("file:C:/temp/upload/")
-                .setCachePeriod(3600);
-            }
-        };
-    }
 }
