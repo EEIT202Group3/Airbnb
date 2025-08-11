@@ -10,7 +10,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import ListingPage from '../components/payment/ListingPage.vue';
 import BookingPage from '../components/payment/BookingPage.vue';
 import ConfirmationPage from '../components/payment/ConfirmationPage.vue';
-import Ecpay from '../components/payment/Ecpay.vue';
+// import Ecpay from '../components/payment/Ecpay.vue';
 import PaymentPage from '../components/payment/PaymentPage.vue';
 import PaymentSuccessPage from '../components/payment/PaymentSuccessPage.vue';
 import { compile } from "vue";
@@ -38,11 +38,36 @@ const routes = [
             name: 'TripHistory',
           },
         ],
+      }, {
+        path: 'host',
+        component: () => import("@/components/user/host/HostPage.vue"),
+        children: [
+          {
+            path: '',
+            component: () => import("@/components/user/host/HostInfo.vue"),
+            name: 'HostInfo',
+          },
+          {
+            path: 'listing',
+            component: () => import("@/components/user/host/HostListing.vue"),
+            name: 'HostListing'
+          },
+          {
+            path: 'order',
+            component: () => import("@/components/user/host/HostOrder.vue"),
+            name: 'HostOrder'
+          },
+        ]
       },
       {
-        path: 'profile',
+        path: 'customerprofile',
         component: () => import('@/components/user/customer/CustomerProfile.vue'),
         name: 'CustomerProfile',
+      },
+      {
+        path: 'hostprofile',
+        component: () => import("@/components/user/host/HostProfile.vue"),
+        name: 'HostProfile',
       },
       {
         path: 'login',
