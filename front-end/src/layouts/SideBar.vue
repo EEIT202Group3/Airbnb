@@ -225,10 +225,37 @@ async function login() {
         <v-list-item to="/addEquipment"
         ><v-icon icon="mdi-home-account"></v-icon>新增設備</v-list-item
       >
+        >
+        <v-list-item to="/approveListing"
+        ><v-icon icon="mdi-home-account"></v-icon>房源審核</v-list-item
+      >
       <v-list-item to="/AdminOrder"
         ><v-icon icon="mdi-invoice-text-multiple-outline"></v-icon
         >訂單管理系統</v-list-item
       >
+    </v-list>   
+  </v-navigation-drawer>
+  <!-- 登入表單 -->
+  <v-dialog v-model="loginDialog">
+    <v-card class="pa-6 mx-auto" style="width: 25%; height: auto">
+      <form @submit.prevent="login">
+        <v-text-field
+          v-model="formData.adminId"
+          label="員工編號"
+          prepend-icon="mdi-account"
+          required
+        ></v-text-field>
+        <v-text-field
+          v-model="formData.password"
+          label="密碼"
+          prepend-icon="mdi-lock"
+          type="password"
+          required
+        ></v-text-field>
+        <v-btn type="submit">送出</v-btn>npm 
+      </form>
+    </v-card>
+  </v-dialog>
       <v-list>
   <v-list-group
     v-for="link in reviewLinks"
