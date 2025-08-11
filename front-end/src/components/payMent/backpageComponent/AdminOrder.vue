@@ -201,9 +201,9 @@ async function fetchOrders() {
       console.error("未登入或沒有權限", error);
       alert("請先登入");
       orders.value = [];
-      router.push({name:'Homepage'});
-    }else{
-      console.error('取得資料失敗', error);
+      router.push({ name: "Homepage" });
+    } else {
+      console.error("取得資料失敗", error);
       throw error;
     }
   } finally {
