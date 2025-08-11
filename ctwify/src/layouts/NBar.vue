@@ -8,7 +8,10 @@ const showAuthPage = ref(false);
   <v-app-bar app color="white" flat class="elevation-1">
     <!-- Logo -->
     <v-toolbar-title class="text-h6 font-weight-bold">
-      <span class="text-orange-darken-2">My</span>Booking
+      <RouterLink to="/" style="text-decoration: none;">
+        <span class="text-orange-darken-2">My</span>
+        <span style="color: black;">Booking</span>
+      </RouterLink>
     </v-toolbar-title>
 
     <!-- Spacer -->
@@ -59,7 +62,8 @@ const showAuthPage = ref(false);
     </v-menu>
   </v-app-bar>
   <v-dialog v-model="showAuthPage" max-width="420" scrollable>
-    <LoginSignup asDialog />
+      <LoginSignup asDialog @login-success="showAuthPage=false"/>
+
   </v-dialog>
 </template>
 

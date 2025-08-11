@@ -1,55 +1,73 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { loginService,signupService } from '@/service/user/customerService'
 
-const tabIndex = ref(0) // 0=Login, 1=Signup（預設可改）
+//用來切換登入、註冊，0登入1註冊
+const tabIndex = ref(0)
 
+//為了在呼叫api之前先做驗證(就是下面的.validate())，所以需要這兩個響應式來存表單
 const loginFormRef = ref()
 const registerFormRef = ref()
 
+//紀錄登入資訊的響應式
 const login = ref({ email: '', password: '' })
 const register = ref({ username: '', email: '', password: '', phone: '' })
 
-// 共用驗證
+//登入、註冊的規則
 const required  = (v: string | boolean) => (!!v || v === true) || '必填'
 const emailRule = (v: string) => /^\S+@\S+\.\S+$/.test(v) || 'Email 格式不正確'
 const phoneRuleTW = (v: string) => /^09\d{8}$/.test(v) || '電話格式不正確'
 
-// ---- 密碼規則（Signup） ----
+//密碼的規則
 const signupRules = computed(() => {
   const pwd = register.value.password
   return {
     length: pwd.length >= 8,
+    lower: /[a-z]/.test(pwd),
     upper: /[A-Z]/.test(pwd),
     number: /\d/.test(pwd),
     special: /[!@#$%^&*()_+\-={}[\]|:;"'<>,.?/`~]/.test(pwd),
   }
 })
+//切換密碼顯示或隱藏
+const show = ref(false)
+
+//用來顯示及時確認密碼規則
 const signupChecklist = computed(() => ([
   { key: 'length', label: '至少 8 碼', ok: signupRules.value.length },
+  { key: 'lower',  label: '至少 1 個小寫字母', ok: signupRules.value.lower },
   { key: 'upper',  label: '至少 1 個大寫字母', ok: signupRules.value.upper },
   { key: 'number', label: '至少 1 個數字', ok: signupRules.value.number },
   { key: 'special',label: '至少 1 個特殊符號', ok: signupRules.value.special },
 ]))
 const registerAllPass = computed(() => signupChecklist.value.every(i => i.ok))
 
+//登入成功之後要讓父元件把登入介面關掉
+const emit = defineEmits(['login-success'])
 
-// 提交（在這裡串 API）
+
+//提交登入資訊
 async function onLogin() {
+  //這邊的.validate()是vuetify提供的表單驗證功能，會去讀每個欄位上用:rules定義的驗證方法(所以上面才要先設定那些方法)
   const ok = await (loginFormRef.value as any)?.validate()
   if (!ok.valid) return
-  // TODO: 呼叫 /login
   console.log('login payload:', login.value)
-  alert('Login 送出（請串接 API）')
+  const response = loginService(login.value)
+  console.log(response)
+  alert('登入成功，檢查cookie有沒有東西')
+  emit('login-success')
 }
 
+//提交註冊資訊
 async function onRegister() {
   const ok = await (registerFormRef.value as any)?.validate()
   if (!ok.valid || !registerAllPass.value) return
-  // TODO: 呼叫 /register
-  console.log('register payload:', register.value)
-  alert('Signup 送出（請串接 API）')
+  const response = signupService(register.value)
+  console.log(response)
+  alert('註冊成功，看看有沒有驗證信')
 }
 
+//忘記密碼
 async function forgetPassword(){
     alert('請串接忘記密碼api')
 }
@@ -69,6 +87,7 @@ async function forgetPassword(){
 
       <!-- Login -->
       <v-form v-if="tabIndex===0" ref="loginFormRef" validate-on="input">
+        <!-- 為了使用vuetify提供的表單驗證功能，這邊的:rules一定要加 -->
         <v-text-field
           v-model="login.email"
           label="Email Address"
@@ -76,13 +95,15 @@ async function forgetPassword(){
           variant="solo"
           density="comfortable"
           rounded="lg"
-          :rules="[required, emailRule]"
+          :rules="[required, emailRule]" 
           class="mb-3"
         />
         <v-text-field
           v-model="login.password"
           label="Password"
-          type="password"
+          :type="show ? 'text' : 'password'"
+          :append-inner-icon="show ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+          @click:append-inner="show = !show"
           prepend-inner-icon="mdi-lock"
           variant="solo"
           density="comfortable"
@@ -135,7 +156,9 @@ async function forgetPassword(){
         <v-text-field
           v-model="register.password"
           label="Password"
-          type="password"
+          :type="show ? 'text' : 'password'"
+          :append-inner-icon="show ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+          @click:append-inner="show = !show"
           prepend-inner-icon="mdi-lock"
           variant="solo"
           density="comfortable"
