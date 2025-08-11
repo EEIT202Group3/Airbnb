@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from 'vue';
-import LoginSignup from '@/components/user/LoginSignup.vue';
+import { ref } from "vue";
+import LoginSignup from "@/components/user/LoginSignup.vue";
 const showAuthPage = ref(false);
 </script>
 
@@ -23,7 +23,11 @@ const showAuthPage = ref(false);
 
     <!-- 登入 / 註冊 -->
     <router-link class="text-decoration-none" color="black">
-      <v-btn variant="text" class="d-flex align-center text-black" @click="showAuthPage=true">
+      <v-btn
+        variant="text"
+        class="d-flex align-center text-black"
+        @click="showAuthPage = true"
+      >
         <v-icon class="me-1" color="black">mdi-account-circle-outline</v-icon>
         登入 / 註冊
       </v-btn>
@@ -37,16 +41,16 @@ const showAuthPage = ref(false);
       </template>
       <v-list>
         <v-list-item to="/customer">
-            <v-list-item-title>客戶首頁</v-list-item-title>
-          </v-list-item>
+          <v-list-item-title>客戶首頁</v-list-item-title>
+        </v-list-item>
         <v-list-item to="/">
           <v-list-item-title>租車服務</v-list-item-title>
         </v-list-item>
         <v-list-item to="/">
           <v-list-item-title>帳號設定</v-list-item-title>
         </v-list-item>
-        <v-list-item to="/">
-          <v-list-item-title>我的最愛</v-list-item-title>
+        <v-list-item to="/reviews">
+          <v-list-item-title>我的評論</v-list-item-title>
         </v-list-item>
         <v-list-item to="/main/getList">
           <v-list-item-title>訂房紀錄</v-list-item-title>
@@ -59,6 +63,7 @@ const showAuthPage = ref(false);
   </v-app-bar>
   <v-dialog v-model="showAuthPage" max-width="420" scrollable>
       <LoginSignup asDialog @login-success="showAuthPage=false"/>
+
   </v-dialog>
 </template>
 

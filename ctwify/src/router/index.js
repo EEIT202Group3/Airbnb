@@ -6,6 +6,7 @@ import { createRouter, createWebHistory } from "vue-router";
 
 //import getList from "@/layouts/ListLayout.vue";
 
+
 import ListingPage from '../components/payment/ListingPage.vue';
 import BookingPage from '../components/payment/BookingPage.vue';
 import ConfirmationPage from '../components/payment/ConfirmationPage.vue';
@@ -14,9 +15,10 @@ import PaymentPage from '../components/payment/PaymentPage.vue';
 import PaymentSuccessPage from '../components/payment/PaymentSuccessPage.vue';
 import { compile } from "vue";
 
+
 const routes = [
   {
-    path: '/',
+    path: "/",
     component: () => import("@/layouts/MainLayout.vue"),
     name: 'Homepage',
     children: [
@@ -25,16 +27,17 @@ const routes = [
         component: () => import("@/components/user/customer/CustomerPage.vue"),
         children: [
           {
-            path: '',
-            component: () => import('@/components/user/customer/CustomerInfo.vue'),
-            name: 'CustomerInfo',
+            path: "",
+            component: () =>
+              import("@/components/user/customer/CustomerInfo.vue"),
+            name: "CustomerInfo",
           },
           {
             path: 'history',
             component: () => import('@/components/user/customer/TripHistory.vue'),
             name: 'TripHistory',
           },
-        ]
+        ],
       },
       {
         path: 'profile',
@@ -52,6 +55,23 @@ const routes = [
       }
     ]
   }
+        path: "/login",
+        component: () => import("@/components/user/LoginSignup.vue"),
+      },
+      {
+        path: "/reviews",
+        component: () => import("@/components/reviews/ReviewView.vue"),
+        name: "Reviews",
+        children: [
+          {
+            path: "insert",
+            component: () =>
+              import("@/components/reviews/customer/InsertReview.vue"),
+          },
+        ],
+      },
+    ],
+  },
 
   // {
   //   path: "/main",
@@ -88,7 +108,6 @@ const routes = [
   // { path: '/ecpay', component: Ecpay, name: 'ecpay' },
   // { path: '/payment', component: PaymentPage, name: 'payment' },
   // { path: '/payment-success', component: PaymentSuccessPage, name: 'paymentSuccess' },
-
 ];
 
 const router = createRouter({
