@@ -1,27 +1,28 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-const history = [
-    {location:'Taipei',date:'2025/01/01',price:'2500',id:'1'},
-    {location:'Taipei',date:'2025/01/01',price:'2500',id:'2'},
-    {location:'Taipei',date:'2025/01/01',price:'2500',id:'3'},
-    {location:'Taipei',date:'2025/01/01',price:'2500',id:'4'},
-]
-
+const orders = [
+    {id: 'ORD-20250811-001', amount: 3200, date: '2025/08/01'},
+    {id: 'ORD-20250811-002', amount: 4500, date: '2025/08/03'},
+    {id: 'ORD-20250811-003', amount: 2800, date: '2025/08/05'},
+    {id: 'ORD-20250811-004', amount: 5200, date: '2025/08/08'},
+    {id: 'ORD-20250811-005', amount: 3900, date: '2025/08/10'}
+];
 const hovered = ref(null)
-function getHistory(data:any){
-    alert(data.id)
+
+function getOrder(data : any){
+    alert(data.id+data.amount+data.date)
 }
 
 </script>
 <template>
     <v-card class="pa-8 elevation-2 rounded-xl mx-auto">
-        <h1 style="font-weight: bolder;">過去的旅程</h1>
+        <h1 style="font-weight: bolder;">訂單總覽</h1>
         <v-divider class="my-6" />
         <v-item-group mandatory>
             <v-container>
                 <v-row>
                     <v-col
-                    v-for="h in history"
+                    v-for="o in orders"
                     cols="12"
                     md="4"
                     >
@@ -30,14 +31,14 @@ function getHistory(data:any){
                         class="d-flex flex-column justify-center align-center"
                         height="200"
                         dark
-                        @click="getHistory(h)"
-                        @mouseover="hovered = h.id"
+                        @click="getOrder(o)"
+                        @mouseover="hovered = o.id"
                         @mouseleave="hovered = null"
-                        :style="hovered === h.id ? 'background-color: #FFDCB9;' : ''"
+                        :style="hovered === o.id ? 'background-color: #FFDCB9;' : ''"
                         >
-                        <div>{{ h.location }}</div>
-                        <div>{{ h.price }}</div>
-                        <div>{{ h.date }}</div>
+                        <div>{{ o.id }}</div>
+                        <div>{{ o.amount }}</div>
+                        <div>{{ o.date }}</div>
                         </v-card>
                     </v-item>
                     </v-col>

@@ -43,6 +43,9 @@ const showAuthPage = ref(false);
         <v-list-item to="/customer">
           <v-list-item-title>客戶首頁</v-list-item-title>
         </v-list-item>
+        <v-list-item to="/host">
+          <v-list-item-title>房東首頁</v-list-item-title>
+        </v-list-item>
         <v-list-item to="/">
           <v-list-item-title>租車服務</v-list-item-title>
         </v-list-item>
