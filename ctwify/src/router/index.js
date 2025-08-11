@@ -12,14 +12,16 @@ import ConfirmationPage from '../components/payment/ConfirmationPage.vue';
 import Ecpay from '../components/payment/Ecpay.vue';
 import PaymentPage from '../components/payment/PaymentPage.vue';
 import PaymentSuccessPage from '../components/payment/PaymentSuccessPage.vue';
+import { compile } from "vue";
 
 const routes = [
   {
     path: '/',
     component: () => import("@/layouts/MainLayout.vue"),
+    name: 'Homepage',
     children: [
       {
-        path: '/customer',
+        path: 'customer',
         component: () => import("@/components/user/customer/CustomerPage.vue"),
         children: [
           {
@@ -28,15 +30,25 @@ const routes = [
             name: 'CustomerInfo',
           },
           {
-            path: '/history',
+            path: 'history',
             component: () => import('@/components/user/customer/TripHistory.vue'),
             name: 'TripHistory',
           },
         ]
       },
       {
-        path: '/login',
+        path: 'profile',
+        component: () => import('@/components/user/customer/CustomerProfile.vue'),
+        name: 'CustomerProfile',
+      },
+      {
+        path: 'login',
         component: () => import('@/components/user/LoginSignup.vue')
+      },
+      {
+        path: 'password',
+        component: () => import('@/components/user/ChangePassword.vue'),
+        name: 'ChangePassword'
       }
     ]
   }

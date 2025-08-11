@@ -1,34 +1,43 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-const user = ref({
-  id: 'nick-001',
-  name: 'Nick',
-  role: '旅客',
-  avatar: '/avatar.jpg', // 可放 public/avatar.jpg，或改成你的圖
-  verified: true,
-  about: '嗨！我喜歡旅行、攝影與咖啡。'
-})
+import { ref,onMounted } from 'vue'
+import { findMe } from '@/service/user/customerService'
+const user = ref(null)
+onMounted(
+    async()=>{
+        user.value = await findMe();
+        console.log(user.value);
+    }
+)
 </script>
 <template>
     <v-card class="pa-8 elevation-2 rounded-xl mx-auto">
  
             <h1 style="font-weight: bolder;">關於我</h1>
             
-            <v-btn size="small" style="margin-top: 10px; margin-left: 10px; border-radius: 20px;">修改個資</v-btn>
+            <v-btn size="small" style="margin-top: 10px; margin-left: 10px; border-radius: 20px;" :to="{name:'CustomerProfile'}">編輯</v-btn>
        
         
         <br>
         <br>
         
         <v-card class="pa-8 elevation-2 rounded-xl" style="width: 35%;">
-            <div class="d-flex align-center">
+            <div v-if="user" class="d-flex align-center">
                 <v-avatar size="80" class="mr-4">
-                    <v-img src="/src/avatar/logo.png" alt="avatar" cover />
+                    <!--  -->
+                    <v-img :src="user?.avatarURL ? 'http://localhost:8080' + user.avatarURL : require('@/assets/user/account.svg')" cover />
                 </v-avatar>
                 <div>
-                    <div class="text-h6">{{ user.name }}</div>
-                    <div class="text-body-2 text-medium-emphasis">{{ user.role }}</div>
+                    <div class="text-h6">{{ user.username }}</div>
+                    <div v-if="user.verified" class="text-body-2 text-medium-emphasis">
+                        <v-icon icon="mdi-shield-check" color="green"></v-icon>已驗證
+                    </div>
+                    <div v-else class="text-body-2 text-medium-emphasis">
+                        <v-icon icon="mdi-alert-circle" color="red"></v-icon>未驗證
+                    </div>
                 </div>
+            </div>
+            <div v-else>
+                請重新登入
             </div>
         </v-card>
         
