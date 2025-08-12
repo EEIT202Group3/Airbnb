@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.EEITG3.Airbnb.reviews.dto.ReviewPatchRequest;
 import com.EEITG3.Airbnb.reviews.entity.Review;
 import com.EEITG3.Airbnb.reviews.service.ReviewService;
 
@@ -72,7 +74,7 @@ public class ReviewController {
 	 * 呼叫service.insert 傳入參數，儲存review對象進行 repo.save(reviews) 用util 處理上傳圖片
 	 */
 
-	@PostMapping("/admins/reviews/insert")
+	@PostMapping("/reviews/insert")
 	public ResponseEntity<?> insertReview(
 		@RequestParam Integer listId, 
 		@RequestParam String bookingId,
@@ -88,26 +90,9 @@ public class ReviewController {
 				images);
 	}
 
-	@PutMapping("/update/{id}")
-	public ResponseEntity<?> updateReview(
-			@RequestParam Integer reviewId,
-			@RequestParam Integer listId, 
-			@RequestParam String bookingId,
-			@RequestParam String custId, 
-			@RequestParam String hostId,
-			@RequestParam String reviewDate,
-			@RequestParam int cleanScore, 
-			@RequestParam int commScore, 
-			@RequestParam int valueScore,
-			@RequestParam String cusComm,
-			@RequestParam String hostComm
-			){
-		System.out.println(reviewId +" " + listId + bookingId + custId + hostId + reviewDate + cleanScore + " " + commScore + " " + valueScore + cusComm);
-		
-		return rService.updateReview(reviewId,listId, bookingId, custId, hostId, reviewDate, cleanScore, commScore, valueScore, cusComm, hostComm);
-	}
-	
-	@PatchMapping(value= "/admins/reviews/update/{id}")
+
+	/*
+	@PatchMapping(value= "/reviews/update/{id}")
 	public ResponseEntity<?> patchReview(
 			@PathVariable("id") Integer reviewId,
 			@RequestParam int cleanScore, 
@@ -118,6 +103,17 @@ public class ReviewController {
 		
 		  return rService.patchReview(reviewId, cleanScore, commScore, valueScore, cusComm, hostComm);
 		
+	}
+	*/
+	@PatchMapping(value = "/reviews/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> patchReview(
+	        @PathVariable("id") Integer reviewId,
+	        @RequestPart("review") ReviewPatchRequest review,
+	        @RequestPart(value = "images", required = false) List<MultipartFile> images,
+	        @RequestPart(value = "deleteSlots", required = false) List<Integer> deleteSlots
+
+	        ) {
+		return rService.patchReview(reviewId, review, images);
 	}
 	
     
