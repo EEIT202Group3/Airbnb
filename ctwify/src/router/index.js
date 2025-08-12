@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
-// import List from "../components/listing/List.vue";
-// import Add from "../components/listing/AddListing.vue";
-// import Detail from "../components/listing/Detail.vue";
-// import Edit from "../components/listing/EditListing.vue";
+import List from "../components/listing/List.vue";
+import Add from "../components/listing/AddListing.vue";
+import Detail from "../components/listing/Detail.vue";
+import Edit from "../components/listing/EditListing.vue";
 
 //import getList from "@/layouts/ListLayout.vue";
 
@@ -13,6 +13,7 @@ import ConfirmationPage from "../components/payment/ConfirmationPage.vue";
 import PaymentPage from "../components/payment/PaymentPage.vue";
 import PaymentSuccessPage from "../components/payment/PaymentSuccessPage.vue";
 import { compile } from "vue";
+
 
 const routes = [
   {
@@ -74,6 +75,41 @@ const routes = [
         path: "login",
         component: () => import("@/components/user/LoginSignup.vue"),
       },
+
+      {
+        path: '/listing/card',
+        name: 'ListingCard',
+        component: () => import('@/components/payment/ListingCard.vue'),
+      },
+
+      {
+        path: '/booking/start',
+        name: 'BookingStart',
+        component: () => import('@/components/payment/BookingStart.vue'),
+      },
+
+
+      {
+        path: '/booking/preview',
+        name: 'PreviewConfirm',
+        component: () => import('@/components/payment/PreviewConfirm.vue'),
+      },
+
+
+      {
+        path: '/booking/pay',
+        name: 'PayRedirect',
+        component: () => import('@/components/payment/PayRedirect.vue'),
+
+      },
+
+
+      {
+        path: '/booking/done/:bookingId',
+        name: 'PaymentDone',
+        component: () => import('@/components/payment/PaymentDone.vue'),
+        props: true,
+      },
       {
         path: "/reviews",
         component: () => import("@/components/reviews/ReviewView.vue"),
@@ -127,6 +163,7 @@ const routes = [
   // { path: '/ecpay', component: Ecpay, name: 'ecpay' },
   // { path: '/payment', component: PaymentPage, name: 'payment' },
   // { path: '/payment-success', component: PaymentSuccessPage, name: 'paymentSuccess' },
+
 ];
 
 const router = createRouter({

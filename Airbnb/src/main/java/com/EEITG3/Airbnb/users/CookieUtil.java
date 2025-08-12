@@ -1,44 +1,54 @@
 package com.EEITG3.Airbnb.users;
 
-import jakarta.servlet.http.Cookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+
 import jakarta.servlet.http.HttpServletResponse;
 
 public class CookieUtil {
 
 	public static void saveCustomerCookie(HttpServletResponse response, String token) {
-		Cookie cookie = new Cookie("jwt_customer",token);
-		cookie.setMaxAge(60*60);
-		cookie.setSecure(true);
-		cookie.setHttpOnly(true);
-		cookie.setPath("/");
-		response.addCookie(cookie);
-	}
+        ResponseCookie cookie = ResponseCookie.from("jwt_customer", token)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(60 * 60)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
 	
 	public static void deleteCustomerCookie(HttpServletResponse response) {
-		Cookie cookie = new Cookie("jwt_customer", null);
-		cookie.setMaxAge(0);
-		cookie.setSecure(true);
-		cookie.setHttpOnly(true);
-		cookie.setPath("/");
-		response.addCookie(cookie);
-	}
+		ResponseCookie cookie = ResponseCookie.from("jwt_customer", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
 	
 	public static void saveHostCookie(HttpServletResponse response, String token) {
-		Cookie cookie = new Cookie("jwt_host",token);
-		cookie.setMaxAge(60*60);
-		cookie.setSecure(true);
-		cookie.setHttpOnly(true);
-		cookie.setPath("/");
-		response.addCookie(cookie);
+		ResponseCookie cookie = ResponseCookie.from("jwt_host", token)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(60 * 60)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 	}
 	
 	public static void deleteHostCookie(HttpServletResponse response) {
-		Cookie cookie = new Cookie("jwt_host", null);
-		cookie.setMaxAge(0);
-		cookie.setSecure(true);
-		cookie.setHttpOnly(true);
-		cookie.setPath("/");
-		response.addCookie(cookie);
+		ResponseCookie cookie = ResponseCookie.from("jwt_host", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 	}
 	
 }

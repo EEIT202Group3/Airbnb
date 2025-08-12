@@ -7,6 +7,7 @@ public class OrderRequestDto {
 	//前端傳來的訂單資料
 
 	    private Integer listid;
+	    private String hostid;
 	    private String customerid;
 	    private String username;
 	    private String housename;
@@ -24,6 +25,12 @@ public class OrderRequestDto {
 		}
 		public void setListid(Integer listid) {
 			this.listid = listid;
+		}
+		public String getHostid() {
+			return hostid;
+		}
+		public void setHostid(String hostid) {
+			this.hostid = hostid;
 		}
 		public String getCustomerid() {
 			return customerid;

@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { ref,onMounted } from 'vue';
-import defaultAvatar from '@/assets/user/account.svg'
-import { findMe } from '@/service/user/customerService';
-const customer = ref(null);
+import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useCustomerStore } from '@/stores/customer';
+import defaultAvatar from '@/images/default.png';
+
+const customerStore = useCustomerStore()
+const {customer} = storeToRefs(customerStore);
+
+
 onMounted(
     async()=>{
-        customer.value = await findMe()
+        if(!customer.value){
+            customerStore.fetchUser();
+        }
     }
 )
 

@@ -1,6 +1,5 @@
 package com.EEITG3.Airbnb.payMent.controller;
 
-import java.security.Provider.Service;
 import java.util.Map;
 
 import org.springframework.http.MediaType;
@@ -23,12 +22,19 @@ public class NewebPayController {
 	}
 	
 	/**Step1:前端帶bookingId取得要post到藍新的欄位*/
+
+	@PostMapping(
+	        value = "/checkout",
+	        consumes = MediaType.APPLICATION_JSON_VALUE,
+	        produces = MediaType.APPLICATION_JSON_VALUE
+	    )
 	public Map<String , String > checkout(@RequestBody Map<String , String> body){
 		String bookingId = body.get("bookingId");
 		if(bookingId == null || bookingId.isBlank()) {
-			throw new IllegalArgumentException("bookingId");
+			throw new IllegalArgumentException("bookingId is required");
 		}
-		return newebPayService.buildMpgFormByBookingId(bookingId);
+		// 回傳的 Map 內容應包含：MerchantID、TradeInfo、TradeSha、Version
+        return newebPayService.buildMpgFormByBookingId(bookingId);
 	}
 	
 	/** Step2：Notify（Server->Server），以這個為準更新訂單狀態 */
@@ -38,6 +44,7 @@ public class NewebPayController {
             @RequestParam("TradeInfo") String tradeInfo,
             @RequestParam("TradeSha") String tradeSha
     ) {
+		// 服務層請務必驗證 TradeSha 與金額、訂單狀態、防重複更新
     	newebPayService.handleNotify(status, tradeInfo, tradeSha);
         return "SUCCESS"; // 藍新預期成功回覆
     }
