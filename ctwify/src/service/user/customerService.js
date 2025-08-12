@@ -10,7 +10,11 @@ export async function loginService(loginData) {
             },
             withCredentials: true,
         });
-        return response.data;
+        if(response.status===200){
+            return response.data;
+        }else{
+            return null;
+        }
     } catch (error) {
         console.log('發生錯誤:' + error.response)
         throw error
@@ -53,9 +57,13 @@ export async function updateCustomerInfo(data) {
             withCredentials: true,
 
         });
-        return response.data;
+        if(response.status===200){
+            return response.data;
+        }else{
+            return null;
+        }
     } catch (error) {
-        console.log('發生錯誤:' + error.response);
+        console.log('發生錯誤:' + error);
         throw error;
     }
 }
@@ -65,9 +73,13 @@ export async function updateAvatar(data) {
         const response = await axios.post(`${BASE_URL}/api/customers/avatar`, data, {
             withCredentials: true,
         });
-        return response.data;
+        if(response.status===200){
+            return response.data;
+        }else{
+            return null;
+        }
     } catch (error) {
-        console.log('發生錯誤:' + error.response);
+        console.log('發生錯誤:' + error);
         throw error;
     }
 }

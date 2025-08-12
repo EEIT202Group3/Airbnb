@@ -108,13 +108,13 @@ public class CustomerController {
 	}
 	//更新大頭照
 	@PostMapping(value = "/customers/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public Customer updateAvatar(@RequestPart MultipartFile avatar, @AuthenticationPrincipal CustomerDetails customerDetails) {
+	public ResponseEntity<?> updateAvatar(@RequestPart MultipartFile avatar, @AuthenticationPrincipal CustomerDetails customerDetails) {
 		try {
 			Customer customer = service.updateAvatar(service.currentCustomer(customerDetails), avatar);
-			return customer;
+			return ResponseEntity.ok(customer);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return null;
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 	

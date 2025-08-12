@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { loginService,signupService } from '@/service/user/customerService'
+import { useCustomerStore } from '@/stores/customer'
 
 //用來切換登入、註冊，0登入1註冊
 const tabIndex = ref(0)
@@ -44,18 +45,23 @@ const registerAllPass = computed(() => signupChecklist.value.every(i => i.ok))
 
 //登入成功之後要讓父元件把登入介面關掉
 const emit = defineEmits(['login-success'])
-
+const customerStore = useCustomerStore();
 
 //提交登入資訊
 async function onLogin() {
   //這邊的.validate()是vuetify提供的表單驗證功能，會去讀每個欄位上用:rules定義的驗證方法(所以上面才要先設定那些方法)
   const ok = await (loginFormRef.value as any)?.validate()
-  if (!ok.valid) return
-  console.log('login payload:', login.value)
+  if (!ok.valid) {
+    return
+  }
   const response = loginService(login.value)
-  console.log(response)
-  alert('登入成功，檢查cookie有沒有東西')
-  emit('login-success')
+  if(response){
+    await customerStore.fetchUser();
+    alert('登入成功')
+    emit('login-success')
+  }else{
+    alert('登入失敗')
+  }
 }
 
 //提交註冊資訊
