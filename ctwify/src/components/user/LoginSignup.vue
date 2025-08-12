@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { loginService,signupService } from '@/service/user/customerService'
-import { useCustomerStore } from '@/stores/customer'
 
 //用來切換登入、註冊，0登入1註冊
 const tabIndex = ref(0)
@@ -45,7 +44,6 @@ const registerAllPass = computed(() => signupChecklist.value.every(i => i.ok))
 
 //登入成功之後要讓父元件把登入介面關掉
 const emit = defineEmits(['login-success'])
-const customerStore = useCustomerStore();
 
 //提交登入資訊
 async function onLogin() {
@@ -56,7 +54,6 @@ async function onLogin() {
   }
   const response = loginService(login.value)
   if(response){
-    await customerStore.fetchUser();
     alert('登入成功')
     emit('login-success')
   }else{

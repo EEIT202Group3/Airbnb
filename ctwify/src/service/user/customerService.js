@@ -10,9 +10,9 @@ export async function loginService(loginData) {
             },
             withCredentials: true,
         });
-        if(response.status===200){
+        if (response.status === 200) {
             return response.data;
-        }else{
+        } else {
             return null;
         }
     } catch (error) {
@@ -57,9 +57,9 @@ export async function updateCustomerInfo(data) {
             withCredentials: true,
 
         });
-        if(response.status===200){
+        if (response.status === 200) {
             return response.data;
-        }else{
+        } else {
             return null;
         }
     } catch (error) {
@@ -73,9 +73,9 @@ export async function updateAvatar(data) {
         const response = await axios.post(`${BASE_URL}/api/customers/avatar`, data, {
             withCredentials: true,
         });
-        if(response.status===200){
+        if (response.status === 200) {
             return response.data;
-        }else{
+        } else {
             return null;
         }
     } catch (error) {

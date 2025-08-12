@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useCustomerStore } from '@/stores/customer'
+import { ref,onMounted } from 'vue';
 import defaultAvatar from '@/assets/user/account.svg'
-const customerStore = useCustomerStore();
-const customer = customerStore.customer
-
-
+import { findMe } from '@/service/user/customerService';
+const customer = ref(null);
 onMounted(
     async()=>{
-        await customerStore.fetchUser()
-        console.log(customer.value)
+        customer.value = await findMe()
     }
 )
+
 </script>
 <template>
     <v-card class="pa-8 elevation-2 rounded-xl mx-auto">
