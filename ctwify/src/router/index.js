@@ -6,14 +6,23 @@ import Edit from "../components/listing/EditListing.vue";
 
 //import getList from "@/layouts/ListLayout.vue";
 
+import ListingPage from "../components/payment/ListingPage.vue";
+import BookingPage from "../components/payment/BookingPage.vue";
+import ConfirmationPage from "../components/payment/ConfirmationPage.vue";
+// import Ecpay from '../components/payment/Ecpay.vue';
+import PaymentPage from "../components/payment/PaymentPage.vue";
+import PaymentSuccessPage from "../components/payment/PaymentSuccessPage.vue";
+import { compile } from "vue";
+
+
 const routes = [
   {
     path: "/",
     component: () => import("@/layouts/MainLayout.vue"),
-    name: 'Homepage',
+    name: "Homepage",
     children: [
       {
-        path: 'customer',
+        path: "customer",
         component: () => import("@/components/user/customer/CustomerPage.vue"),
         children: [
           {
@@ -23,45 +32,48 @@ const routes = [
             name: "CustomerInfo",
           },
           {
-            path: 'history',
-            component: () => import('@/components/user/customer/TripHistory.vue'),
-            name: 'TripHistory',
+            path: "history",
+            component: () =>
+              import("@/components/user/customer/TripHistory.vue"),
+            name: "TripHistory",
           },
         ],
-      }, {
-        path: 'host',
+      },
+      {
+        path: "host",
         component: () => import("@/components/user/host/HostPage.vue"),
         children: [
           {
-            path: '',
+            path: "",
             component: () => import("@/components/user/host/HostInfo.vue"),
-            name: 'HostInfo',
+            name: "HostInfo",
           },
           {
-            path: 'listing',
+            path: "listing",
             component: () => import("@/components/user/host/HostListing.vue"),
-            name: 'HostListing'
+            name: "HostListing",
           },
           {
-            path: 'order',
+            path: "order",
             component: () => import("@/components/user/host/HostOrder.vue"),
-            name: 'HostOrder'
+            name: "HostOrder",
           },
-        ]
+        ],
       },
       {
-        path: 'customerprofile',
-        component: () => import('@/components/user/customer/CustomerProfile.vue'),
-        name: 'CustomerProfile',
+        path: "customerprofile",
+        component: () =>
+          import("@/components/user/customer/CustomerProfile.vue"),
+        name: "CustomerProfile",
       },
       {
-        path: 'hostprofile',
+        path: "hostprofile",
         component: () => import("@/components/user/host/HostProfile.vue"),
-        name: 'HostProfile',
+        name: "HostProfile",
       },
       {
-        path: 'login',
-        component: () => import('@/components/user/LoginSignup.vue')
+        path: "login",
+        component: () => import("@/components/user/LoginSignup.vue"),
       },
 
       {
@@ -102,49 +114,56 @@ const routes = [
         path: "/reviews",
         component: () => import("@/components/reviews/ReviewView.vue"),
         name: "Reviews",
-        children: [
-          {
-            path: "insert",
-            component: () =>
-              import("@/components/reviews/customer/InsertReview.vue"),
-          },
-        ],
       },
       {
-        path: 'password',
-        component: () => import('@/components/user/ChangePassword.vue'),
-        name: 'ChangePassword'
-      }
-    ]
-  },
-  {
-    path: "/main",
-    component: () => import("@/layouts/MainLayout.vue"),
-    children: [
-      {
-        path: "list",
-        component: () => import("@/views/MainView.vue"),
+        path: "reviews/insert",
+        component: () =>
+          import("@/components/reviews/customer/InsertReview.vue"),
       },
       {
-        path: "getList/:id?",
-        component: (id) => import(`@/views/ListView.vue`),
+        path: "password",
+        component: () => import("@/components/user/ChangePassword.vue"),
+        name: "ChangePassword",
       },
     ],
   },
-  {
-    path: "/getList",
-    component: () => import("@/layouts/ListLayout.vue"),
-    children: [
-      {
-        path: "",
-        component: () => import("@/views/ListView.vue"),
-      },
-    ],
-  },
-  { path: "/", component: List }, // 建議加這個作為首頁
-  { path: "/listing/addListing", component: Add },
-  { path: "/listing/detail/:id", component: Detail },
-  { path: "/listing/edit/:id", component: Edit },
+
+  // {
+  //   path: "/main",
+  //   component: () => import("@/layouts/MainLayout.vue"),
+  //   children: [
+  //     {
+  //       path: "list",
+  //       component: () => import("@/views/MainView.vue"),
+  //     },
+  //     {
+  //       path: "getList/:id?",
+  //       component: (id) => import(`@/views/ListView.vue`),
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: "/getList",
+  //   component: () => import("@/layouts/ListLayout.vue"),
+  //   children: [
+  //     {
+  //       path: "",
+  //       component: () => import("@/views/ListView.vue"),
+  //     },
+  //   ],
+  // },
+  // { path: "/", component: List }, // 建議加這個作為首頁
+  // { path: "/listing/addListing", component: Add },
+  // { path: "/listing/detail/:id", component: Detail },
+  // { path: "/listing/edit/:id", component: Edit },
+
+  // { path: '/', component: ListingPage, name: 'listing' },
+  // { path: '/booking', component: BookingPage, name: 'booking' },
+  // { path: '/confirmation', component: ConfirmationPage, name: 'confirmation' },
+  // { path: '/ecpay', component: Ecpay, name: 'ecpay' },
+  // { path: '/payment', component: PaymentPage, name: 'payment' },
+  // { path: '/payment-success', component: PaymentSuccessPage, name: 'paymentSuccess' },
+
 ];
 
 const router = createRouter({

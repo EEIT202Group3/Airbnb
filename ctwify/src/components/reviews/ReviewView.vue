@@ -5,6 +5,7 @@
       :index="r.id"
       :review="r"
       justify="center"
+      @update="updateReviewInList"
     ></ReviewCard>
   </v-row>
 </template>
@@ -19,9 +20,16 @@ const list = ref({});
 onMounted(async () => {
   reviews.value = (await api.get("/api/reviews")).data;
   console.log(reviews.value);
-  list.value = (await api.get("/listings/simple")).data;
-  console.log(list.value);
+  // list.value = (await api.get("/listings/simple")).data;
+  // console.log(list.value);
 });
+
+function updateReviewInList(updatedReview) {
+  const i = reviewList.findIndex((r) => r.reviewId === updatedReview.reviewId);
+  if (i !== -1) {
+    reviewList[i] = updatedReview;
+  }
+}
 </script>
 
 <style></style>

@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.EEITG3.Airbnb.reviews.dto.ReviewPatchRequest;
 import com.EEITG3.Airbnb.reviews.entity.Review;
 import com.EEITG3.Airbnb.reviews.repository.ReviewRepository;
 import com.EEITG3.Airbnb.reviews.utils.ReviewUtils;
@@ -20,6 +22,12 @@ public class ReviewService {
 
 	@Autowired
 	private ReviewRepository rRepository;
+	
+	private ImageStorageService storage;
+	
+	 public ReviewService(ReviewRepository rRepository, ImageStorageService storage) {
+	        this.rRepository = rRepository; this.storage = storage;
+	    }
 	
 	public List<Review> findByTypeAndKeyword(String type, String keyword) {
 	    return rRepository.findByTypeAndKeyword(type, keyword);
@@ -106,32 +114,53 @@ public class ReviewService {
 	 	 }
 	}
 	
-	public ResponseEntity<?> patchReview(Integer reviewId, int cleanScore, int commScore, int valueScore,
-			String cusComm, String hostComm) {
-			// 透過ID找出該評論
-		Optional<Review> optionalReview = rRepository.findById(reviewId);
+	public ResponseEntity<?> patchReview(Integer id, ReviewPatchRequest req, List<MultipartFile> images) {
+        Review r = rRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Review not found"));
+        ImageStorageService iss = new ImageStorageService();
+        if (req.getCleanScore()!=null) r.setCleanScore(req.getCleanScore());
+        if (req.getCommScore()!=null)  r.setCommScore(req.getCommScore());
+        if (req.getValueScore()!=null) r.setValueScore(req.getValueScore());
+        if (req.getCusComm()!=null)    r.setCusComm(req.getCusComm());
 
-		if (!optionalReview.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Review not found");
-		}
+        // 處理每一張圖片（0, 1, 2）
+        for (int i = 0; i < 3; i++) {
+            MultipartFile file = (images != null && images.size() > i) ? images.get(i) : null;
 
-		Review review = optionalReview.get();
+            if (file != null && !file.isEmpty()) {
+                // 有新圖要上傳
+                String oldFilename = getImageBySlot(r, i + 1);
+                iss.deleteImg(oldFilename);
 
-			// 更新評分與評論文字
-		review.setCleanScore(cleanScore);
-		review.setCommScore(commScore);
-		review.setValueScore(valueScore);
-		review.setCusComm(cusComm);
-		review.setHostComm(hostComm);
+                String newName = iss.saveImg(file);
+                setImageBySlot(r, i + 1, newName);
+            }
+            // else: 沒檔案傳來，保留原圖
+        }
 
-			// 儲存更新後的評論
-		rRepository.save(review);
-		Review resultBean = save(review);
-		if(resultBean != null) {
-			return ResponseEntity.ok("Review updated successfully");
-		}else {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("更新失敗");
-		}
-		}
+        rRepository.save(r);
+        return ResponseEntity.ok().build();
+    }
+	
+	private String getImageBySlot(Review review, int slot) {
+	    return switch (slot) {
+	        case 1 -> review.getImage1();
+	        case 2 -> review.getImage2();
+	        case 3 -> review.getImage3();
+	        default -> throw new IllegalArgumentException("圖片槽位必須是 1~3");
+	    };
+	}
+
+	private void setImageBySlot(Review review, int slot, String filename) {
+	    switch (slot) {
+	        case 1 -> review.setImage1(filename);
+	        case 2 -> review.setImage2(filename);
+	        case 3 -> review.setImage3(filename);
+	        default -> throw new IllegalArgumentException("圖片槽位必須是 1~3");
+	    }
+	}
+	
+	
+
 
 }

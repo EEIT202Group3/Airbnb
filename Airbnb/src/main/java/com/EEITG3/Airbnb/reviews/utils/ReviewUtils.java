@@ -1,6 +1,10 @@
 package com.EEITG3.Airbnb.reviews.utils;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -18,7 +22,7 @@ public class ReviewUtils {
 
     public List<String> uploadImg(List<MultipartFile> images){
     	
-    	String saveFileDir = "D:/pohto/";
+    	String saveFileDir = "D:/photo/listing";
     	File dir = new File(saveFileDir);
     	if (!dir.exists()) {
     		dir.mkdirs();
@@ -56,5 +60,16 @@ public class ReviewUtils {
         }
         return imgList;
     	
+    }
+    
+    public String saveImage(MultipartFile file) {
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path path = Paths.get("your_upload_path", fileName);
+        try {
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("圖片儲存失敗", e);
+        }
+        return fileName;
     }
 }
