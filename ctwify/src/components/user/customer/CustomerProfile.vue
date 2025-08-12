@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { ref,computed,onMounted } from 'vue'
-import { updateCustomerInfo,updateAvatar } from '@/service/user/customerService'
+import { ref,onMounted } from 'vue'
+import { updateCustomerInfo,updateAvatar,findMe } from '@/service/user/customerService'
 import { useRouter } from 'vue-router'
-import { useCustomerStore } from '@/stores/customer'
 const router = useRouter()
-const customerStore = useCustomerStore()
-const user = customerStore.customer
 const avatarActive = ref(false)
 const avatar = ref(null)
 
@@ -46,7 +43,7 @@ async function editAvatar() {
     files.append('avatar',avatar.value)
     const response = await updateAvatar(files)
     if(response){
-        await customerStore.fetchUser()
+        customer.value = await findMe()
         alert('更新成功')
     }else{
         alert('失敗，重作')
@@ -58,7 +55,7 @@ async function submit() {
     const payload = Object.fromEntries(updateData.value.map(x => [x.key, x.value]))
     const response = await updateCustomerInfo(payload);
     if(response){
-        await customerStore.fetchUser()
+        customer.value = await findMe()
         alert('更新成功');
         router.push({name:'CustomerInfo'})
     }else{
@@ -66,12 +63,14 @@ async function submit() {
     }
 }
 
+const customer = ref(null)
+
 onMounted(
     async()=>{
-        await customerStore.fetchUser()
+        customer.value = await findMe()
         items = [
-            { icon: 'mdi-account-outline', title: '更改使用者名稱', key: 'username', value: user.value?.username ?? '' },
-            { icon: 'mdi-phone-outline',   title: '更改電話號碼',   key: 'phone',    value: user.value?.phone ?? '' },
+            { icon: 'mdi-account-outline', title: '更改使用者名稱', key: 'username', value: customer.value.username },
+            { icon: 'mdi-phone-outline',   title: '更改電話號碼',   key: 'phone',    value: customer.value.phone },
             { icon: 'mdi-lock-outline',    title: '更改密碼',       key: 'password', value: '' },
         ]
     }
@@ -86,7 +85,7 @@ onMounted(
             <v-col cols="12" md="3" class="d-flex flex-column align-center">
                 <div class="position-relative">
                     <v-avatar size="250">
-                        <v-img :src="user?.avatarURL ? 'http://localhost:8080' + user.avatarURL : '../src/assets/user/account.svg'" cover />
+                        <v-img :src="customer?.avatarURL ? 'http://localhost:8080' + customer.avatarURL : '../src/assets/user/account.svg'" cover />
                     </v-avatar>
                     <v-btn
                         class="avatar-edit-btn"
@@ -103,7 +102,7 @@ onMounted(
             <v-col cols="12" md="9" style="margin-top: 20px; position:static;">
                 <h2 class="text-h4 font-weight-bold mb-3">個人資訊</h2>
                 <v-divider class="my-6" />
-                <div v-if="user">
+                <div v-if="customer">
                     <v-list class="py-0">
                         <v-list-item
                         v-for="item in items"
