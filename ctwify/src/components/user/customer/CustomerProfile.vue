@@ -1,20 +1,27 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { findMe,updateCustomerInfo,updateAvatar } from '@/service/user/customerService'
+import { ref,computed,onMounted } from 'vue'
+import { updateCustomerInfo,updateAvatar } from '@/service/user/customerService'
 import { useRouter } from 'vue-router'
+import { useCustomerStore } from '@/stores/customer'
 const router = useRouter()
-const user = ref(null)
+const customerStore = useCustomerStore()
+const user = customerStore.customer
 const avatarActive = ref(false)
 const avatar = ref(null)
 
+//定義修改項目的架構
 type FieldItem = { icon: string; title: string; key: string; value: any }
-const items = ref<FieldItem[]>([])
+let items : FieldItem[]
 
+//控制、傳輸要送入dialog的資料
 const dialogActive = ref(false)
 const selected = ref<FieldItem | null>(null)
 const tempValue = ref('')
+
+//用來暫存修改資料，之後一次送出
 const updateData = ref<{key:string,value:any}[]>([])
 
+//把更新的資料加入暫存區
 function addUpdateData(item:any, key:string, value:any) {
   const i = updateData.value.findIndex(x => x.key === key)
   if (i >= 0) updateData.value[i].value = value
@@ -26,42 +33,50 @@ function addUpdateData(item:any, key:string, value:any) {
   dialogActive.value = false
 }
 
+//打開dialog並傳入資料
 function openDialog(item: FieldItem) {
   selected.value = item
   tempValue.value = item.value ?? ''
   dialogActive.value = true
 }
 
+//修改大頭貼
 async function editAvatar() {
     const files = new FormData();
     files.append('avatar',avatar.value)
     const response = await updateAvatar(files)
     if(response){
+        await customerStore.fetchUser()
         alert('更新成功')
     }else{
         alert('失敗，重作')
     }
 }
 
+//送出修改內容
 async function submit() {
     const payload = Object.fromEntries(updateData.value.map(x => [x.key, x.value]))
     const response = await updateCustomerInfo(payload);
     if(response){
+        await customerStore.fetchUser()
         alert('更新成功');
         router.push({name:'CustomerInfo'})
-    }  
+    }else{
+        alert('更新失敗')
+    }
 }
 
-onMounted(async () => {
-  const me = await findMe()
-  user.value = me
+onMounted(
+    async()=>{
+        await customerStore.fetchUser()
+        items = [
+            { icon: 'mdi-account-outline', title: '更改使用者名稱', key: 'username', value: user.value?.username ?? '' },
+            { icon: 'mdi-phone-outline',   title: '更改電話號碼',   key: 'phone',    value: user.value?.phone ?? '' },
+            { icon: 'mdi-lock-outline',    title: '更改密碼',       key: 'password', value: '' },
+        ]
+    }
+)
 
-  items.value = [
-    { icon: 'mdi-account-outline', title: '更改使用者名稱', key: 'username', value: me.username },
-    { icon: 'mdi-phone-outline',   title: '更改電話號碼',   key: 'phone',    value: me.phone },
-    { icon: 'mdi-lock-outline',    title: '更改密碼',       key: 'password', value: '' },
-  ]
-})
 </script>
 
 <template>

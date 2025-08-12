@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { ref,onMounted } from 'vue'
-import { findMe } from '@/service/user/customerService'
-const user = ref(null)
+import { onMounted } from 'vue'
+import { useCustomerStore } from '@/stores/customer'
+import defaultAvatar from '@/assets/user/account.svg'
+const customerStore = useCustomerStore();
+const customer = customerStore.customer
+
+
 onMounted(
     async()=>{
-        user.value = await findMe();
-        console.log(user.value);
+        await customerStore.fetchUser()
+        console.log(customer.value)
     }
 )
 </script>
@@ -21,14 +25,14 @@ onMounted(
         <br>
         
         <v-card class="pa-8 elevation-2 rounded-xl" style="width: 35%;">
-            <div v-if="user" class="d-flex align-center">
+            <div v-if="customer" class="d-flex align-center">
                 <v-avatar size="80" class="mr-4">
                     <!--  -->
-                    <v-img :src="user?.avatarURL ? 'http://localhost:8080' + user.avatarURL : require('@/assets/user/account.svg')" cover />
+                    <v-img :src="customer?.avatarURL ? 'http://localhost:8080' + customer.avatarURL : defaultAvatar"/>
                 </v-avatar>
                 <div>
-                    <div class="text-h6">{{ user.username }}</div>
-                    <div v-if="user.verified" class="text-body-2 text-medium-emphasis">
+                    <div class="text-h6">{{ customer.username }}</div>
+                    <div v-if="customer.verified" class="text-body-2 text-medium-emphasis">
                         <v-icon icon="mdi-shield-check" color="green"></v-icon>已驗證
                     </div>
                     <div v-else class="text-body-2 text-medium-emphasis">
