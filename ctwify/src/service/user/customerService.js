@@ -21,7 +21,7 @@ export async function signupService(signupData) {
 }
 
 export async function logoutService() {
-    const response = await axios.post(`${BASE_URL}/api/customers/logout`, {
+    const response = await axios.post(`${BASE_URL}/api/customers/logout`, null, {
         withCredentials: true,
     })
     return response.data
