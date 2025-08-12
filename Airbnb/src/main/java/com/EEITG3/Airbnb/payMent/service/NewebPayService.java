@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -36,14 +37,16 @@ public class NewebPayService {
 	private String clientBackUrl;
 
 	private final OrderRepository orderRepository;
+	private final CustomerRepository customerRepository;
 	private final ObjectMapper mapper = new ObjectMapper();
-	private final Customer customer;
 
-	public NewebPayService(OrderRepository orderRepository,Customer customer) {
+	public NewebPayService(OrderRepository orderRepository, CustomerRepository customerRepository) {
 		this.orderRepository = orderRepository;
-		this.customer=customer;
+		this.customerRepository = customerRepository;
 	}
 
+	// Step1：回傳要 POST 到藍新的四個欄位（MerchantID / TradeInfo / TradeSha / Version） 
+=======
 	public Map<String, String> buildMpgFormByBookingId(String bookingId) {
 		Order order = orderRepository.findByBookingId(bookingId)
 				.orElseThrow(() -> new IllegalArgumentException("Order not found:" + bookingId));
@@ -57,16 +60,23 @@ public class NewebPayService {
 			orderRepository.save(order);
 		}
 
-		// --- 1) 組 TradeInfo 明文（value 需 URL encode） ---
+
+		// 取 Email（// FIX: 別用 findCustomerByEmail(customerId)）
+		String customerId = order.getCustomerId();// 確認 Order 有這欄位與 getter
+		String email = customerRepository.findCustomerByEmail(customerId).map(Customer::getEmail)
+				.orElse("test@example.com");
+
+		//組裝 TradeInfo 明文（value 需 URL encode） ---
 		Map<String, String> trade = new LinkedHashMap<>();
 		trade.put("MerchantID", merchantId);
 		trade.put("RespondType", "JSON");
 		trade.put("TimeStamp", String.valueOf(Instant.now().getEpochSecond())); // 秒
 		trade.put("Version", version);
 		trade.put("MerchantOrderNo", order.getPaymentid());
-		trade.put("Amt", String.valueOf(order.getTotalamount()));
+		int amt = order.getTotalamount().setScale(0, RoundingMode.HALF_DOWN).intValueExact();
+		trade.put("Amt", String.valueOf(amt));
 		trade.put("ItemDesc", "Booking " + bookingId);
-		trade.put("Email", customer.getEmail() != null ? customer.getEmail() : "test@example.com");
+		trade.put("Email", email);
 		trade.put("LoginType", "0");
 		trade.put("CREDIT", "1");
 		trade.put("ReturnURL", returnUrl);
@@ -75,10 +85,11 @@ public class NewebPayService {
 
 		String plain = toQueryString(trade, true);
 
-		// --- 2) AES 加密 → hex ---
+
+		//  AES 加密 → hex 
 		String tradeInfoHex = NewebPayUtil.aesEncryptToHex(plain, hashKey, hashIv);
 
-		// --- 3) 產生 TradeSha ---
+		// 產生 TradeSha 
 		String shaSource = "HashKey=" + hashKey + "&" + tradeInfoHex + "&HashIV=" + hashIv;
 		String tradeSha = NewebPayUtil.sha256ToUpper(shaSource);
 
@@ -87,44 +98,51 @@ public class NewebPayService {
 		res.put("TradeInfo", tradeInfoHex);
 		res.put("TradeSha", tradeSha);
 		res.put("Version", version);
-		res.put("Gateway", mpgGateway);
+		res.put("Gateway", mpgGateway);// 前端要 POST 的 action
 		return res;
 	}
-
-	/** Notify：驗簽 → 解密 → 用 paymentId 對單 → 金額比對 → 更新 mentStatus / paidTime */
+	//Step2：Notify（Server->Server
+	// Notify：驗簽 → 解密 → 用 paymentId 對單 → 金額比對 → 更新 mentStatus / paidTime 
 	@Transactional
 	public void handleNotify(String status, String tradeInfoHex, String tradeSha) {
-		// 1) 比對簽章
-		String expected = NewebPayUtil.sha256ToUpper("HashKey=" + hashKey + "&" + tradeInfoHex + "&HashIV=" + hashIv);
-		if (!expected.equals(tradeSha)) {
-			throw new IllegalArgumentException("TradeSha mismatch");
-		}
+		//  比對簽章 FIX: 一樣要 URL-encode 後 SHA-256
+		String expectedRaw = "HashKey=" + hashKey + "&TradeInfo=" + tradeInfoHex + "&HashIV=" + hashIv;
+        String expected = NewebPayUtil.sha256ToUpper(NewebPayUtil.urlEncode(expectedRaw));
+        if (!expected.equals(tradeSha)) {
+            throw new IllegalArgumentException("TradeSha mismatch");
+        }
 
-		// 2) 解密 TradeInfo
+		// 解密 TradeInfo
 		String decrypted = NewebPayUtil.aesDecryptFromHex(tradeInfoHex, hashKey, hashIv);
 		Map<String, Object> flat = parseTradeInfo(decrypted);
 
-		// 3) 取出欄位
+		// 取出欄位
 		String merchantOrderNo = String.valueOf(flat.get("Result/MerchantOrderNo"));
 		Integer amt = Integer.valueOf(String.valueOf(flat.get("Result/Amt")));
 		String respondCode = String.valueOf(flat.get("Result/RespondCode")); // "00" 成功
 
-		// 4) 對單
-		Order order = orderRepository.findyByPaymentId(merchantOrderNo)
+
+		// 對單 FIX: 方法名要跟 Entity 欄位名一致
+		Order order = orderRepository.findByPaymentId(merchantOrderNo)
 				.orElseThrow(() -> new IllegalStateException("Order not found by paymentId=" + merchantOrderNo));
 
-		if (!Objects.equals(order.getTotalamount(), amt)) {
-			throw new IllegalStateException("Amount mismatch");
-		}
+		// 金額比對（整數）
+        int orderAmt = order.getTotalamount().setScale(0, RoundingMode.HALF_DOWN).intValueExact();
+        if (orderAmt != amt) {
+            throw new IllegalStateException("Amount mismatch");
+        }
 
-		// 5) 更新狀態（以 Notify 為準）
-		if ("SUCCESS".equalsIgnoreCase(status) && "00".equals(respondCode)) {
-			order.setMentstatus("PAID");
-			order.setPaidtime(LocalDateTime.now());
-		} else {
-			order.setMentstatus("FAILED");
-		}
-		orderRepository.save(order);
+		// 更新狀態（以 Notify 為準）
+        if ("SUCCESS".equalsIgnoreCase(status) && "00".equals(respondCode)) {
+            if (!"PAID".equalsIgnoreCase(order.getMentstatus())) { // 防重覆更新
+                order.setMentstatus("PAID");
+                order.setPaidtime(LocalDateTime.now());
+                orderRepository.save(order);
+            }
+        } else {
+            order.setMentstatus("FAILED");
+            orderRepository.save(order);
+        }
 	}
 
 	// ===== Helpers =====
@@ -138,28 +156,27 @@ public class NewebPayService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> parseTradeInfo(String decrypted) {
-		try {
-			if (decrypted.trim().startsWith("{")) {
-				Map<String, Object> root = mapper.readValue(decrypted, Map.class);
-				Map<String, Object> flat = new LinkedHashMap<>();
-				flat.put("Status", root.get("Status"));
-				Object result = root.get("Result");
-				if (result instanceof Map<?, ?> res) {
-					res.forEach((k, v) -> flat.put("Result/" + k, v));
-				}
-				return flat;
-			} else {
-				Map<String, Object> flat = new LinkedHashMap<>();
-				for (String p : decrypted.split("&")) {
-					int i = p.indexOf('=');
-					if (i > 0)
-						flat.put(p.substring(0, i), p.substring(i + 1));
-				}
-				return flat;
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("Parse TradeInfo failed", e);
-		}
+    private Map<String, Object> parseTradeInfo(String decrypted) {
+        try {
+            if (decrypted != null && decrypted.trim().startsWith("{")) {
+                Map<String, Object> root = mapper.readValue(decrypted, Map.class);
+                Map<String, Object> flat = new LinkedHashMap<>();
+                flat.put("Status", root.get("Status"));
+                Object result = root.get("Result");
+                if (result instanceof Map<?, ?> res) {
+                    res.forEach((k, v) -> flat.put("Result/" + k, v));
+                }
+                return flat;
+            } else {
+                Map<String, Object> flat = new LinkedHashMap<>();
+                for (String p : decrypted.split("&")) {
+                    int i = p.indexOf('=');
+                    if (i > 0) flat.put(p.substring(0, i), p.substring(i + 1));
+                }
+                return flat;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Parse TradeInfo failed", e);
+        }
 	}
 }

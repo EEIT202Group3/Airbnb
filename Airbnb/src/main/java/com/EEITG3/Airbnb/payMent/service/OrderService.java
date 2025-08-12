@@ -55,6 +55,7 @@ public class OrderService {
 
 	        Order order = new Order();
 	        order.setListing(listing);   // 設定房源對象
+	        order.setHostId(dto.getHostid());
 	        order.setCustomerId(dto.getCustomerid());
 	        order.setUsername(dto.getUsername()); // 顯示用
 	        order.setHousename(dto.getHousename());
