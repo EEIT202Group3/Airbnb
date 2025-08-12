@@ -6,12 +6,7 @@ import { createRouter, createWebHistory } from "vue-router";
 
 //import getList from "@/layouts/ListLayout.vue";
 
-import ListingPage from '../components/payment/ListingPage.vue';
-import BookingPage from '../components/payment/BookingPage.vue';
-import ConfirmationPage from '../components/payment/ConfirmationPage.vue';
-import Ecpay from '../components/payment/Ecpay.vue';
-import PaymentPage from '../components/payment/PaymentPage.vue';
-import PaymentSuccessPage from '../components/payment/PaymentSuccessPage.vue';
+
 
 const routes = [
   {
@@ -37,9 +32,45 @@ const routes = [
       {
         path: '/login',
         component: () => import('@/components/user/LoginSignup.vue')
-      }
-    ]
+      },
+
+      {
+        path: '/listing/card',
+        name: 'ListingCard',
+        component: () => import('@/components/payment/ListingCard.vue'),
+      },
+
+      {
+        path: '/booking/start',
+        name: 'BookingStart',
+        component: () => import('@/components/payment/BookingStart.vue'),
+      },
+
+
+      {
+        path: '/booking/preview',
+        name: 'PreviewConfirm',
+        component: () => import('@/components/payment/PreviewConfirm.vue'),
+      },
+
+
+      {
+        path: '/booking/pay',
+        name: 'PayRedirect',
+        component: () => import('@/components/payment/PayRedirect.vue'),
+
+      },
+
+
+      {
+        path: '/booking/done/:bookingId',
+        name: 'PaymentDone',
+        component: () => import('@/components/payment/PaymentDone.vue'),
+        props: true,
+      },
+    ],
   }
+
 
   // {
   //   path: "/main",
@@ -70,12 +101,7 @@ const routes = [
   // { path: "/listing/detail/:id", component: Detail },
   // { path: "/listing/edit/:id", component: Edit },
 
-  // { path: '/', component: ListingPage, name: 'listing' },
-  // { path: '/booking', component: BookingPage, name: 'booking' },
-  // { path: '/confirmation', component: ConfirmationPage, name: 'confirmation' },
-  // { path: '/ecpay', component: Ecpay, name: 'ecpay' },
-  // { path: '/payment', component: PaymentPage, name: 'payment' },
-  // { path: '/payment-success', component: PaymentSuccessPage, name: 'paymentSuccess' },
+
 
 ];
 

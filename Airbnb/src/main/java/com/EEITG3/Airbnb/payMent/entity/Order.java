@@ -31,6 +31,9 @@ public class Order implements java.io.Serializable {
 		@ManyToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "list_id")
 		private LisBean listing;              // 房源ID (外來鍵)
+		
+		@Column(name = "host_id")
+		private String hostId;
 
 		@Column(name = "customer_id")
 		private String customerId;
@@ -80,10 +83,10 @@ public class Order implements java.io.Serializable {
 	    @Column(name = "price")
 	    private Integer price;              // 房租金額
 
-	    @Column(name = "total_amount")
+	    @Column(name = "total_amount", precision = 10, scale = 0)
 	    private BigDecimal total;    // 租車金額
 
-	    @Column(name = "total")
+	    @Column(name = "total", precision = 10, scale = 0)
 	    private BigDecimal totalAmount;              // 總金額
 
 	    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -102,12 +105,16 @@ public class Order implements java.io.Serializable {
 
 
 
+
 		public String getBookingid() {return bookingId;}
 		public void setBookingid(String bookingId) {this.bookingId = bookingId;}
 
 		public LisBean getListing() {return listing;}
 		public void setListing(LisBean listing) {this.listing = listing;}
 
+		public String getHostId() {return hostId;}
+		public void setHostId(String hostId) {this.hostId = hostId;}
+		
 		public String getCustomerId() {return customerId;}
 		public void setCustomerId(String customerId) {this.customerId = customerId;}
 
@@ -169,7 +176,10 @@ public class Order implements java.io.Serializable {
 		public void setMentstatus(String mentStatus) {this.mentStatus = mentStatus;}
 
 
-
+		public static final String STATUS_PENDING = "PENDING"; // 下單成功未付款
+		public static final String STATUS_CONFIRMED = "CONFIRMED"; // 付款成功
+		public static final String STATUS_COMPLETED = "COMPLETED"; // 履約完成（退房）
+		public static final String STATUS_CANCELLED = "CANCELLED";
 
 
 

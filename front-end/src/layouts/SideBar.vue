@@ -17,6 +17,11 @@ const items = [
   { title: "客戶清單", icon: "mdi-account", to: "/customers" },
   { title: "房東清單", icon: "mdi-home-account", to: "/hosts" },
   { title: "評論清單", icon: "mdi-comment", to: "/reviews/list" },
+  {
+    title: "訂單清單",
+    icon: "mdi-invoice-text-multiple-outline",
+    to: "/AdminOrder",
+  },
   { title: "租車服務", icon: "mdi-car", to: "/car-rent/back-homepage" },
 ];
 
