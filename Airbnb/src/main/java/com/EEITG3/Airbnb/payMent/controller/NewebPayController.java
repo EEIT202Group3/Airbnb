@@ -22,6 +22,7 @@ public class NewebPayController {
 	}
 	
 	/**Step1:前端帶bookingId取得要post到藍新的欄位*/
+
 	@PostMapping(
 	        value = "/checkout",
 	        consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -37,7 +38,7 @@ public class NewebPayController {
 	}
 	
 	/** Step2：Notify（Server->Server），以這個為準更新訂單狀態 */
-	@PostMapping(value = "/notify", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/notify", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String notifyCallback(
             @RequestParam("Status") String status,
             @RequestParam("TradeInfo") String tradeInfo,

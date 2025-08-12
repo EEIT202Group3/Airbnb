@@ -192,5 +192,28 @@ public class ListingService {
         
         listRepository.save(lisBean);
     }
+    //下架房源
+    public LisBean updatePublishedStatus(Integer id, boolean status) {
+        LisBean listing = listRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("房源不存在"));
+        listing.setPublished(status);
+        return listRepository.save(listing);
+    }
+    
+    //重新上架房源
+    public boolean republishListing(Integer id) {
+        return listRepository.findById(id).map(listing -> {
+            listing.setPublished(true);  // 設為重新上架
+            listRepository.save(listing);
+            return true;
+        }).orElse(false);
+    }
+    
+    
+    //前台房源卡
+    public List<LisBean> findApprovedAndPublished() {
+        return listRepository.findByApprovedTrueAndPublishedTrue();
+    }
+    
 
 }

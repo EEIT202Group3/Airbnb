@@ -1,11 +1,13 @@
 package com.EEITG3.Airbnb.users.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EEITG3.Airbnb.users.CookieUtil;
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
@@ -101,6 +105,17 @@ public class CustomerController {
 	@GetMapping("/customers/current")
 	public Customer getCurrentCustomer(@AuthenticationPrincipal CustomerDetails customerDetails) {
 		return service.currentCustomer(customerDetails);
+	}
+	//更新大頭照
+	@PostMapping(value = "/customers/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> updateAvatar(@RequestPart MultipartFile avatar, @AuthenticationPrincipal CustomerDetails customerDetails) {
+		try {
+			Customer customer = service.updateAvatar(service.currentCustomer(customerDetails), avatar);
+			return ResponseEntity.ok(customer);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
 	}
 	
 	

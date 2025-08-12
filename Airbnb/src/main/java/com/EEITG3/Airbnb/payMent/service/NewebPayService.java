@@ -46,6 +46,7 @@ public class NewebPayService {
 	}
 
 	// Step1：回傳要 POST 到藍新的四個欄位（MerchantID / TradeInfo / TradeSha / Version） 
+=======
 	public Map<String, String> buildMpgFormByBookingId(String bookingId) {
 		Order order = orderRepository.findByBookingId(bookingId)
 				.orElseThrow(() -> new IllegalArgumentException("Order not found:" + bookingId));
@@ -58,6 +59,7 @@ public class NewebPayService {
 			order.setMentstatus("PENDING");
 			orderRepository.save(order);
 		}
+
 
 		// 取 Email（// FIX: 別用 findCustomerByEmail(customerId)）
 		String customerId = order.getCustomerId();// 確認 Order 有這欄位與 getter
@@ -82,6 +84,7 @@ public class NewebPayService {
 		trade.put("ClientBackURL", clientBackUrl);
 
 		String plain = toQueryString(trade, true);
+
 
 		//  AES 加密 → hex 
 		String tradeInfoHex = NewebPayUtil.aesEncryptToHex(plain, hashKey, hashIv);
@@ -117,6 +120,7 @@ public class NewebPayService {
 		String merchantOrderNo = String.valueOf(flat.get("Result/MerchantOrderNo"));
 		Integer amt = Integer.valueOf(String.valueOf(flat.get("Result/Amt")));
 		String respondCode = String.valueOf(flat.get("Result/RespondCode")); // "00" 成功
+
 
 		// 對單 FIX: 方法名要跟 Entity 欄位名一致
 		Order order = orderRepository.findByPaymentId(merchantOrderNo)

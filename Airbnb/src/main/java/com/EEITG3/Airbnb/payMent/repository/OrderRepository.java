@@ -31,4 +31,6 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 			"  AND o.paidTime >= :start " + "  AND o.paidTime <  :end")
 	List<HostOrderAggDto> findPaidOrdersForPayout(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
+	
+
 }

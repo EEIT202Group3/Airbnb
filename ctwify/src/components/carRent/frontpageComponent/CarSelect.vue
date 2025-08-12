@@ -45,9 +45,14 @@ const filters = ref({
   dailyRentMax: null as number | null,
 });
 
-const maxDailyRent = computed(() =>
-    originalCarList.value.length
-        ? Math.max(...originalCarList.value.map((c) => c.dailyRent)) : 0);
+const maxDailyRent = computed(() => {
+    if(originalCarList.value.length > 0){
+      const rents = originalCarList.value.map(c => c.dailyRent);
+      return Math.max(...rents);
+    }else {
+      return 0;
+    }
+});
 
 onMounted(async () => {
   if (!searchParams.pickupDateTime || !searchParams.returnDateTime) {
