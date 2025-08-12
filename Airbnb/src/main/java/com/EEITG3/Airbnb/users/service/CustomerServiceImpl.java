@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -71,7 +72,7 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer customer = temp.get();
 		//如果沒有驗證過，拋出Exception，請先完成驗證
 		if(!customer.isVerified()) {
-			throw new BadCredentialsException("請先完成驗證");
+			throw new DisabledException("請先完成驗證");
 		}
 		//上面的三個驗證都過了，產生JWT並回傳
 		return jwtService.generateToken(customer.getEmail(), "ROLE_CUSTOMER");
@@ -82,7 +83,7 @@ public class CustomerServiceImpl implements CustomerService {
 		Optional<Customer> temp = repo.findCustomerByEmail(request.getEmail());
 		//表示已經有註冊過了
 		if(temp.isPresent()) {
-			throw new IllegalArgumentException("已註冊");
+			throw new IllegalArgumentException("帳號已存在");
 		}
 		//先對密碼進行加密
 		String encodedPassword = encoder.encode(request.getPassword());

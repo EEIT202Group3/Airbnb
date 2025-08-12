@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { loginService,signupService } from '@/service/user/customerService'
+import { signupService } from '@/service/user/customerService'
+import { useCustomerStore } from '@/stores/customer'
+
+const customerStore = useCustomerStore();
 
 //用來切換登入、註冊，0登入1註冊
 const tabIndex = ref(0)
@@ -52,12 +55,24 @@ async function onLogin() {
   if (!ok.valid) {
     return
   }
-  const response = loginService(login.value)
-  if(response){
+  try {
+    await customerStore.login(login.value)
     alert('登入成功')
     emit('login-success')
-  }else{
-    alert('登入失敗')
+  } catch (error) {
+    let msg = ''
+    const status = error.response.status
+    switch(status){
+      case 401:
+        msg = '帳號或密碼錯誤'
+        break
+      case 403:
+        msg = '請先完成驗證'
+        break
+      default:
+        msg = '未知錯誤'
+    }
+    alert(`${msg}`)
   }
 }
 
@@ -65,9 +80,22 @@ async function onLogin() {
 async function onRegister() {
   const ok = await (registerFormRef.value as any)?.validate()
   if (!ok.valid || !registerAllPass.value) return
-  const response = signupService(register.value)
-  console.log(response)
-  alert('註冊成功，看看有沒有驗證信')
+  try {
+    await signupService(register.value)
+    alert('註冊成功')
+    emit('login-success')
+  } catch (error) {
+    let msg = ''
+    const status = error.response.status
+    switch(status){
+      case 409:
+        msg = '帳號已註冊'
+        break
+      default :
+        msg = '未知錯誤'
+    }
+    alert(`${msg}`)
+  }
 }
 
 //忘記密碼
