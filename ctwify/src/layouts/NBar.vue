@@ -1,7 +1,32 @@
 <script setup>
-import { ref } from "vue";
+import { ref,onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useCustomerStore } from "@/stores/customer";
 import LoginSignup from "@/components/user/LoginSignup.vue";
+import defaultAvatar from '@/images/default.png'
+
 const showAuthPage = ref(false);
+
+const customerStore = useCustomerStore();
+const {customer} = storeToRefs(customerStore);
+
+async function logout(){
+  try {
+    await customerStore.logout()
+    alert('登出成功')
+  } catch (error) {
+    console.log(error.response)
+    alert('登出失敗')
+  }
+}
+
+onMounted(
+  async()=>{
+    if(!customer.value){
+      await customerStore.fetchUser()
+    }
+  }
+)
 </script>
 
 <template>
@@ -19,10 +44,15 @@ const showAuthPage = ref(false);
 
     <!-- 主選單連結 -->
     <v-btn text to="/listing/addlisting">刊登旅宿</v-btn>
-    <v-btn text to="/">規劃行程</v-btn>
+    <v-btn text to="/" class="ml-2 mr-4">規劃行程</v-btn>
 
     <!-- 登入 / 註冊 -->
-    <router-link class="text-decoration-none" color="black">
+    <router-link v-if="customer" to="/customer">
+      <v-avatar size="32">
+        <v-img :src="customer?.avatarURL ? 'http://localhost:8080' + customer.avatarURL : defaultAvatar" cover/>
+      </v-avatar>
+    </router-link>
+    <router-link v-else class="text-decoration-none" color="black">
       <v-btn
         variant="text"
         class="d-flex align-center text-black"
@@ -60,6 +90,9 @@ const showAuthPage = ref(false);
         </v-list-item>
         <v-list-item to="/main/list">
           <v-list-item-title>我的房源</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="logout()">
+          <v-list-item-title>登出</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>

@@ -89,7 +89,7 @@ public class SecurityConfig{
 				.authorizeHttpRequests(configurer->
 					configurer
 					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-					.requestMatchers("/api/customers/login","/api/customers/signup","api/customers/verify").permitAll()
+					.requestMatchers("/api/customers/login","/api/customers/signup","api/customers/verify","/api/customers/logout").permitAll()
 					.anyRequest().hasRole("CUSTOMER"))
 				.build();	
 	}
@@ -195,7 +195,7 @@ public class SecurityConfig{
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.addAllowedOriginPattern("http://localhost:*");
+		config.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:5174"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true);

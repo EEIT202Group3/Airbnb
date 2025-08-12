@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -54,6 +55,8 @@ public class CustomerController {
 			return ResponseEntity.ok(token);
 		} catch (BadCredentialsException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+		} catch (DisabledException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
 		}
 	}
 	
@@ -71,8 +74,12 @@ public class CustomerController {
 			}
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 		}
-		service.customerSignup(request);
-		return ResponseEntity.ok("已送出驗證信");
+		try {
+			service.customerSignup(request);
+			return ResponseEntity.ok("已送出驗證信");
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+		}
 	}
 	
 	//接收驗證信
