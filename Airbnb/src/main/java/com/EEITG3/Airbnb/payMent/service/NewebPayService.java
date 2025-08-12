@@ -46,7 +46,6 @@ public class NewebPayService {
 	}
 
 	// Step1：回傳要 POST 到藍新的四個欄位（MerchantID / TradeInfo / TradeSha / Version） 
-=======
 	public Map<String, String> buildMpgFormByBookingId(String bookingId) {
 		Order order = orderRepository.findByBookingId(bookingId)
 				.orElseThrow(() -> new IllegalArgumentException("Order not found:" + bookingId));
