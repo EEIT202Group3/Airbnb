@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
+
 // import List from "../components/listing/List.vue";
 // import Add from "../components/listing/AddListing.vue";
 // import Detail from "../components/listing/Detail.vue";
 // import Edit from "../components/listing/EditListing.vue";
+import { compile } from "vue";
+
 
 // //import getList from "@/layouts/ListLayout.vue";
 
@@ -24,6 +27,7 @@ const routes = [
       {
         path: "customer",
         component: () => import("@/components/user/customer/CustomerPage.vue"),
+        redirect: { name: "CustomerInfo" },
         children: [
           {
             path: "",
@@ -40,25 +44,9 @@ const routes = [
         ],
       },
       {
-        path: "host",
-        component: () => import("@/components/user/host/HostPage.vue"),
-        children: [
-          {
-            path: "",
-            component: () => import("@/components/user/host/HostInfo.vue"),
-            name: "HostInfo",
-          },
-          {
-            path: "listing",
-            component: () => import("@/components/user/host/HostListing.vue"),
-            name: "HostListing",
-          },
-          {
-            path: "order",
-            component: () => import("@/components/user/host/HostOrder.vue"),
-            name: "HostOrder",
-          },
-        ],
+        path: 'hostLogin',
+        component: () => import("@/components/user/host/HostLoginPage.vue"),
+        name: 'HostLogin'
       },
       {
         path: "customerprofile",
@@ -67,13 +55,8 @@ const routes = [
         name: "CustomerProfile",
       },
       {
-        path: "hostprofile",
-        component: () => import("@/components/user/host/HostProfile.vue"),
-        name: "HostProfile",
-      },
-      {
         path: "login",
-        component: () => import("@/components/user/LoginSignup.vue"),
+        component: () => import("@/components/user/customer/LoginSignup.vue"),
       },
 
       {
@@ -122,10 +105,49 @@ const routes = [
       },
       {
         path: "password",
-        component: () => import("@/components/user/ChangePassword.vue"),
+        component: () => import("@/components/user/customer/ChangePassword.vue"),
         name: "ChangePassword",
       },
     ],
+  },
+  {
+    path: '/host',
+    component: () => import('@/layouts/host/MainLayout.vue'),
+    children: [
+      {
+        path: "",
+        component: () => import("@/components/user/host/HostPage.vue"),
+        name: 'HostHomepage',
+        redirect: { name: "HostInfo" },
+        children: [
+          {
+            path: "",
+            component: () => import("@/components/user/host/HostInfo.vue"),
+            name: "HostInfo",
+          },
+          {
+            path: "listing",
+            component: () => import("@/components/user/host/HostListing.vue"),
+            name: "HostListing",
+          },
+          {
+            path: "order",
+            component: () => import("@/components/user/host/HostOrder.vue"),
+            name: "HostOrder",
+          },
+        ],
+      },
+      {
+        path: "hostprofile",
+        component: () => import("@/components/user/host/HostProfile.vue"),
+        name: "HostProfile",
+      },
+      {
+        path: "password",
+        component: () => import("@/components/user/host/ChangePassword.vue"),
+        name: 'HostPassword',
+      },
+    ]
   },
 
   // {

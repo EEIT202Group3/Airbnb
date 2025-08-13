@@ -18,7 +18,7 @@ onMounted(
 
 </script>
 <template>
-    <v-card class="pa-8 elevation-2 rounded-xl mx-auto">
+    <v-card class="pa-8 elevation-6 rounded-xl mx-auto">
  
             <h1 style="font-weight: bolder;">關於我</h1>
             
@@ -61,4 +61,7 @@ onMounted(
     </v-card>
 </template>
 <style scoped>
+.v-btn{
+    background-color: #FFFAF4;
+}
 </style>
