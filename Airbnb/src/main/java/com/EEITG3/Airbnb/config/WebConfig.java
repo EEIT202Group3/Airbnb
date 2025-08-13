@@ -17,14 +17,19 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         
-    	String avatarPath = Paths.get(baseDir, "avatar", "customers").toAbsolutePath().toUri().toString();
+    	String customerAvatarPath = Paths.get(baseDir, "avatar", "customers").toAbsolutePath().toUri().toString();
+    	
+    	String hostAvatarPath = Paths.get(baseDir, "avatar", "hosts").toAbsolutePath().toUri().toString();
     	
     	// 將 /images/** 映射到本機磁碟位置
         registry.addResourceHandler("/images/listing/**")
                 .addResourceLocations("file:D:/photo/listing/")
                 .setCachePeriod(3600); 
         registry.addResourceHandler("/images/avatar/customers/**")
-        		.addResourceLocations(avatarPath)
+        		.addResourceLocations(customerAvatarPath)
         		.setCachePeriod(3600);
+        registry.addResourceHandler("/images/avatar/hosts/**")
+				.addResourceLocations(hostAvatarPath)
+				.setCachePeriod(3600);
     }
 }

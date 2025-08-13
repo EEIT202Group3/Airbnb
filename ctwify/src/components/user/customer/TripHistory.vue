@@ -33,7 +33,7 @@ function getHistory(data:any){
                         @click="getHistory(h)"
                         @mouseover="hovered = h.id"
                         @mouseleave="hovered = null"
-                        :style="hovered === h.id ? 'background-color: #FFDCB9;' : ''"
+                        :style="hovered === h.id ? 'background-color: #F2AB27;color:white;' : ''"
                         >
                         <div>{{ h.location }}</div>
                         <div>{{ h.price }}</div>

@@ -33,7 +33,7 @@ function getList(data:any){
                         @click="getList(l)"
                         @mouseover="hovered = l.id"
                         @mouseleave="hovered = null"
-                        :style="hovered === l.id ? 'background-color: #FFDCB9;' : ''"
+                        :style="hovered === l.id ? 'background-color:#F2AB27;color:white;' : ''"
                         >
                         <div>{{ l.id }}</div>
                         <div>{{ l.name }}</div>
