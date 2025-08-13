@@ -1,52 +1,46 @@
+<template>
+  <v-container class="py-10" max-width="900">
+    <h2 class="mb-6">導向信用卡付款中…</h2>
+    <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
+
+    <form
+      v-if="form"
+      ref="payForm"
+      :action="form.action"
+      method="POST"
+      style="display: none"
+    >
+      <input name="MerchantID" :value="form.MerchantID" />
+      <input name="TradeInfo" :value="form.TradeInfo" />
+      <input name="TradeSha" :value="form.TradeSha" />
+      <input name="Version" :value="form.Version" />
+    </form>
+
+    <v-progress-circular indeterminate v-if="!error" />
+  </v-container>
+</template>
+
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { payNewebpayCheckout } from "@/api/orders";
+import { payNewebpayCheckout } from "./order";
 
 const route = useRoute();
-const bookingId = route.query.bookingId;
-
+const payForm = ref(null);
+const form = ref(null);
 const error = ref("");
-const loading = ref(true);
 
 onMounted(async () => {
   try {
-    if (!bookingId) throw new Error("缺少 bookingId");
-    const data = await payNewebpayCheckout(String(bookingId));
-
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = data.Gateway; // https://ccore.newebpay.com/MPG/mpg_gateway
-
-    addHidden(form, "MerchantID", data.MerchantID);
-    addHidden(form, "TradeInfo", data.TradeInfo);
-    addHidden(form, "TradeSha", data.TradeSha);
-    addHidden(form, "Version", data.Version);
-
-    document.body.appendChild(form);
-    form.submit();
+    const bookingId = route.query.bookingId || route.params.bookingId;
+    if (!bookingId) {
+      error.value = "缺少訂單編號，無法進入信用卡付款。";
+      return;
+    }
+    form.value = await payNewebpayCheckout(String(bookingId));
+    requestAnimationFrame(() => payForm.value?.submit());
   } catch (e) {
-    error.value = e.message || "導向金流失敗";
-  } finally {
-    loading.value = false;
+    error.value = e?.response?.data || e?.message || "建立信用卡交易失敗";
   }
 });
-
-function addHidden(form, name, value) {
-  const input = document.createElement("input");
-  input.type = "hidden";
-  input.name = name;
-  input.value = value;
-  form.appendChild(input);
-}
 </script>
-
-<template>
-  <v-container class="py-10 text-center">
-    <v-progress-circular v-if="loading" indeterminate size="56" class="mb-4" />
-    <div v-if="loading">正在導向藍新金流頁面…</div>
-    <v-alert v-else-if="error" type="error" class="mx-auto" max-width="600">
-      {{ error }}
-    </v-alert>
-  </v-container>
-</template>

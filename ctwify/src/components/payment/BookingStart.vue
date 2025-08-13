@@ -1,116 +1,135 @@
+<template>
+  <v-container class="py-6" max-width="1000">
+    <h2 class="mb-4">預約房源</h2>
+
+    <!-- 房源資訊 -->
+    <v-card class="mb-4" color="orange-lighten-5">
+      <v-card-title class="text-h6">房源資訊</v-card-title>
+      <v-card-text>
+        <div>房名：{{ listing.houseName }}</div>
+        <div>地址：{{ listing.address }}</div>
+        <div>床位：{{ listing.bed }}</div>
+        <div>房型：{{ listing.type }}</div>
+        <div>聯絡電話：{{ listing.tel }}</div>
+      </v-card-text>
+    </v-card>
+
+    <!-- 輸入欄位 -->
+    <v-card class="mb-4">
+      <v-card-title class="text-h6">請填寫預訂資訊</v-card-title>
+      <v-card-text>
+        <v-text-field
+          label="入住日期"
+          v-model="form.checkin"
+          type="date"
+          variant="outlined"
+          class="mb-2"
+        />
+
+        <v-text-field
+          label="退房日期"
+          v-model="form.checkout"
+          type="date"
+          variant="outlined"
+          class="mb-2"
+        />
+
+        <v-text-field
+          label="入住人數"
+          v-model.number="form.people"
+          type="number"
+          min="1"
+          variant="outlined"
+          class="mb-2"
+        />
+
+        <v-btn color="orange-darken-2" @click="goToPreview">
+          下一步：確認訂單
+        </v-btn>
+      </v-card-text>
+    </v-card>
+
+    <!-- 錯誤訊息 -->
+    <v-alert type="error" v-if="error" class="mt-4">
+      {{ error }}
+    </v-alert>
+  </v-container>
+</template>
+
 <script setup>
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { previewOrder } from "@/api/orderconfirm/preview";
-//import ListingCard from "@/components/ListingCard.vue";
-import ListingCard from "@/components/payment/ListingCard.vue";
-import ListLayout from "@/layouts/ListLayout.vue";
-import PreviewConfirm from "./PreviewConfirm.vue";
+import axios from "axios";
 
-const router = useRouter();
 const route = useRoute();
+const router = useRouter();
+const error = ref("");
 
-const listId = ref(route.query.listId ? Number(route.query.listId) : null);
+// 從上一頁取得房源資訊
+const listing = {
+  listId: route.query.listId,
+  houseName: route.query.houseName,
+  address: route.query.address,
+  tel: route.query.tel,
+  bed: route.query.bed,
+  type: route.query.type,
+  price: parseInt(route.query.price),
+};
 
+// 表單輸入欄位
 const form = ref({
-  listid: listId.value, // 後端 DTO 欄位名就是 listid（小寫）
-  checkindate: null, // 'YYYY-MM-DD'
-  checkoutdate: null,
+  checkin: "",
+  checkout: "",
   people: 1,
 });
 
-const loading = ref(false);
-const error = ref("");
-const previewData = ref(null); // 若你想在本頁先視覺化 preview，可以先塞起來
-
-async function submitPreview() {
+// 傳送預覽訂單請求並導向下一頁
+async function goToPreview() {
   error.value = "";
-  if (
-    !form.value.listid ||
-    !form.value.checkindate ||
-    !form.value.checkoutdate ||
-    !form.value.people
-  ) {
-    error.value = "請完整填寫入住資訊";
+  // 前端驗證
+  if (!form.value.checkin || !form.value.checkout || form.value.people < 1) {
+    error.value = "請填寫完整的預訂資訊";
     return;
   }
-  loading.value = true;
+
+  if (new Date(form.value.checkin) >= new Date(form.value.checkout)) {
+    error.value = "退房日期必須晚於入住日期";
+    return;
+  }
+
   try {
     const payload = {
-      listid: form.value.listid,
-      checkindate: form.value.checkindate,
-      checkoutdate: form.value.checkoutdate,
-      people: Number(form.value.people),
+      listid: parseInt(listing.listId),
+      checkindate: form.value.checkin,
+      checkoutdate: form.value.checkout,
+      people: form.value.people,
     };
-    const data = await PreviewConfirm(payload);
-    // 直接把 payload + 後端回傳結果帶去下一頁（也可存在 store）
+
+    console.log("發送預覽請求:", payload); // 調試用
+
+    const { data } = await axios.post("/api/orderconfirm/preview", payload);
+
     router.push({
       name: "PreviewConfirm",
-      state: { previewPayload: payload, previewResult: data },
+      query: {
+        listId: listing.listId,
+        houseName: listing.houseName,
+        address: listing.address,
+        tel: listing.tel,
+        bed: listing.bed,
+        type: listing.type,
+        price: listing.price,
+        checkInDate: form.value.checkin,
+        checkOutDate: form.value.checkout,
+        guests: form.value.people,
+        days: data.days,
+        total: data.total,
+        username: data.customer?.name || data.customer?.username,
+      },
     });
-  } catch (e) {
-    error.value = e.message || "預覽失敗";
-  } finally {
-    loading.value = false;
+  } catch (err) {
+    console.error("預覽訂單錯誤:", err); // 調試用
+    error.value = err.response?.data || err.message || "預覽訂單失敗";
   }
 }
 </script>
-
-<template>
-  <v-container class="py-6" max-width="900">
-    <h2 class="mb-4">我要訂房</h2>
-
-    <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
-
-    <v-card>
-      <v-card-text>
-        <v-row dense>
-          <v-col cols="12" md="4">
-            <v-text-field
-              label="2"
-              type="number"
-              v-model.number="form.listid"
-              hint="2"
-              persistent-hint
-              required
-            />
-          </v-col>
-
-          <v-col cols="12" md="4">
-            <v-text-field
-              label="入住日"
-              v-model="form.checkindate"
-              type="date"
-              required
-            />
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-text-field
-              label="退房日"
-              v-model="form.checkoutdate"
-              type="date"
-              required
-            />
-          </v-col>
-
-          <v-col cols="12" md="4">
-            <v-text-field
-              label="入住人數"
-              v-model.number="form.people"
-              type="number"
-              min="1"
-              required
-            />
-          </v-col>
-        </v-row>
-      </v-card-text>
-
-      <v-card-actions>
-        <v-spacer />
-        <v-btn color="primary" :loading="loading" @click="submitPreview">
-          預覽訂單
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-container>
-</template>

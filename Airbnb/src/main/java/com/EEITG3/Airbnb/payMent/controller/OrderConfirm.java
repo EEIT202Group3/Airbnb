@@ -1,10 +1,10 @@
 package com.EEITG3.Airbnb.payMent.controller;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,6 +61,18 @@ public class OrderConfirm {
 		LisBean listing = listRepository.findById(dto.getListid()).orElseThrow(() -> new RuntimeException("房源不存在"));
 		Customer customer = customerRepository.findCustomerByEmail(email)
 				.orElseThrow(() -> new RuntimeException("會員不存在"));
+		
+		// 驗證必要參數
+	    if (dto.getListid() == null || dto.getCheckindate() == null || 
+	        dto.getCheckoutdate() == null || dto.getPeople() <= 0) {
+	        return ResponseEntity.badRequest().body("缺少必要參數");
+	    }
+	    
+	    // 驗證日期邏輯
+	    if (dto.getCheckindate().isAfter(dto.getCheckoutdate()) || 
+	        dto.getCheckindate().isBefore(LocalDate.now())) {
+	        return ResponseEntity.badRequest().body("日期設定錯誤");
+	    }
 
 		long days = ChronoUnit.DAYS.between(dto.getCheckindate(), dto.getCheckoutdate());
 

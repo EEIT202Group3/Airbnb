@@ -35,7 +35,7 @@ public class AdminOrderService {
 			dto.setPeople(order.getPeople());
 			dto.setBookingstatus(order.getBookingstatus());
 			dto.setUsername(order.getUsername());
-			dto.setTotalamount(order.getTotalamount());
+			dto.setGrandtotal(order.getGrandTotal());
 			dto.setCheckindate(order.getCheckindate());
 			dto.setCheckoutdate(order.getCheckoutdate());
 			return dto;
@@ -60,11 +60,11 @@ public class AdminOrderService {
     	    dto.setPeople(order.getPeople());
     	    dto.setLocationId(order.getLocationid());
     	    dto.setPaymentId(order.getPaymentid());
-    	    dto.setPrice(order.getPrice());
+    	    dto.setRoomprice(order.getRoomPrice());
     	    dto.setBookingStatus(order.getBookingstatus());
     	    dto.setMentStatus(order.getMentstatus());
-    	    dto.setTotal(order.getTotal());
-    	    dto.setTotalAmount(order.getTotalamount());
+    	    dto.setCartotal(order.getCarTotal());
+    	    dto.setGrandtotal(order.getGrandTotal());
     	    dto.setPaidTime(order.getPaidtime());
     	    dto.setBookingMethod(order.getBookingmethod());
     	    dto.setBookingStatus(order.getBookingstatus());

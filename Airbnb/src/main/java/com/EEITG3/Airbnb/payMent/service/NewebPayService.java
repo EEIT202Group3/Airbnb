@@ -47,67 +47,90 @@ public class NewebPayService {
 
 	// Step1：回傳要 POST 到藍新的四個欄位（MerchantID / TradeInfo / TradeSha / Version） 
 	public Map<String, String> buildMpgFormByBookingId(String bookingId) {
-		Order order = orderRepository.findByBookingId(bookingId)
-				.orElseThrow(() -> new IllegalArgumentException("Order not found:" + bookingId));
-		if (order.getTotalamount() == null || order.getTotalamount().compareTo(BigDecimal.ZERO) <= 0) {
-			throw new IllegalStateException("Order amount invalid");
-		}
-		// 若尚未產生 paymentId，這裡產生（**paymentId 即 MerchantOrderNo**）
-		if (order.getPaymentid() == null || order.getPaymentid().isBlank()) {
-			order.setPaymentid("ORD" + System.currentTimeMillis());
-			order.setMentstatus("PENDING");
-			orderRepository.save(order);
-		}
+	    Order order = orderRepository.findByBookingId(bookingId)
+	            .orElseThrow(() -> new IllegalArgumentException("Order not found:" + bookingId));
+	    if (order.getGrandTotal() == null || order.getGrandTotal().compareTo(BigDecimal.ZERO) <= 0) {
+	        throw new IllegalStateException("Order amount invalid");
+	    }
 
+	    // 產生 MerchantOrderNo（避免太長、含 -）
+	    if (order.getPaymentid() == null || order.getPaymentid().isBlank()) {
+	        order.setPaymentid("ORD" + System.currentTimeMillis()); // 約 16~20 字
+	        order.setMentstatus("PENDING");
+	        orderRepository.save(order);
+	    }
 
-		// 取 Email（// FIX: 別用 findCustomerByEmail(customerId)）
-		String customerId = order.getCustomerId();// 確認 Order 有這欄位與 getter
-		String email = customerRepository.findCustomerByEmail(customerId).map(Customer::getEmail)
-				.orElse("test@example.com");
+	    // 取得 Email（這段依你的資料庫而定，保持簡單）
+	    String email = "test@example.com";
+	    try {
+	        String customerId = order.getCustomerId();
+	        email = customerRepository.findCustomerByEmail(customerId)
+	                .map(Customer::getEmail).orElse(email);
+	    } catch (Exception ignore) {}
 
-		//組裝 TradeInfo 明文（value 需 URL encode） ---
-		Map<String, String> trade = new LinkedHashMap<>();
-		trade.put("MerchantID", merchantId);
-		trade.put("RespondType", "JSON");
-		trade.put("TimeStamp", String.valueOf(Instant.now().getEpochSecond())); // 秒
-		trade.put("Version", version);
-		trade.put("MerchantOrderNo", order.getPaymentid());
-		int amt = order.getTotalamount().setScale(0, RoundingMode.HALF_DOWN).intValueExact();
-		trade.put("Amt", String.valueOf(amt));
-		trade.put("ItemDesc", "Booking " + bookingId);
-		trade.put("Email", email);
-		trade.put("LoginType", "0");
-		trade.put("CREDIT", "1");
-		trade.put("ReturnURL", returnUrl);
-		trade.put("NotifyURL", notifyUrl);
-		trade.put("ClientBackURL", clientBackUrl);
+	    // 組 TradeInfo 明文參數（使用 LinkedHashMap 保順序）
+	    LinkedHashMap<String, String> trade = new LinkedHashMap<>();
+	    trade.put("MerchantID", merchantId);
+	    trade.put("RespondType", "JSON");
+	    trade.put("TimeStamp", String.valueOf(Instant.now().getEpochSecond()));
+	    trade.put("Version", version);
+	    trade.put("MerchantOrderNo", order.getPaymentid());
+	    int amt = order.getGrandTotal().setScale(0, RoundingMode.HALF_DOWN).intValueExact();
+	    trade.put("Amt", String.valueOf(amt));
+	    trade.put("ItemDesc", "Booking " + bookingId);
+	    trade.put("Email", email);
+	    trade.put("LoginType", "0");
+	    trade.put("CREDIT", "1");
+	    trade.put("ReturnURL", returnUrl);
+	    trade.put("NotifyURL", notifyUrl);
+	    trade.put("ClientBackURL", clientBackUrl);
 
-		String plain = toQueryString(trade, true);
+	    // 將 value 做 URL-encode 再拼字串（encode 一次就好）
+	    LinkedHashMap<String, String> encodedTrade = new LinkedHashMap<>();
+	    trade.forEach((k, v) -> encodedTrade.put(k, NewebPayUtil.urlEncode(v)));
 
+	    String plain = NewebPayUtil.joinParams(encodedTrade);
 
-		//  AES 加密 → hex 
-		String tradeInfoHex = NewebPayUtil.aesEncryptToHex(plain, hashKey, hashIv);
+	    // AES → HEX（用 properties 讀到的同一組 key/iv）
+	    String tradeInfoHex = NewebPayUtil.aesEncryptToHex(plain, hashKey, hashIv);
 
-		// 產生 TradeSha 
-		String shaSource = "HashKey=" + hashKey + "&" + tradeInfoHex + "&HashIV=" + hashIv;
-		String tradeSha = NewebPayUtil.sha256ToUpper(shaSource);
+	    // 產生 TradeSha（修正版本：先轉小寫再 URL encode）
+	    String tradeSha = NewebPayUtil.buildTradeSha(tradeInfoHex, hashKey, hashIv);
 
-		Map<String, String> res = new HashMap<>();
-		res.put("MerchantID", merchantId);
-		res.put("TradeInfo", tradeInfoHex);
-		res.put("TradeSha", tradeSha);
-		res.put("Version", version);
-		res.put("Gateway", mpgGateway);// 前端要 POST 的 action
-		return res;
+	    // ===== Debug（測通後可移除） =====
+	    System.out.println("=== TradeInfo 明文 ===\n" + plain);
+	    System.out.println("=== TradeInfo HEX ===\n" + tradeInfoHex);
+	    String raw = "HashKey=" + hashKey + "&TradeInfo=" + tradeInfoHex + "&HashIV=" + hashIv;
+	    System.out.println("=== TradeSha 原始字串 ===\n" + raw);
+	    System.out.println("=== TradeSha URL-encoded ===\n" + NewebPayUtil.urlEncode(raw));
+	    System.out.println("=== TradeSha (final) ===\n" + tradeSha);
+	    // ================================
+
+	    Map<String, String> res = new HashMap<>();
+	    res.put("MerchantID", merchantId);
+	    res.put("TradeInfo", tradeInfoHex);
+	    res.put("TradeSha", tradeSha);
+	    res.put("Version", version);
+	    res.put("action", mpgGateway);
+	    return res;
 	}
-	//Step2：Notify（Server->Server
+	
+	//Step2：Notify（Server->Server）
 	// Notify：驗簽 → 解密 → 用 paymentId 對單 → 金額比對 → 更新 mentStatus / paidTime 
 	@Transactional
 	public void handleNotify(String status, String tradeInfoHex, String tradeSha) {
-		//  比對簽章 FIX: 一樣要 URL-encode 後 SHA-256
+		// 比對簽章 修正：同樣使用小寫+URL encode
 		String expectedRaw = "HashKey=" + hashKey + "&TradeInfo=" + tradeInfoHex + "&HashIV=" + hashIv;
-        String expected = NewebPayUtil.sha256ToUpper(NewebPayUtil.urlEncode(expectedRaw));
+		String expectedLower = expectedRaw.toLowerCase();
+        String expected = NewebPayUtil.sha256ToUpper(NewebPayUtil.urlEncode(expectedLower));
+        
         if (!expected.equals(tradeSha)) {
+            System.out.println("=== TradeSha 驗證失敗 ===");
+            System.out.println("原始字串: " + expectedRaw);
+            System.out.println("小寫字串: " + expectedLower);
+            System.out.println("編碼字串: " + NewebPayUtil.urlEncode(expectedLower));
+            System.out.println("Expected: " + expected);
+            System.out.println("Received: " + tradeSha);
             throw new IllegalArgumentException("TradeSha mismatch");
         }
 
@@ -121,19 +144,19 @@ public class NewebPayService {
 		String respondCode = String.valueOf(flat.get("Result/RespondCode")); // "00" 成功
 
 
-		// 對單 FIX: 方法名要跟 Entity 欄位名一致
+		// 對單 修正：方法名要跟 Entity 欄位名一致
 		Order order = orderRepository.findByPaymentId(merchantOrderNo)
 				.orElseThrow(() -> new IllegalStateException("Order not found by paymentId=" + merchantOrderNo));
 
 		// 金額比對（整數）
-        int orderAmt = order.getTotalamount().setScale(0, RoundingMode.HALF_DOWN).intValueExact();
+        int orderAmt = order.getGrandTotal().setScale(0, RoundingMode.HALF_DOWN).intValueExact();
         if (orderAmt != amt) {
             throw new IllegalStateException("Amount mismatch");
         }
 
 		// 更新狀態（以 Notify 為準）
         if ("SUCCESS".equalsIgnoreCase(status) && "00".equals(respondCode)) {
-            if (!"PAID".equalsIgnoreCase(order.getMentstatus())) { // 防重覆更新
+            if (!"PAID".equalsIgnoreCase(order.getMentstatus())) { // 防重複更新
                 order.setMentstatus("PAID");
                 order.setPaidtime(LocalDateTime.now());
                 orderRepository.save(order);
