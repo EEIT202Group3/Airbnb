@@ -14,7 +14,7 @@ function getHistory(data:any){
 
 </script>
 <template>
-    <v-card class="pa-8 elevation-2 rounded-xl mx-auto">
+    <v-card class="pa-8 elevation-6 rounded-xl mx-auto">
         <h1 style="font-weight: bolder;">過去的旅程</h1>
         <v-divider class="my-6" />
         <v-item-group mandatory>
@@ -33,7 +33,8 @@ function getHistory(data:any){
                         @click="getHistory(h)"
                         @mouseover="hovered = h.id"
                         @mouseleave="hovered = null"
-                        :style="hovered === h.id ? 'background-color: #F2AB27;color:white;' : ''"
+                        :style="hovered === h.id ? 'background-color: #F2AB27;color:white;' : 'background-color: #FFFAF4;'"
+                        style="border-radius: 20px;"
                         >
                         <div>{{ h.location }}</div>
                         <div>{{ h.price }}</div>

@@ -34,7 +34,7 @@ function getOrder(data : any){
                         @click="getOrder(o)"
                         @mouseover="hovered = o.id"
                         @mouseleave="hovered = null"
-                        :style="hovered === o.id ? 'background-color:#F2AB27;color:white;' : ''"
+                        :style="hovered === o.id ? 'background-color:#F2AB27;color:white;' : 'background-color: #FFFAF4;'"
                         >
                         <div>{{ o.id }}</div>
                         <div>{{ o.amount }}</div>

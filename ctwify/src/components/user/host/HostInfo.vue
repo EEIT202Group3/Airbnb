@@ -71,7 +71,6 @@ onMounted(
 </template>
 <style scoped>
 .v-btn{
-    background-color: #F29727;
-    color: white;
+    background-color:#FFFAF4;
 }
 </style>
