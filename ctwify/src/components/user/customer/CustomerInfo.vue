@@ -61,4 +61,8 @@ onMounted(
     </v-card>
 </template>
 <style scoped>
+.v-btn{
+    background-color: #F29727;
+    color: white;
+}
 </style>

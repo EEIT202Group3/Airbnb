@@ -2,7 +2,7 @@
 import { ref,onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useCustomerStore } from "@/stores/customer";
-import LoginSignup from "@/components/user/LoginSignup.vue";
+import LoginSignup from "@/components/user/customer/LoginSignup.vue";
 import defaultAvatar from '@/images/default.png'
 
 const showAuthPage = ref(false);
@@ -73,8 +73,8 @@ onMounted(
         <v-list-item to="/customer">
           <v-list-item-title>客戶首頁</v-list-item-title>
         </v-list-item>
-        <v-list-item to="/host">
-          <v-list-item-title>房東首頁</v-list-item-title>
+        <v-list-item to="/hostLogin">
+          <v-list-item-title>房東專區</v-list-item-title>
         </v-list-item>
         <v-list-item to="/">
           <v-list-item-title>租車服務</v-list-item-title>

@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { ref,onMounted } from 'vue';
-import { findMe } from '@/service/host/hostService';
-const host = ref(null);
+import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useHostStore } from '@/stores/host';
+import defaultAvatar from '@/images/default.png'
+
+const hostStore = useHostStore()
+const {host} = storeToRefs(hostStore)
+
+
 onMounted(
     async()=>{
-        host.value = await findMe();
-        console.log(host.value);
+        if(!host.value){
+            hostStore.fetchUser();
+        }
     }
 )
 </script>
@@ -19,27 +26,37 @@ onMounted(
         
         <br>
         <br>
-
-        <v-card class="pa-8 elevation-2 rounded-xl" style="width: 35%;">
-            <div v-if="host" class="d-flex align-center">
-                <v-avatar size="80" class="mr-4">
-                    <!--  -->
-                    <v-img :src="host?.avatarURL ? 'http://localhost:8080' + host.avatarURL : require('@/assets/user/account.svg')" cover />
-                </v-avatar>
-                <div>
-                    <div class="text-h6">{{ host.username }}</div>
-                    <div v-if="host.verified" class="text-body-2 text-medium-emphasis">
-                        <v-icon icon="mdi-shield-check" color="green"></v-icon>已驗證
+        <v-row>
+            <v-col cols="3">
+                <v-card class="pa-8 elevation-2 rounded-xl" style="width: 100%;">
+                    <div v-if="host" class="d-flex align-center">
+                        <v-avatar size="80" class="mr-4">
+                            <!--  -->
+                            <v-img :src="host?.avatarURL ? 'http://localhost:8080' + host.avatarURL : defaultAvatar" />
+                        </v-avatar>
+                        <div>
+                            <div class="text-h6">{{ host.username }}</div>
+                            <div v-if="host.verified" class="text-body-2 text-medium-emphasis">
+                                <v-icon icon="mdi-shield-check" color="green"></v-icon>已驗證
+                            </div>
+                            <div v-else class="text-body-2 text-medium-emphasis">
+                                <v-icon icon="mdi-alert-circle" color="red"></v-icon>未驗證
+                            </div>
+                        </div>
                     </div>
-                    <div v-else class="text-body-2 text-medium-emphasis">
-                        <v-icon icon="mdi-alert-circle" color="red"></v-icon>未驗證
+                    <div v-else>
+                        請重新登入
                     </div>
-                </div>
-            </div>
-            <div v-else>
-                請重新登入
-            </div>
-        </v-card>
+                </v-card>
+            </v-col>
+            <v-col cols="9">
+                <v-card class="pa-8 elevation-2 rounded-xl" style="width: 100%;">
+                    <h3 style="font-weight: bold;">房東介紹</h3>
+                    <p>{{ host?.intro?host.intro:'此房東沒有介紹' }}</p>
+                </v-card>
+            </v-col>
+        </v-row>
+        
 
         <v-divider class="my-6" />
 
@@ -53,4 +70,8 @@ onMounted(
     </v-card>
 </template>
 <style scoped>
+.v-btn{
+    background-color: #F29727;
+    color: white;
+}
 </style>

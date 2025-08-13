@@ -1,7 +1,10 @@
 package com.EEITG3.Airbnb.users.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
@@ -21,6 +24,8 @@ public interface HostService {
 	Host currentHost(HostDetails hostDetails);
 	//房東更新資料
 	Host hostUpdate(Map<String, Object> patchPayload, HostDetails hostDetails);
+	//更新大頭貼
+	Host updateAvatar(Host host,MultipartFile avatar) throws IOException;
 	//登出
 	
 	//後台功能
