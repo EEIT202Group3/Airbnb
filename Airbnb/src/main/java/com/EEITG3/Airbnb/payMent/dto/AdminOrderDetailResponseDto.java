@@ -16,9 +16,9 @@ public class AdminOrderDetailResponseDto {
 	private LocalDateTime checkoutDate;    
 	private Integer locationId;        
 	private String paymentId;         
-	private Integer price;        
-	private BigDecimal total;             
-	private BigDecimal totalAmount;
+	private Integer roomprice;        
+	private BigDecimal cartotal;             
+	private BigDecimal grandtotal;
 	private LocalDateTime paidTime;       
 	private String bookingStatus;   
 	private String bookingMethod;    
@@ -95,23 +95,23 @@ public class AdminOrderDetailResponseDto {
 	public void setPaymentId(String paymentId) {
 		this.paymentId = paymentId;
 	}
-	public Integer getPrice() {
-		return price;
+	public Integer getRoomprice() {
+		return roomprice;
 	}
-	public void setPrice(Integer price) {
-		this.price = price;
+	public void setRoomprice(Integer roomprice) {
+		this.roomprice = roomprice;
 	}
-	public BigDecimal getTotalAmount() {
-		return totalAmount;
+	public BigDecimal getCartotal() {
+		return cartotal;
 	}
-	public void setTotalAmount(BigDecimal totalAmount) {
-		this.totalAmount = totalAmount;
+	public void setCartotal(BigDecimal cartotal) {
+		this.cartotal = cartotal;
 	}
-	public BigDecimal getTotal() {
-		return total;
+	public BigDecimal getGrandtotal() {
+		return grandtotal;
 	}
-	public void setTotal(BigDecimal total) {
-		this.total = total;
+	public void setGrandtotal(BigDecimal grandtotal) {
+		this.grandtotal = grandtotal;
 	}
 	public LocalDateTime getPaidTime() {
 		return paidTime;
@@ -137,6 +137,4 @@ public class AdminOrderDetailResponseDto {
 	public void setMentStatus(String mentStatus) {
 		this.mentStatus = mentStatus;
 	}
-	
-	
 }

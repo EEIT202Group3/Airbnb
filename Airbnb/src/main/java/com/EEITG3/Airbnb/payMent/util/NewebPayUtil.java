@@ -14,23 +14,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class NewebPayUtil {
-	// ====== 測試環境金鑰（請妥善保護，正式上線改用環境變數）======
-    private static final String HASH_KEY = "7Tlk7OhSY6kcFzNtnSSDhgeoTJZ5jj10"; // 32 chars
-    private static final String HASH_IV  = "C1kMoPKw76zPjNbP";                 // 16 chars
+	  // ================= AES-256-CBC =================
 
-    // 對外提供（若需要）
-    public static String getHashKey() { return HASH_KEY; }
-    public static String getHashIv()  { return HASH_IV;  }
-
-
-    // ================= AES-256-CBC =================
-
-    /** AES-256-CBC + PKCS5Padding 加密 → 回傳小寫 hex */
-    public static String aesEncryptToHex(String plain) {
-        return aesEncryptToHex(plain, HASH_KEY, HASH_IV);
-    }
-
-    /** AES-256-CBC + PKCS5Padding 加密（自訂 key/iv）→ 小寫 hex */
+    /** AES-256-CBC + PKCS5Padding 加密（自訂 key/iv）→ 回傳小寫 hex */
     public static String aesEncryptToHex(String plain, String key, String iv) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -44,12 +30,7 @@ public class NewebPayUtil {
         }
     }
 
-    /** AES-256-CBC + PKCS5Padding 解密（預設 key/iv）*/
-    public static String aesDecryptFromHex(String hex) {
-        return aesDecryptFromHex(hex, HASH_KEY, HASH_IV);
-    }
-
-    /** AES-256-CBC + PKCS5Padding 解密（自訂 key/iv）*/
+    /** AES-256-CBC + PKCS5Padding 解密（自訂 key/iv）→ 回傳 UTF-8 字串 */
     public static String aesDecryptFromHex(String hex, String key, String iv) {
         try {
             byte[] bytes = hexStringToByteArray(hex);
@@ -63,32 +44,44 @@ public class NewebPayUtil {
         }
     }
 
-    // ================= 藍新用的 TradeInfo / TradeSha =================
+    // ================= TradeInfo / TradeSha =================
 
     /**
-     * 將參數依傳入順序組成 query string（key=value&...），再做 AES 加密得到 TradeInfo。
-     * 建議用 LinkedHashMap 以保留參數順序（符合藍新文件示例）。
+     * 依參數順序組成明文（key=value&...），再做 AES 加密得到 TradeInfo hex
      */
-    public static String buildTradeInfoHex(LinkedHashMap<String, String> params) {
+    public static String buildTradeInfoHex(LinkedHashMap<String, String> params, String key, String iv) {
         String query = joinParams(params);
-        return aesEncryptToHex(query);
+        return aesEncryptToHex(query, key, iv);
     }
 
     /**
-     * 產生 TradeSha（藍新規格）：
-     * 1) raw = "HashKey={KEY}&{TradeInfoHex}&HashIV={IV}"
-     * 2) urlEncode(raw)  -> 注意只需一般 UTF-8 編碼
-     * 3) SHA-256 後轉大寫
+     * 產生 TradeSha - 嚴格按照藍新規範：
+     * 1) 拼接：HashKey={KEY}&TradeInfo={TradeInfoHex}&HashIV={IV}
+     * 2) 先轉小寫
+     * 3) URL encode
+     * 4) SHA-256 後轉大寫
      */
-    public static String buildTradeSha(String tradeInfoHex) {
-        String raw = "HashKey=" + HASH_KEY + "&" + tradeInfoHex + "&HashIV=" + HASH_IV;
-        String encoded = urlEncode(raw);
-        return sha256ToUpper(encoded);
+    public static String buildTradeSha(String tradeInfoHex, String hashKey, String hashIv) {
+        try {
+            // Step 1: 拼接原始字串
+            String raw = String.format("HashKey=%s&TradeInfo=%s&HashIV=%s", hashKey, tradeInfoHex, hashIv);
+
+            // Step 2: 轉小寫（很重要）
+            String lowerRaw = raw.toLowerCase();
+
+            // Step 3: URL encode（一次就好）
+            String urlEncoded = URLEncoder.encode(lowerRaw, StandardCharsets.UTF_8.name());
+
+            // Step 4: SHA-256 → upper
+            return sha256ToUpper(urlEncoded);
+        } catch (Exception e) {
+            throw new RuntimeException("buildTradeSha error", e);
+        }
     }
 
     // ================= 小工具 =================
 
-    /** 組 query string（不做 URL Encode，AES 加密前不需要）*/
+    /** 組 query string（不做 URL Encode；由呼叫端決定 value 是否 encode） */
     public static String joinParams(Map<String, String> params) {
         StringJoiner sj = new StringJoiner("&");
         for (Map.Entry<String, String> e : params.entrySet()) {
@@ -108,12 +101,12 @@ public class NewebPayUtil {
         }
     }
 
-    /** URL encode（UTF-8）*/
+    /** 一般 UTF-8 URL encode */
     public static String urlEncode(String s) {
         return URLEncoder.encode(s, StandardCharsets.UTF_8);
     }
 
-    /** byte[] → hex */
+    /** byte[] → hex（小寫） */
     public static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);
         for (byte b : bytes) sb.append(String.format("%02x", b));

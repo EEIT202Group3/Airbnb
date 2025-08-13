@@ -1,18 +1,18 @@
 import { createRouter, createWebHistory } from "vue-router";
-import List from "../components/listing/List.vue";
-import Add from "../components/listing/AddListing.vue";
-import Detail from "../components/listing/Detail.vue";
-import Edit from "../components/listing/EditListing.vue";
+// import List from "../components/listing/List.vue";
+// import Add from "../components/listing/AddListing.vue";
+// import Detail from "../components/listing/Detail.vue";
+// import Edit from "../components/listing/EditListing.vue";
 
-//import getList from "@/layouts/ListLayout.vue";
+// //import getList from "@/layouts/ListLayout.vue";
 
-import ListingPage from "../components/payment/ListingPage.vue";
-import BookingPage from "../components/payment/BookingPage.vue";
-import ConfirmationPage from "../components/payment/ConfirmationPage.vue";
-// import Ecpay from '../components/payment/Ecpay.vue';
-import PaymentPage from "../components/payment/PaymentPage.vue";
-import PaymentSuccessPage from "../components/payment/PaymentSuccessPage.vue";
-import { compile } from "vue";
+// import ListingPage from "../components/payment/ListingPage.vue";
+// import BookingPage from "../components/payment/BookingPage.vue";
+// import ConfirmationPage from "../components/payment/ConfirmationPage.vue";
+// // import Ecpay from '../components/payment/Ecpay.vue';
+// import PaymentPage from "../components/payment/PaymentPage.vue";
+// import PaymentSuccessPage from "../components/payment/PaymentSuccessPage.vue";
+// import { compile } from "vue";
 
 
 const routes = [
@@ -81,35 +81,35 @@ const routes = [
         name: 'ListingCard',
         component: () => import('@/components/payment/ListingCard.vue'),
       },
-
       {
         path: '/booking/start',
         name: 'BookingStart',
         component: () => import('@/components/payment/BookingStart.vue'),
       },
-
-
       {
         path: '/booking/preview',
         name: 'PreviewConfirm',
         component: () => import('@/components/payment/PreviewConfirm.vue'),
       },
-
-
       {
         path: '/booking/pay',
         name: 'PayRedirect',
         component: () => import('@/components/payment/PayRedirect.vue'),
 
       },
-
-
       {
         path: '/booking/done/:bookingId',
         name: 'PaymentDone',
         component: () => import('@/components/payment/PaymentDone.vue'),
         props: true,
       },
+      {
+        path: '/carrent',
+        name: 'CarRentFrontHomepage',
+        component: () => import('@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue'),
+      },
+
+
       {
         path: "/reviews",
         component: () => import("@/components/reviews/ReviewView.vue"),
