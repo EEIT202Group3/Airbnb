@@ -163,6 +163,22 @@
       </v-card>
     </v-dialog>
   </v-col>
+
+  <!-- 刪除確認視窗 -->
+  <v-dialog v-model="deleteDialog" max-width="400">
+    <v-card>
+      <v-card-title class="text-h6">確認刪除</v-card-title>
+      <v-card-text>
+        確定要刪除評論編號為
+        <strong>{{ selectedReview?.reviewId }}</strong> 的紀錄嗎？
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="deleteDialog = false">取消</v-btn>
+        <v-btn color="error" text @click="deleteReview">確認刪除</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -203,8 +219,28 @@ function toggleEdit() {
   isEditing.value = !isEditing.value;
 }
 
-function deleteReview() {
-  console.log("刪除評論：", selectedReview.value.reviewId);
+// 刪除功能
+const deleteDialog = ref(false);
+
+async function deleteReview() {
+  const id = selectedReview.value.reviewId;
+  console.log("刪除的評論 ID:", id);
+  const confirmed = window.confirm(`確定要刪除評論 #${id} 嗎？`);
+  if (!confirmed) return;
+
+  try {
+    await axios.delete(`http://localhost:8080/api/reviews/del/${id}`, {
+      withCredentials: true,
+    });
+
+    emit("updated", { reviewId: id, deleted: true }); // 通知父組件
+  } catch (err) {
+    console.error("刪除失敗:", err);
+  }
+  dialog.value = false;
+
+  deleteDialog.value = false;
+  selectedReview.value = null;
 }
 
 function removeImage(index) {

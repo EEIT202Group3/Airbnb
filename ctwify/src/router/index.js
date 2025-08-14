@@ -6,7 +6,6 @@ import { createRouter, createWebHistory } from "vue-router";
 // import Edit from "../components/listing/EditListing.vue";
 import { compile } from "vue";
 
-
 // //import getList from "@/layouts/ListLayout.vue";
 
 // import ListingPage from "../components/payment/ListingPage.vue";
@@ -16,7 +15,6 @@ import { compile } from "vue";
 // import PaymentPage from "../components/payment/PaymentPage.vue";
 // import PaymentSuccessPage from "../components/payment/PaymentSuccessPage.vue";
 // import { compile } from "vue";
-
 
 const routes = [
   {
@@ -44,9 +42,9 @@ const routes = [
         ],
       },
       {
-        path: 'hostLogin',
+        path: "hostLogin",
         component: () => import("@/components/user/host/HostLoginPage.vue"),
-        name: 'HostLogin'
+        name: "HostLogin",
       },
       {
         path: "customerprofile",
@@ -60,38 +58,39 @@ const routes = [
       },
 
       {
-        path: '/listing/card',
-        name: 'ListingCard',
-        component: () => import('@/components/payment/ListingCard.vue'),
+        path: "/listing/card",
+        name: "ListingCard",
+        component: () => import("@/components/payment/ListingCard.vue"),
       },
       {
-        path: '/booking/start',
-        name: 'BookingStart',
-        component: () => import('@/components/payment/BookingStart.vue'),
+        path: "/booking/start",
+        name: "BookingStart",
+        component: () => import("@/components/payment/BookingStart.vue"),
       },
       {
-        path: '/booking/preview',
-        name: 'PreviewConfirm',
-        component: () => import('@/components/payment/PreviewConfirm.vue'),
+        path: "/booking/preview",
+        name: "PreviewConfirm",
+        component: () => import("@/components/payment/PreviewConfirm.vue"),
       },
       {
-        path: '/booking/pay',
-        name: 'PayRedirect',
-        component: () => import('@/components/payment/PayRedirect.vue'),
-
+        path: "/booking/pay",
+        name: "PayRedirect",
+        component: () => import("@/components/payment/PayRedirect.vue"),
       },
       {
-        path: '/booking/done/:bookingId',
-        name: 'PaymentDone',
-        component: () => import('@/components/payment/PaymentDone.vue'),
+        path: "/booking/done/:bookingId",
+        name: "PaymentDone",
+        component: () => import("@/components/payment/PaymentDone.vue"),
         props: true,
       },
       {
-        path: '/carrent',
-        name: 'CarRentFrontHomepage',
-        component: () => import('@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue'),
+        path: "/carrent",
+        name: "CarRentFrontHomepage",
+        component: () =>
+          import(
+            "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue"
+          ),
       },
-
 
       {
         path: "/reviews",
@@ -105,19 +104,20 @@ const routes = [
       },
       {
         path: "password",
-        component: () => import("@/components/user/customer/ChangePassword.vue"),
+        component: () =>
+          import("@/components/user/customer/ChangePassword.vue"),
         name: "ChangePassword",
       },
     ],
   },
   {
-    path: '/host',
-    component: () => import('@/layouts/host/MainLayout.vue'),
+    path: "/host",
+    component: () => import("@/layouts/host/MainLayout.vue"),
     children: [
       {
         path: "",
         component: () => import("@/components/user/host/HostPage.vue"),
-        name: 'HostHomepage',
+        name: "HostHomepage",
         redirect: { name: "HostInfo" },
         children: [
           {
@@ -145,9 +145,9 @@ const routes = [
       {
         path: "password",
         component: () => import("@/components/user/host/ChangePassword.vue"),
-        name: 'HostPassword',
+        name: "HostPassword",
       },
-    ]
+    ],
   },
 
   // {
@@ -185,7 +185,6 @@ const routes = [
   // { path: '/ecpay', component: Ecpay, name: 'ecpay' },
   // { path: '/payment', component: PaymentPage, name: 'payment' },
   // { path: '/payment-success', component: PaymentSuccessPage, name: 'paymentSuccess' },
-
 ];
 
 const router = createRouter({
