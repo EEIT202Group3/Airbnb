@@ -54,9 +54,9 @@ public class NewebPayService {
 	    }
 
 	    // 產生 MerchantOrderNo（避免太長、含 -）
-	    if (order.getPaymentid() == null || order.getPaymentid().isBlank()) {
-	        order.setPaymentid("ORD" + System.currentTimeMillis()); // 約 16~20 字
-	        order.setMentstatus("PENDING");
+	    if (order.getPaymentId() == null || order.getPaymentId().isBlank()) {
+	        order.setPaymentId("ORD" + System.currentTimeMillis()); // 約 16~20 字
+	        order.setMentStatus("PENDING");
 	        orderRepository.save(order);
 	    }
 
@@ -74,7 +74,7 @@ public class NewebPayService {
 	    trade.put("RespondType", "JSON");
 	    trade.put("TimeStamp", String.valueOf(Instant.now().getEpochSecond()));
 	    trade.put("Version", version);
-	    trade.put("MerchantOrderNo", order.getPaymentid());
+	    trade.put("MerchantOrderNo", order.getPaymentId());
 	    int amt = order.getGrandTotal().setScale(0, RoundingMode.HALF_DOWN).intValueExact();
 	    trade.put("Amt", String.valueOf(amt));
 	    trade.put("ItemDesc", "Booking " + bookingId);
@@ -85,24 +85,20 @@ public class NewebPayService {
 	    trade.put("NotifyURL", notifyUrl);
 	    trade.put("ClientBackURL", clientBackUrl);
 
-	    // 將 value 做 URL-encode 再拼字串（encode 一次就好）
-	    LinkedHashMap<String, String> encodedTrade = new LinkedHashMap<>();
-	    trade.forEach((k, v) -> encodedTrade.put(k, NewebPayUtil.urlEncode(v)));
-
-	    String plain = NewebPayUtil.joinParams(encodedTrade);
-
-	    // AES → HEX（用 properties 讀到的同一組 key/iv）
+	    // 【關鍵修正】：先組成明文字串，再對整個字串做 URL encode
+	    String plain = NewebPayUtil.joinParams(trade);  // 不先 URL 編碼
 	    String tradeInfoHex = NewebPayUtil.aesEncryptToHex(plain, hashKey, hashIv);
 
-	    // 產生 TradeSha（修正版本：先轉小寫再 URL encode）
+	    // AES 加密（使用 URL encoded 的明文）
+	   // String tradeInfoHex = NewebPayUtil.aesEncryptToHex(urlEncodedPlain, hashKey, hashIv);
+
+	    // 產生 TradeSha（使用修正版本）
 	    String tradeSha = NewebPayUtil.buildTradeSha(tradeInfoHex, hashKey, hashIv);
 
 	    // ===== Debug（測通後可移除） =====
-	    System.out.println("=== TradeInfo 明文 ===\n" + plain);
+	    System.out.println("=== TradeInfo 明文（未編碼） ===\n" + plain);
+	    //System.out.println("=== TradeInfo 明文（已編碼） ===\n" + urlEncodedPlain);
 	    System.out.println("=== TradeInfo HEX ===\n" + tradeInfoHex);
-	    String raw = "HashKey=" + hashKey + "&TradeInfo=" + tradeInfoHex + "&HashIV=" + hashIv;
-	    System.out.println("=== TradeSha 原始字串 ===\n" + raw);
-	    System.out.println("=== TradeSha URL-encoded ===\n" + NewebPayUtil.urlEncode(raw));
 	    System.out.println("=== TradeSha (final) ===\n" + tradeSha);
 	    // ================================
 
@@ -119,29 +115,24 @@ public class NewebPayService {
 	// Notify：驗簽 → 解密 → 用 paymentId 對單 → 金額比對 → 更新 mentStatus / paidTime 
 	@Transactional
 	public void handleNotify(String status, String tradeInfoHex, String tradeSha) {
-		// 比對簽章 修正：同樣使用小寫+URL encode
-		String expectedRaw = "HashKey=" + hashKey + "&TradeInfo=" + tradeInfoHex + "&HashIV=" + hashIv;
-		String expectedLower = expectedRaw.toLowerCase();
-        String expected = NewebPayUtil.sha256ToUpper(NewebPayUtil.urlEncode(expectedLower));
-        
-        if (!expected.equals(tradeSha)) {
-            System.out.println("=== TradeSha 驗證失敗 ===");
-            System.out.println("原始字串: " + expectedRaw);
-            System.out.println("小寫字串: " + expectedLower);
-            System.out.println("編碼字串: " + NewebPayUtil.urlEncode(expectedLower));
-            System.out.println("Expected: " + expected);
-            System.out.println("Received: " + tradeSha);
-            throw new IllegalArgumentException("TradeSha mismatch");
-        }
+	    // 【關鍵修正】使用與 buildTradeSha 相同的邏輯
+	    String expectedTradeSha = NewebPayUtil.buildTradeSha(tradeInfoHex, hashKey, hashIv);
+	    
+	    if (!expectedTradeSha.equals(tradeSha)) {
+	        System.out.println("=== TradeSha 驗證失敗 ===");
+	        System.out.println("Expected: " + expectedTradeSha);
+	        System.out.println("Received: " + tradeSha);
+	        throw new IllegalArgumentException("TradeSha mismatch");
+	    }
 
 		// 解密 TradeInfo
 		String decrypted = NewebPayUtil.aesDecryptFromHex(tradeInfoHex, hashKey, hashIv);
 		Map<String, Object> flat = parseTradeInfo(decrypted);
 
 		// 取出欄位
-		String merchantOrderNo = String.valueOf(flat.get("Result/MerchantOrderNo"));
-		Integer amt = Integer.valueOf(String.valueOf(flat.get("Result/Amt")));
-		String respondCode = String.valueOf(flat.get("Result/RespondCode")); // "00" 成功
+		 String merchantOrderNo = String.valueOf(flat.get("Result/MerchantOrderNo"));
+		    Integer amt = Integer.valueOf(String.valueOf(flat.get("Result/Amt")));
+		    String respondCode = String.valueOf(flat.get("Result/RespondCode")); // "00" 成功
 
 
 		// 對單 修正：方法名要跟 Entity 欄位名一致
@@ -156,14 +147,22 @@ public class NewebPayService {
 
 		// 更新狀態（以 Notify 為準）
         if ("SUCCESS".equalsIgnoreCase(status) && "00".equals(respondCode)) {
-            if (!"PAID".equalsIgnoreCase(order.getMentstatus())) { // 防重複更新
-                order.setMentstatus("PAID");
-                order.setPaidtime(LocalDateTime.now());
+            if (!"PAID".equalsIgnoreCase(order.getMentStatus())) {
+                order.setMentStatus("PAID");
+                order.setPaidTime(LocalDateTime.now());
+                order.setBookingMethod("CREDIT_NEWEBPAY"); // 設定付款方式
+                order.setBookingStatus(Order.STATUS_CONFIRMED); // 更新訂單狀態
                 orderRepository.save(order);
+                
+                // 新增：記錄日誌以便除錯
+                System.out.println("訂單更新成功: " + merchantOrderNo + " -> PAID");
             }
         } else {
-            order.setMentstatus("FAILED");
+            order.setMentStatus("FAILED");
+            order.setBookingStatus(Order.STATUS_CANCELLED);
             orderRepository.save(order);
+            
+            System.out.println("付款失敗: " + merchantOrderNo + " -> FAILED");
         }
 	}
 

@@ -114,8 +114,8 @@ public class Order implements java.io.Serializable {
 
 
 
-		public String getBookingid() {return bookingId;}
-		public void setBookingid(String bookingId) {this.bookingId = bookingId;}
+	    public String getBookingId() { return bookingId; }
+	    public void setBookingId(String bookingId) { this.bookingId = bookingId; }
 
 		public LisBean getListing() {return listing;}
 		public void setListing(LisBean listing) {this.listing = listing;}
@@ -132,8 +132,8 @@ public class Order implements java.io.Serializable {
 		public String getUsername() {return username;}
 		public void setUsername(String username) {this.username = username;}
 
-		public String getHousename() {return houseName;}
-		public void setHousename(String houseName) {this.houseName = houseName;}
+		public String getHouseName() {return houseName;}
+		public void setHouseName(String houseName) {this.houseName = houseName;}
 
 		public String getAddress() {return address;}
 		public void setAddress(String address) {this.address = address;}
@@ -147,23 +147,23 @@ public class Order implements java.io.Serializable {
 		public Integer getPeople() {return people;}
 		public void setPeople(Integer people) {this.people = people;}
 
-		public LocalDateTime getCheckindate() {return checkinDate;}
-		public void setCheckindate(LocalDateTime checkinDate) {this.checkinDate = checkinDate;}
+		public LocalDateTime getCheckinDate() {return checkinDate;}
+		public void setCheckinDate(LocalDateTime checkinDate) {this.checkinDate = checkinDate;}
 
-		public LocalDateTime getCheckoutdate() {return checkoutDate;}
-		public void setCheckoutdate(LocalDateTime checkoutDate) {this.checkoutDate = checkoutDate;}
+		public LocalDateTime getCheckoutDate() {return checkoutDate;}
+		public void setCheckoutDate(LocalDateTime checkoutDate) {this.checkoutDate = checkoutDate;}
 
 		public Integer getLocationid() {return locationId;}
 		public void setLocationid(Integer locationId) {this.locationId = locationId;}
 
-		public LocalDateTime getCreatedtime() {return createdTime;}
-		public void setCreatedtime(LocalDateTime createdTime) {this.createdTime = createdTime;}
+		public LocalDateTime getCreatedTime() {return createdTime;}
+		public void setCreatedTime(LocalDateTime createdTime) {this.createdTime = createdTime;}
 
-		public String getBookingstatus() {return bookingStatus;}
-		public void setBookingstatus(String bookingStatus) {this.bookingStatus = bookingStatus;}
+		public String getBookingStatus() {return bookingStatus;}
+		public void setBookingStatus(String bookingStatus) {this.bookingStatus = bookingStatus;}
 
-		public String getPaymentid() {return paymentId;}
-		public void setPaymentid(String paymentId) {this.paymentId = paymentId;}
+		public String getPaymentId() {return paymentId;}
+		public void setPaymentId(String paymentId) {this.paymentId = paymentId;}
 
 		public Integer getRoomPrice() {return roomPrice;}
 		public void setRoomPrice(Integer roomPrice) {this.roomPrice = roomPrice;}
@@ -174,14 +174,14 @@ public class Order implements java.io.Serializable {
 		public BigDecimal getGrandTotal() {return grandTotal;}
 		public void setGrandTotal(BigDecimal grandTotal) {this.grandTotal = grandTotal;}
 
-		public LocalDateTime getPaidtime() {return paidTime;}
-		public void setPaidtime(LocalDateTime paidTime) {this.paidTime = paidTime;}
+		public LocalDateTime getPaidTime() {return paidTime;}
+		public void setPaidTime(LocalDateTime paidTime) {this.paidTime = paidTime;}
 
-		public String getBookingmethod() {return bookingMethod;}
-		public void setBookingmethod(String bookingMethod) {this.bookingMethod = bookingMethod;}
+		public String getBookingMethod() {return bookingMethod;}
+		public void setBookingMethod(String bookingMethod) {this.bookingMethod = bookingMethod;}
 
-		public String getMentstatus() {return mentStatus;}
-		public void setMentstatus(String mentStatus) {this.mentStatus = mentStatus;}
+		public String getMentStatus() {return mentStatus;}
+		public void setMentStatus(String mentStatus) {this.mentStatus = mentStatus;}
 
 
 		public static final String STATUS_PENDING = "PENDING"; // 下單成功未付款

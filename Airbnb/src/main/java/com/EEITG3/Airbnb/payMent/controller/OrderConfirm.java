@@ -58,9 +58,24 @@ public class OrderConfirm {
 		}else {
 			email=jwtService.extractEmail(token);
 		}
-		LisBean listing = listRepository.findById(dto.getListid()).orElseThrow(() -> new RuntimeException("房源不存在"));
-		Customer customer = customerRepository.findCustomerByEmail(email)
+		LisBean listing;
+		try {
+			listing = listRepository.findById(dto.getListid())
+				.orElseThrow(() -> new RuntimeException("房源不存在"));
+		} catch (Exception e) {
+			return ResponseEntity.badRequest()
+				.body(createErrorResponse("找不到指定的房源", "LISTING_NOT_FOUND"));
+		}
+		
+		Customer customer;
+		try {
+			customer = customerRepository.findCustomerByEmail(email)
 				.orElseThrow(() -> new RuntimeException("會員不存在"));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(createErrorResponse("找不到會員資料，請重新登入", "CUSTOMER_NOT_FOUND"));
+		}
+		
 		
 		// 驗證必要參數
 	    if (dto.getListid() == null || dto.getCheckindate() == null || 
@@ -68,19 +83,22 @@ public class OrderConfirm {
 	        return ResponseEntity.badRequest().body("缺少必要參數");
 	    }
 	    
-	    // 驗證日期邏輯
-	    if (dto.getCheckindate().isAfter(dto.getCheckoutdate()) || 
-	        dto.getCheckindate().isBefore(LocalDate.now())) {
-	        return ResponseEntity.badRequest().body("日期設定錯誤");
-	    }
+	 // 驗證日期邏輯
+	 		if (dto.getCheckindate().isAfter(dto.getCheckoutdate()) || 
+	 		    dto.getCheckindate().isBefore(LocalDate.now())) {
+	 		    return ResponseEntity.badRequest()
+	 		    	.body(createErrorResponse("日期設定錯誤", "INVALID_DATE"));
+	 		}
 
-		long days = ChronoUnit.DAYS.between(dto.getCheckindate(), dto.getCheckoutdate());
+	 		long days = ChronoUnit.DAYS.between(dto.getCheckindate(), dto.getCheckoutdate());
 
-		boolean isBooked = orderService.isRoomBooked(listing.getHouseName(), dto.getCheckindate().atStartOfDay(),
-				dto.getCheckoutdate().atStartOfDay());
-		if (isBooked) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("此日期已被預訂");
-		}
+	 		// 檢查房間是否已被預訂
+	 		boolean isBooked = orderService.isRoomBooked(listing.getHouseName(), 
+	 			dto.getCheckindate().atStartOfDay(), dto.getCheckoutdate().atStartOfDay());
+	 		if (isBooked) {
+	 			return ResponseEntity.status(HttpStatus.CONFLICT)
+	 				.body(createErrorResponse("此日期已被預訂", "DATE_UNAVAILABLE"));
+	 		}
 
 		int total = listing.getPrice() * (int) days * dto.getPeople() / 2;
 
@@ -101,7 +119,7 @@ public class OrderConfirm {
 		try {
 			String email = jwtService.extractEmail(token);
 			Order order = orderService.createOrder(dto,email);
-			return ResponseEntity.ok("訂單成功！訂單編號：" + order.getBookingid());
+			return ResponseEntity.ok("訂單成功！訂單編號：" + order.getBookingId());
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("建立訂單失敗：" + e.getMessage());
 		}
@@ -119,7 +137,14 @@ public class OrderConfirm {
         
     	return orderService.getOrdersByCustomerId(email);
     }	
-    
+    // 輔助方法：創建錯誤回應
+    private Map<String, Object> createErrorResponse(String message, String code) {
+    	Map<String, Object> error = new HashMap<>();
+    	error.put("error", message);
+    	error.put("code", code);
+    	error.put("timestamp", java.time.LocalDateTime.now());
+    	return error;
+    }
 
 
   
