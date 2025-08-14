@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref,computed } from 'vue';
 import { updateCustomerInfo } from '@/service/user/customerService';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const newPassword = ref('')
 const checkPassword = ref('')
 
@@ -29,12 +31,17 @@ const signupChecklist = computed(() => ([
 ]))
 const passwordOk = computed(() => signupChecklist.value.every(i => i.ok))
 
-function submit(){
+async function submit(){
     if(newPassword.value===checkPassword.value){
         const payload = {password:newPassword.value};
-        const response = updateCustomerInfo(payload);
-        if(response){
+        try {
+            await updateCustomerInfo(payload);
             alert('密碼更新成功')
+        } catch (error) {
+            console.log(error.response)
+            alert('更新失敗')   
+        }finally{
+            router.push({name:'Homepage'})
         }
     }else{
         alert('密碼不一致，請重新輸入')

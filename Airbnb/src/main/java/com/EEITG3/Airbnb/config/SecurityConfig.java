@@ -89,7 +89,12 @@ public class SecurityConfig{
 				.authorizeHttpRequests(configurer->
 					configurer
 					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-					.requestMatchers("/api/customers/login","/api/customers/signup","api/customers/verify","/api/customers/logout").permitAll()
+					.requestMatchers("/api/customers/login",
+									 "/api/customers/signup",
+									 "/api/customers/verify",
+									 "/api/customers/logout",
+									 "/api/customers/forgetpwd",
+									 "/api/customers/pwdverify").permitAll()
 					.anyRequest().hasRole("CUSTOMER"))
 				.build();	
 	}
