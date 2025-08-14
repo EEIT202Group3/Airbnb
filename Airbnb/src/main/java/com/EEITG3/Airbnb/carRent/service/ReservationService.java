@@ -3,9 +3,11 @@ package com.EEITG3.Airbnb.carRent.service;
 
 import com.EEITG3.Airbnb.carRent.entity.Reservation;
 import com.EEITG3.Airbnb.carRent.entity.Vehicle;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +41,10 @@ public interface ReservationService {
     //租車時間重複檢查
     public void checkVehicleAvailable(Integer vehicleId, LocalDateTime pickup, LocalDateTime ret, Integer reservationId);
 
-    //訂單儀錶板
+    //預約儀錶板
     public Map<String, Integer> reservationDashBoard();
+
+//    時間+模糊查詢查符合預約
+    public Page<Reservation> searchEligibleReservations(String keyword, LocalDate from, LocalDate to, String mode, Pageable pageable);
+
 }

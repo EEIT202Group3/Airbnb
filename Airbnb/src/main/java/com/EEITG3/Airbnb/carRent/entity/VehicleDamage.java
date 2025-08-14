@@ -25,6 +25,13 @@ public class VehicleDamage {
     @Column(name = "REPORT_DATE")
     private LocalDateTime reportDate;
 
+    @PrePersist
+    public void prePersist() {
+        if (this.reportDate == null) {
+            this.reportDate = java.time.LocalDateTime.now();
+        }
+    }
+
     public VehicleDamage() {
     }
 

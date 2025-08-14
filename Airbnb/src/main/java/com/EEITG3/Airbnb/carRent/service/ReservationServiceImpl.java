@@ -4,10 +4,14 @@ import com.EEITG3.Airbnb.carRent.entity.Reservation;
 import com.EEITG3.Airbnb.carRent.entity.Vehicle;
 import com.EEITG3.Airbnb.carRent.repository.ReservationRepository;
 import com.EEITG3.Airbnb.carRent.repository.VehicleRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -113,5 +117,16 @@ public class ReservationServiceImpl implements ReservationService {
         map.put("逾期", Optional.ofNullable(rRepository.countOverdueReservations()).orElse(0));
         map.put("取消", Optional.ofNullable(rRepository.countCancelledReservations()).orElse(0));
         return map;
+    }
+
+    @Override
+    public Page<Reservation> searchEligibleReservations(String keyword, LocalDate from, LocalDate to, String mode, Pageable pageable) {
+        String kw = StringUtils.hasText(keyword) ? keyword.trim() : null;
+        LocalDateTime fromDt = (from != null) ? from.atStartOfDay() : null;
+        LocalDateTime toDt = (to != null) ? to.plusDays(1).atStartOfDay() : null;
+        if("period".equalsIgnoreCase(mode)) {
+            return rRepository.searchByPeriodOverlap(kw,fromDt, toDt, pageable);
+        }
+        return rRepository.searchByCreatedAt(kw, fromDt, toDt, pageable);
     }
 }
