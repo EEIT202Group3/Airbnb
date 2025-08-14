@@ -30,6 +30,8 @@ public interface CustomerService {
 	
 	//更新大頭貼
 	Customer updateAvatar(Customer customer, MultipartFile avatar) throws IOException;
+	//忘記密碼時送驗證信
+	void forgetPwd(String email);
 	
 	
 //後台功能

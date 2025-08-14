@@ -80,6 +80,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public void customerSignup(SignUpRequest request) {
+		System.out.println(request.getEmail());
 		Optional<Customer> temp = repo.findCustomerByEmail(request.getEmail());
 		//表示已經有註冊過了
 		if(temp.isPresent()) {
@@ -166,6 +167,24 @@ public class CustomerServiceImpl implements CustomerService {
         return (dotIndex >= 0) ? filename.substring(dotIndex + 1).toLowerCase() : "png";
     }
 	
+	@Override
+	public void forgetPwd(String email) {
+		//用email找客戶
+		System.out.println(email);
+		Optional<Customer> temp = repo.findCustomerByEmail(email);
+		System.out.println(temp.isPresent());
+		if(!temp.isPresent()) {
+			throw new IllegalArgumentException("你還未註冊");
+		}
+		Customer customer = temp.get();
+		//設定驗證用的UUID token
+		String token = UUID.randomUUID().toString();
+		customer.setVerificationToken(token);
+		repo.save(customer);
+		//呼叫發送驗證信的service
+		emailService.sendCustomerForgetPwdEmail(email,token);
+		
+	}
 	
 	
 	@Override
@@ -215,6 +234,8 @@ public class CustomerServiceImpl implements CustomerService {
 		String likePhone = "%"+phone+"%";
 		return repo.findLikeByPhone(likePhone);
 	}
+
+
 
 	
 	

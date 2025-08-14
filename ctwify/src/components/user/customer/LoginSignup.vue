@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { signupService } from '@/service/user/customerService'
+import { signupService,sendEmailService } from '@/service/user/customerService'
 import { useCustomerStore } from '@/stores/customer'
 
 const customerStore = useCustomerStore();
@@ -47,6 +47,10 @@ const registerAllPass = computed(() => signupChecklist.value.every(i => i.ok))
 
 //登入成功之後要讓父元件把登入介面關掉
 const emit = defineEmits(['login-success'])
+
+//跟忘記密碼有關的變數
+const forget = ref(false)
+const email = ref('')
 
 //提交登入資訊
 async function onLogin() {
@@ -98,14 +102,45 @@ async function onRegister() {
   }
 }
 
-//忘記密碼
-async function forgetPassword(){
-    alert('請串接忘記密碼api')
+//發送忘記密碼驗證信
+async function sendEmail(){
+  try {
+    await sendEmailService(email.value);
+    alert('已送出驗證信')
+  } catch (error) {
+    const status = error.response.status
+    switch (status){
+      case 404:
+        alert('你還沒註冊')
+        break
+      default:
+        alert('未知錯誤')
+    }
+  }
 }
+
 </script>
 
 <template>
-    <v-card class="auth-card rounded-xl pa-8" width="360">
+    <v-card v-if="forget" class="auth-card rounded-xl pa-8" width="360">
+      <v-text-field
+          v-model="email"
+          label="請輸入電子信箱"
+          prepend-inner-icon="mdi-email"
+          variant="solo"
+          density="comfortable"
+          rounded="lg"
+          :rules="[required, emailRule]" 
+          class="mb-3"
+      />
+      <div class="text-caption mb-4">
+        <a href="#" @click.prevent="forget = false" style="color:	#FF8000;">回到登入</a>
+      </div>
+      <v-btn block class="gradient-btn mb-4" rounded="lg" size="large" @click="sendEmail()">
+        發送驗證信
+      </v-btn>
+    </v-card>
+    <v-card v-else class="auth-card rounded-xl pa-8" width="360">
       <div class="text-h5 text-center font-weight-bold mb-6">Login Form</div>
 
       <!-- 上方切換 -->
@@ -144,7 +179,7 @@ async function forgetPassword(){
         />
 
         <div class="text-caption mb-4">
-          <a href="#" @click.prevent="forgetPassword()" style="color:	#FF8000;">Forgot password?</a>
+          <a href="#" @click.prevent="forget = true" style="color:	#FF8000;">Forgot password?</a>
         </div>
 
         <v-btn block class="gradient-btn mb-4" rounded="lg" size="large" @click="onLogin">

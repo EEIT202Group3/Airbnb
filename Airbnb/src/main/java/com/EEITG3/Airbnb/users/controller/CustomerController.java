@@ -39,7 +39,6 @@ import jakarta.validation.Valid;
 public class CustomerController {
 
 	private CustomerService service;
-	
 	@Autowired
 	public CustomerController(CustomerService service) {
 		this.service = service;
@@ -84,10 +83,14 @@ public class CustomerController {
 	
 	//接收驗證信
 	@GetMapping("/customers/verify")
-	public ResponseEntity<?> verify(@RequestParam("token") String token, HttpServletResponse response){
+	public void verify(@RequestParam("token") String token, HttpServletResponse response){
 		String jwt = service.verify(token);
 		CookieUtil.saveCustomerCookie(response, jwt);
-		return ResponseEntity.ok("驗證成功");
+		try {
+			response.sendRedirect("http://localhost:5173");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//客戶登出
@@ -122,6 +125,32 @@ public class CustomerController {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	//忘記密碼
+	@PostMapping("/customers/forgetpwd")
+	public ResponseEntity<?> forgetpwd(@RequestBody Map<String, Object> data){
+		try {
+			//送驗證信給他
+			String email = (String)data.get("email");
+			System.out.println(email);
+			service.forgetPwd(email);
+			//回傳OK
+			return ResponseEntity.ok("已送出驗證信");
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("你還未註冊");
+		}
+	}
+	
+	@GetMapping("/customers/pwdverify")
+	public void pwdVerify(@RequestParam("token") String token,HttpServletResponse response){
+		String jwt = service.verify(token);
+		CookieUtil.saveCustomerCookie(response, jwt);
+		try {
+			response.sendRedirect("http://localhost:5173/password");
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	

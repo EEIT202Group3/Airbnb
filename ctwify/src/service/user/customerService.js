@@ -69,3 +69,13 @@ export async function updateAvatar(data) {
         throw error;
     }
 }
+
+export async function sendEmailService(email){
+    const response = await axios.post(`${BASE_URL}/api/customers/forgetpwd`,{email},{
+        headers:{
+            'Content-Type':'application/json'
+        },
+        withCredentials:true,
+    });
+    return response.data;
+}
