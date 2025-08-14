@@ -1,9 +1,11 @@
 package com.EEITG3.Airbnb.carRent.controller;
 
 import com.EEITG3.Airbnb.carRent.entity.Vehicle;
-
 import com.EEITG3.Airbnb.carRent.repository.VehicleRepository;
 import com.EEITG3.Airbnb.carRent.service.VehicleService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -85,7 +87,7 @@ public class VehicleController {
 
             File dir = new File(uploadDir);
             if (!dir.exists()) {
-                dir.mkdirs(); // 建資料夾
+                dir.mkdirs();
             }
 
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -112,6 +114,12 @@ public class VehicleController {
     @GetMapping("/status-summary")
     public Map<String, Integer> getStatusSummary() {
         return vService.getVehicleStatusSummary();
+    }
+    
+    @GetMapping("/search-eligible")
+    public Page<Vehicle> search(@RequestParam(required = false) String plateNo,
+                                @PageableDefault(size = 10, sort = "vehicleId") Pageable pageable) {
+        return vService.searchEligibleVehicle(plateNo, pageable);
     }
 
 }

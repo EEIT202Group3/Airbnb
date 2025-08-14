@@ -6,6 +6,8 @@ import com.EEITG3.Airbnb.carRent.repository.ReservationRepository;
 import com.EEITG3.Airbnb.carRent.repository.VehicleRepository;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,6 +127,7 @@ public class VehicleServiceImpl implements VehicleService {
         return summary;
     }
 
+    @Override
     public void checkPlateNoAvailable(String plateNo, Integer excludeId) {
         Optional<Vehicle> conflicts = vRepository.findByPlateNo(plateNo);
         if (conflicts.isPresent()) {
@@ -133,5 +136,12 @@ public class VehicleServiceImpl implements VehicleService {
                 throw new RuntimeException("該車牌已被登入");
             }
         }
+    }
+
+    @Override
+    public Page<Vehicle> searchEligibleVehicle(String plateNo, Pageable pageable) {
+        String kw = (plateNo != null) ? plateNo.trim() : "";
+        if (kw.isEmpty()) return Page.empty(pageable);
+        return vRepository.findByPlateNoContainingIgnoreCase(kw, pageable);
     }
 }

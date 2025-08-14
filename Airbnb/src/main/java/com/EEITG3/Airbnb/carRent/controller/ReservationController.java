@@ -3,11 +3,16 @@ package com.EEITG3.Airbnb.carRent.controller;
 import com.EEITG3.Airbnb.carRent.entity.Reservation;
 import com.EEITG3.Airbnb.carRent.entity.Vehicle;
 import com.EEITG3.Airbnb.carRent.service.ReservationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -92,5 +97,18 @@ public class ReservationController {
     @GetMapping("/dashboard")
     public Map<String, Integer> reservationDashBoard(){
         return rService.reservationDashBoard();
+    }
+
+    @GetMapping("/search-eligible")
+    public Page<Reservation> search(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(defaultValue = "created") String mode,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return rService.searchEligibleReservations(keyword, from, to, mode, pageable);
     }
 }
