@@ -1,154 +1,64 @@
 import { createRouter, createWebHistory } from "vue-router";
-
+import CarRentFrontHomepage from "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue";
+import CarSelect from "@/components/carRent/frontpageComponent/CarSelect.vue";
+import CarDetail from "@/components/carRent/frontpageComponent/CarDetail.vue";
 // import List from "../components/listing/List.vue";
 // import Add from "../components/listing/AddListing.vue";
 // import Detail from "../components/listing/Detail.vue";
 // import Edit from "../components/listing/EditListing.vue";
-import { compile } from "vue";
 
+//import getList from "@/layouts/ListLayout.vue";
 
-// //import getList from "@/layouts/ListLayout.vue";
-
-// import ListingPage from "../components/payment/ListingPage.vue";
-// import BookingPage from "../components/payment/BookingPage.vue";
-// import ConfirmationPage from "../components/payment/ConfirmationPage.vue";
-// // import Ecpay from '../components/payment/Ecpay.vue';
-// import PaymentPage from "../components/payment/PaymentPage.vue";
-// import PaymentSuccessPage from "../components/payment/PaymentSuccessPage.vue";
-// import { compile } from "vue";
-
+import ListingPage from '../components/payment/ListingPage.vue';
+import BookingPage from '../components/payment/BookingPage.vue';
+import ConfirmationPage from '../components/payment/ConfirmationPage.vue';
+import Ecpay from '../components/payment/Ecpay.vue';
+import PaymentPage from '../components/payment/PaymentPage.vue';
+import PaymentSuccessPage from '../components/payment/PaymentSuccessPage.vue';
 
 const routes = [
   {
-    path: "/",
+    path: '/',
     component: () => import("@/layouts/MainLayout.vue"),
-    name: "Homepage",
     children: [
       {
-        path: "customer",
+        path: '/customer',
         component: () => import("@/components/user/customer/CustomerPage.vue"),
-        redirect: { name: "CustomerInfo" },
         children: [
           {
-            path: "",
-            component: () =>
-              import("@/components/user/customer/CustomerInfo.vue"),
-            name: "CustomerInfo",
+            path: '',
+            component: () => import('@/components/user/customer/CustomerInfo.vue'),
+            name: 'CustomerInfo',
           },
           {
-            path: "history",
-            component: () =>
-              import("@/components/user/customer/TripHistory.vue"),
-            name: "TripHistory",
+            path: '/history',
+            component: () => import('@/components/user/customer/TripHistory.vue'),
+            name: 'TripHistory',
           },
-        ],
+        ]
       },
       {
-        path: 'hostLogin',
-        component: () => import("@/components/user/host/HostLoginPage.vue"),
-        name: 'HostLogin'
+        path: '/login',
+        component: () => import('@/components/user/LoginSignup.vue')
       },
       {
-        path: "customerprofile",
-        component: () =>
-          import("@/components/user/customer/CustomerProfile.vue"),
-        name: "CustomerProfile",
+        path: '/car-front-homepage',
+        name: 'carFrontHomepage',
+        component: CarRentFrontHomepage
       },
       {
-        path: "login",
-        component: () => import("@/components/user/customer/LoginSignup.vue"),
-      },
-
-      {
-        path: '/listing/card',
-        name: 'ListingCard',
-        component: () => import('@/components/payment/ListingCard.vue'),
+        path: '/car-select',
+        name: 'carSelect',
+        component: CarSelect
       },
       {
-        path: '/booking/start',
-        name: 'BookingStart',
-        component: () => import('@/components/payment/BookingStart.vue'),
-      },
-      {
-        path: '/booking/preview',
-        name: 'PreviewConfirm',
-        component: () => import('@/components/payment/PreviewConfirm.vue'),
-      },
-      {
-        path: '/booking/pay',
-        name: 'PayRedirect',
-        component: () => import('@/components/payment/PayRedirect.vue'),
-
-      },
-      {
-        path: '/booking/done/:bookingId',
-        name: 'PaymentDone',
-        component: () => import('@/components/payment/PaymentDone.vue'),
-        props: true,
-      },
-      {
-        path: '/carrent',
-        name: 'CarRentFrontHomepage',
-        component: () => import('@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue'),
-      },
-
-
-      {
-        path: "/reviews",
-        component: () => import("@/components/reviews/ReviewView.vue"),
-        name: "Reviews",
-      },
-      {
-        path: "reviews/insert",
-        component: () =>
-          import("@/components/reviews/customer/InsertReview.vue"),
-      },
-      {
-        path: "password",
-        component: () => import("@/components/user/customer/ChangePassword.vue"),
-        name: "ChangePassword",
-      },
-    ],
-  },
-  {
-    path: '/host',
-    component: () => import('@/layouts/host/MainLayout.vue'),
-    children: [
-      {
-        path: "",
-        component: () => import("@/components/user/host/HostPage.vue"),
-        name: 'HostHomepage',
-        redirect: { name: "HostInfo" },
-        children: [
-          {
-            path: "",
-            component: () => import("@/components/user/host/HostInfo.vue"),
-            name: "HostInfo",
-          },
-          {
-            path: "listing",
-            component: () => import("@/components/user/host/HostListing.vue"),
-            name: "HostListing",
-          },
-          {
-            path: "order",
-            component: () => import("@/components/user/host/HostOrder.vue"),
-            name: "HostOrder",
-          },
-        ],
-      },
-      {
-        path: "hostprofile",
-        component: () => import("@/components/user/host/HostProfile.vue"),
-        name: "HostProfile",
-      },
-      {
-        path: "password",
-        component: () => import("@/components/user/host/ChangePassword.vue"),
-        name: 'HostPassword',
-      },
+        path: '/car-detail/:id',
+        name: 'carDetail',
+        component: CarDetail,
+        props: true
+      }
     ]
-  },
+  }
 
   // {
   //   path: "/main",
