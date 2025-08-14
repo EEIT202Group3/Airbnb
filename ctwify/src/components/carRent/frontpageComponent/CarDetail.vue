@@ -1,29 +1,39 @@
 <script setup lang="ts">
 import NavigationBar from "@/components/carRent/frontpageComponent/NavigationBar.vue";
-import {ref, onMounted, computed} from "vue";
-import {useRoute} from "vue-router";
-import axios from "axios";
+import { ref, onMounted, computed } from "vue";
+import { useRoute } from "vue-router";
 import router from "@/router";
 import api from "@/api";
 
 const props = defineProps<{
-  id: string | number
+  id: string | number;
 }>();
 
 const route = useRoute();
-const pickupDateTime = route.query.pickupDateTime as string || '';
-const returnDateTime = route.query.returnDateTime as string || '';
+const pickupDateTime = (route.query.pickupDateTime as string) || "";
+const returnDateTime = (route.query.returnDateTime as string) || "";
 
 const vehicle = ref<any | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
-const firstName = ref('');
-const lastName = ref('');
-const email = ref('');
-const phone = ref('');
-const license = ref('');
-const driverAge = ref('25-60');
+// 表單
+const formRef = ref<any>(null);
+const firstName = ref("");
+const lastName = ref("");
+const email = ref("");
+const phone = ref("");
+const license = ref("");
+const driverAge = ref("25-60");
+
+// 驗證規則
+const required = (v: any) => (!!v || v === 0 ? true : "必填");
+const emailRule = (v: string) =>
+    !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Email 格式不正確";
+const phoneRule = (v: string) =>
+    !v || /^09\d{2}-?\d{3}-?\d{3}$/.test(v) || "手機格式 09xx-xxx-xxx";
+const licenseRule = (v: string) =>
+    !v || /^[A-Z]\d{9}$/.test(v) || "駕照格式 A123456789";
 
 onMounted(async () => {
   try {
@@ -36,9 +46,28 @@ onMounted(async () => {
     loading.value = false;
   }
 });
-// 寫入資料
+
+// 金額計算
+const rentalDays = computed(() => {
+  if (!pickupDateTime || !returnDateTime) return 1;
+  const pickup = new Date(pickupDateTime);
+  const returnD = new Date(returnDateTime);
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const diffInMs = returnD.getTime() - pickup.getTime();
+  return Math.max(1, Math.ceil(diffInMs / msPerDay));
+});
+
+const totalAmount = computed(() => {
+  if (!vehicle.value) return 0;
+  return rentalDays.value * vehicle.value.dailyRent;
+});
+
+// 送出
 async function submitReservation() {
   if (!vehicle.value) return;
+
+  const { valid } = await formRef.value.validate();
+  if (!valid) return;
 
   const formData = {
     pickupDate: pickupDateTime,
@@ -59,157 +88,219 @@ async function submitReservation() {
     console.log("新增成功", res.data);
     alert("預約成功！");
     await router.push("/car-front-homepage");
-  } catch (error) {
-    console.error("新增失敗", error);
+  } catch (err) {
+    console.error("新增失敗", err);
     alert("預約失敗，請稍後再試");
   }
 }
-// 金額計算
-const rentalDays = computed(() => {
-  if (!pickupDateTime || !returnDateTime) return 1;
-  const pickup = new Date(pickupDateTime);
-  const returnD = new Date(returnDateTime);
-  const msPerDay = 1000 * 60 * 60 * 24;
-  const diffInMs = returnD.getTime() - pickup.getTime();
-  return Math.max(1, Math.ceil(diffInMs / msPerDay));
-});
-
-const totalAmount = computed(() => {
-  if (!vehicle.value) return 0;
-  return rentalDays.value * vehicle.value.dailyRent;
-});
 </script>
 
 <template>
-  <NavigationBar></NavigationBar>
-  <div v-if="loading" class="text-center my-5">
-    載入中...
-  </div>
+  <NavigationBar />
 
-  <div v-else-if="error" class="alert alert-danger my-4">
-    {{ error }}
-  </div>
-  <!-- 車輛詳細資訊 -->
-  <template v-else>
-    <div class="container">
-      <div v-if="vehicle" class="card mb-4 shadow-sm">
-        <div class="card-header fw-bold bg-primary text-white">
-          車輛詳細資訊
-        </div>
-        <div class="row g-0">
-          <div class="col-md-4">
-            <img :src="`/carPicture/${vehicle.image}`" class="img-fluid rounded-start"
-                 :alt="`${vehicle.brand} ${vehicle.model}`"/>
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h4 class="card-title mb-3">{{ vehicle.brand }} {{ vehicle.model }}</h4>
-              <div class="row mb-2">
-                <div class="col-sm-4"><strong>車牌號碼：</strong></div>
-                <div class="col-sm-8">{{ vehicle.plateNo }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-sm-4"><strong>顏色 / 座位數：</strong></div>
-                <div class="col-sm-8">{{ vehicle.color }} / {{ vehicle.seatCapacity }} 人座</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-sm-4"><strong>變速系統 / 油種：</strong></div>
-                <div class="col-sm-8">{{ vehicle.transmission }} / {{ vehicle.fuelType }}</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-sm-4"><strong>油箱容量：</strong></div>
-                <div class="col-sm-8">{{ vehicle.fuelCapacity }} 公升</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-sm-4"><strong>里程數：</strong></div>
-                <div class="col-sm-8">{{ vehicle.mileage.toLocaleString() }} 公里</div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-sm-4"><strong>租金：</strong></div>
-                <div class="col-sm-8 text-success fw-bold">NT${{ vehicle.dailyRent }} / 日</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 取還車資訊 -->
-      <div class="card mb-4">
-        <div class="card-header ">取車及還車</div>
-        <div class="card-body">
-          <p>取車時間：{{ pickupDateTime.replace('T', ' ') }}</p>
-          <p>還車時間：{{ returnDateTime.replace('T', ' ') }}</p>
-          <p>營業時間：07:30 - 22:00</p>
-        </div>
-      </div>
-
-      <!--駕駛人資料-->
-      <form @submit.prevent="submitReservation">
-        <div class="card mb-4">
-          <div class="card-header">駕駛人資料</div>
-          <div class="card-body">
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="firstname" class="form-label">姓氏</label>
-                <input type="text" class="form-control" placeholder="請以中文輸入" name="firstname"
-                       id="firstname" v-model="lastName">
-              </div>
-              <div class="col-md-6">
-                <label for="lastname" class="form-label">名字</label>
-                <input type="text" class="form-control" placeholder="請以中文輸入" name="lastname"
-                       id="lastname" v-model="firstName">
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="email" class="form-label">電子郵件</label>
-                <input type="email" class="form-control" placeholder="email@example.com" name="email"
-                       id="email" v-model="email">
-              </div>
-              <div class="col-md-6">
-                <label for="phone" class="form-label">手機號碼</label>
-                <input type="tel" class="form-control" placeholder="09xx-xxx-xxx" name="phone"
-                       id="phone" v-model="phone">
-              </div>
-              <div class="col-md-6">
-                <label for="license" class="form-label">駕照號碼</label>
-                <input type="tel" class="form-control" placeholder="A123456789" name="license"
-                       id="license" v-model="license">
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">駕駛年齡</label>
-              <select class="form-select" name="driverAge" v-model="driverAge">
-                <option>18-24</option>
-                <option>25-60</option>
-                <option>60+</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!--隱藏欄位-->
-        <input type="hidden" name="vehicleId" :value="vehicle.id">
-        <input type="hidden" name="pickupDateTime" :value="pickupDateTime">
-        <input type="hidden" name="returnDateTime" :value="returnDateTime">
-        <!--總價與按鈕-->
-        <div class="col-lg-4">
-          <div class="card sticky-sidebar p-3">
-            <h5 class="mb-3">價格明細</h5>
-            <ul class="list-unstyled">
-              <li>租用天數：{{ rentalDays }} 天</li>
-              <li>每日租金：NT${{ vehicle.dailyRent.toLocaleString() }}</li>
-              <hr />
-              <li><strong>共：NT${{ totalAmount.toLocaleString() }} 元</strong></li>
-            </ul>
-            <button type="submit" class="btn btn-primary w-100">預定車輛</button>
-          </div>
-        </div>
-      </form>
+  <v-container class="py-6">
+    <!-- 載入中 -->
+    <div v-if="loading" class="text-center my-10">
+      <v-progress-circular indeterminate />
+      <div class="mt-2 text-medium-emphasis">載入中...</div>
     </div>
-  </template>
+
+    <!-- 錯誤 -->
+    <v-alert v-else-if="error" type="error" variant="tonal" class="my-4">
+      {{ error }}
+    </v-alert>
+
+    <!-- 內容 -->
+    <template v-else>
+      <v-row v-if="vehicle" dense>
+        <!-- 車輛資訊 -->
+        <v-col cols="12">
+          <v-card elevation="2" class="mb-4">
+            <v-card-title class="text-white" style="background: var(--v-theme-primary);">
+              車輛詳細資訊
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="4">
+                  <v-img
+                      :src="`/carPicture/${vehicle.image}`"
+                      :alt="`${vehicle.brand} ${vehicle.model}`"
+                      height="260"
+                      cover
+                      class="rounded"
+                  />
+                </v-col>
+                <v-col cols="12" md="8">
+                  <div class="text-h5 font-weight-bold mb-3">
+                    {{ vehicle.brand }} {{ vehicle.model }}
+                  </div>
+
+                  <v-row class="mb-1">
+                    <v-col cols="5" md="3" class="text-medium-emphasis">車牌號碼：</v-col>
+                    <v-col cols="7" md="9">{{ vehicle.plateNo }}</v-col>
+                  </v-row>
+
+                  <v-row class="mb-1">
+                    <v-col cols="5" md="3" class="text-medium-emphasis">顏色 / 座位數：</v-col>
+                    <v-col cols="7" md="9">{{ vehicle.color }} / {{ vehicle.seatCapacity }} 人座</v-col>
+                  </v-row>
+
+                  <v-row class="mb-1">
+                    <v-col cols="5" md="3" class="text-medium-emphasis">變速系統 / 油種：</v-col>
+                    <v-col cols="7" md="9">{{ vehicle.transmission }} / {{ vehicle.fuelType }}</v-col>
+                  </v-row>
+
+                  <v-row class="mb-1">
+                    <v-col cols="5" md="3" class="text-medium-emphasis">油箱容量：</v-col>
+                    <v-col cols="7" md="9">{{ vehicle.fuelCapacity }} 公升</v-col>
+                  </v-row>
+
+                  <v-row class="mb-1">
+                    <v-col cols="5" md="3" class="text-medium-emphasis">里程數：</v-col>
+                    <v-col cols="7" md="9">{{ vehicle.mileage?.toLocaleString?.() }} 公里</v-col>
+                  </v-row>
+
+                  <v-row class="mb-1">
+                    <v-col cols="5" md="3" class="text-medium-emphasis">租金：</v-col>
+                    <v-col cols="7" md="9" class="text-success font-weight-bold">
+                      NT${{ vehicle.dailyRent?.toLocaleString?.() }} / 日
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- 取還車資訊 -->
+        <v-col cols="12">
+          <v-card elevation="2" class="mb-4">
+            <v-card-title>取車及還車</v-card-title>
+            <v-card-text>
+              <div>取車時間：{{ pickupDateTime.replace('T', ' ') }}</div>
+              <div>還車時間：{{ returnDateTime.replace('T', ' ') }}</div>
+              <div>營業時間：07:30 - 22:00</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- 表單 + 價格側欄 -->
+        <v-col cols="12" md="8">
+          <v-card elevation="2" class="mb-4">
+            <v-card-title>駕駛人資料</v-card-title>
+            <v-card-text>
+              <v-form ref="formRef" @submit.prevent="submitReservation">
+                <v-row dense>
+                  <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model="lastName"
+                        label="姓氏"
+                        placeholder="請以中文輸入"
+                        :rules="[required]"
+                        variant="outlined"
+                        density="comfortable"
+                    />
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model="firstName"
+                        label="名字"
+                        placeholder="請以中文輸入"
+                        :rules="[required]"
+                        variant="outlined"
+                        density="comfortable"
+                    />
+                  </v-col>
+
+                  <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model="email"
+                        label="電子郵件"
+                        placeholder="email@example.com"
+                        :rules="[required, emailRule]"
+                        variant="outlined"
+                        density="comfortable"
+                    />
+                  </v-col>
+
+                  <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model="phone"
+                        label="手機號碼"
+                        placeholder="09xx-xxx-xxx"
+                        :rules="[required, phoneRule]"
+                        variant="outlined"
+                        density="comfortable"
+                    />
+                  </v-col>
+
+                  <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model="license"
+                        label="駕照號碼"
+                        placeholder="A123456789"
+                        :rules="[required, licenseRule]"
+                        variant="outlined"
+                        density="comfortable"
+                    />
+                  </v-col>
+
+                  <v-col cols="12" md="6">
+                    <v-select
+                        v-model="driverAge"
+                        :items="['18-24','25-60','60+']"
+                        label="駕駛年齡"
+                        :rules="[required]"
+                        variant="outlined"
+                        density="comfortable"
+                    />
+                  </v-col>
+
+                  <!-- 隱藏欄位 -->
+                  <input type="hidden" name="vehicleId" :value="vehicle?.vehicleId" />
+                  <input type="hidden" name="pickupDateTime" :value="pickupDateTime" />
+                  <input type="hidden" name="returnDateTime" :value="returnDateTime" />
+                </v-row>
+
+                <v-divider class="my-4" />
+
+                <v-btn color="primary" type="submit">預定車輛</v-btn>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <v-col cols="12" md="4">
+          <v-card elevation="2" class="position-sticky" style="top: 16px;">
+            <v-card-title>價格明細</v-card-title>
+            <v-card-text>
+              <v-list density="compact">
+                <v-list-item>
+                  <v-list-item-title>租用天數</v-list-item-title>
+                  <v-list-item-subtitle>{{ rentalDays }} 天</v-list-item-subtitle>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>每日租金</v-list-item-title>
+                  <v-list-item-subtitle>NT${{ vehicle.dailyRent?.toLocaleString?.() }}</v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+              <v-divider class="my-3" />
+              <div class="text-subtitle-1 font-weight-bold">
+                共：NT${{ totalAmount.toLocaleString() }} 元
+              </div>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-btn color="primary" block @click="submitReservation">預定車輛</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
+    </template>
+  </v-container>
 </template>
 
 <style scoped>
-
+.font-weight-bold { font-weight: 700; }
+.position-sticky { position: sticky; }
 </style>

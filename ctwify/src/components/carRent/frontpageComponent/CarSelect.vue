@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import {useRoute} from "vue-router";
-import NavigationBar from "@/components/carRent/frontpageComponent/NavigationBar.vue";
+import { useRoute } from "vue-router";
 import SearchBar from "@/components/carRent/frontpageComponent/SearchBar.vue";
-import {computed, onMounted, ref} from "vue";
+import { computed, onMounted, ref } from "vue";
 import api from "@/api";
 
 interface Vehicle {
@@ -46,14 +45,41 @@ const filters = ref({
 });
 
 const maxDailyRent = computed(() => {
-    if(originalCarList.value.length > 0){
-      const rents = originalCarList.value.map(c => c.dailyRent);
-      return Math.max(...rents);
-    }else {
-      return 0;
-    }
+  if (!originalCarList.value.length) return 0;
+  return Math.max(...originalCarList.value.map((c) => Number(c.dailyRent) || 0));
 });
 
+// --- 產生去重的 items（以小寫作 key，保留第一次出現的顯示值） ---
+const brandItems = computed(() => {
+  const map = new Map<string, string>();
+  for (const c of originalCarList.value) {
+    const raw = String(c.brand ?? "").trim();
+    const key = raw.toLowerCase();
+    if (raw && !map.has(key)) map.set(key, raw);
+  }
+  return [{ title: "全部", value: "" }, ...Array.from(map.values()).map((b) => ({ title: b, value: b }))];
+});
+
+const seatItems = computed(() => {
+  const set = new Set<number>();
+  for (const c of originalCarList.value) {
+    const n = Number((c as any).seatCapacity);
+    if (!Number.isNaN(n)) set.add(n);
+  }
+  return [{ title: "全部", value: null }, ...Array.from(set).sort((a, b) => a - b).map((n) => ({ title: String(n), value: n }))];
+});
+
+const colorItems = computed(() => {
+  const map = new Map<string, string>();
+  for (const c of originalCarList.value) {
+    const raw = String(c.color ?? "").trim();
+    const key = raw.toLowerCase();
+    if (raw && !map.has(key)) map.set(key, raw);
+  }
+  return [{ title: "全部", value: "" }, ...Array.from(map.values()).map((col) => ({ title: col, value: col }))];
+});
+
+// --- 請求資料 ---
 onMounted(async () => {
   if (!searchParams.pickupDateTime || !searchParams.returnDateTime) {
     fetchError.value = "缺少時間參數";
@@ -67,7 +93,14 @@ onMounted(async () => {
         returnDateTime: searchParams.returnDateTime,
       },
     });
-    originalCarList.value = res.data;
+    // 可選：在前端先做一次輕度清洗，避免空白/大小寫干擾
+    originalCarList.value = (res.data ?? []).map((c: any) => ({
+      ...c,
+      brand: String(c.brand ?? "").trim(),
+      color: String(c.color ?? "").trim(),
+      seatCapacity: Number(c.seatCapacity),
+      dailyRent: Number(c.dailyRent),
+    }));
     filters.value.dailyRentMax = maxDailyRent.value || 0;
   } catch (err) {
     fetchError.value = "無法載入車輛資料";
@@ -77,17 +110,17 @@ onMounted(async () => {
   }
 });
 
-const uniqueBrands = computed(() => Array.from(new Set(originalCarList.value.map(c => c.brand))));
-const uniqueSeats = computed(() => Array.from(new Set(originalCarList.value.map(c => c.seatCapacity))).sort((a, b) => a - b));
-const uniqueColors = computed(() => Array.from(new Set(originalCarList.value.map(c => c.color))));
-
+// --- 篩選 ---
 const filteredCars = computed(() =>
-    originalCarList.value.filter((car) =>
-        (!filters.value.brand || car.brand === filters.value.brand) &&
-        (!filters.value.color || car.color === filters.value.color) &&
-        (!filters.value.seatCapacity || car.seatCapacity === Number(filters.value.seatCapacity)) &&
-        (!filters.value.dailyRentMax || car.dailyRent <= Number(filters.value.dailyRentMax))
-    )
+    originalCarList.value.filter((car) => {
+      const matchBrand = !filters.value.brand || car.brand === filters.value.brand;
+      const matchColor = !filters.value.color || car.color === filters.value.color;
+      const matchSeat =
+          !filters.value.seatCapacity || Number(car.seatCapacity) === Number(filters.value.seatCapacity);
+      const matchPrice =
+          !filters.value.dailyRentMax || Number(car.dailyRent) <= Number(filters.value.dailyRentMax);
+      return matchBrand && matchColor && matchSeat && matchPrice;
+    })
 );
 
 // 清除篩選結果
@@ -100,86 +133,118 @@ function clearFilters() {
 </script>
 
 <template>
-  <NavigationBar/>
-  <SearchBar/>
+   <NavigationBar />
+  <SearchBar />
 
   <!-- 篩選按鈕 -->
-  <div class="container">
-    <button class="btn btn-primary my-3" @click="showFilter = true">
+  <v-container>
+    <v-btn color="primary" class="my-3" @click="showFilter = true" prepend-icon="mdi-filter-variant">
       篩選條件
-    </button>
-  </div>
+    </v-btn>
+  </v-container>
 
-  <div class="filter-overlay" :class="{ active: showFilter }" @click="showFilter = false">
-    <div class="filter-panel" :class="{ active: showFilter }" @click.stop>
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">篩選條件</h5>
-        <button class="btn btn-sm btn-outline-secondary" @click="showFilter = false">關閉</button>
-      </div>
+  <!-- 左側篩選抽屜 -->
+  <v-navigation-drawer v-model="showFilter" location="left" temporary width="320">
+    <v-toolbar flat>
+      <v-toolbar-title>篩選條件</v-toolbar-title>
+      <v-spacer />
+      <v-btn icon="mdi-close" variant="text" @click="showFilter = false" />
+    </v-toolbar>
 
-      <div class="mb-2">
-        <label class="form-label">品牌</label>
-        <select v-model="filters.brand" class="form-select">
-          <option value="">全部</option>
-          <option v-for="b in uniqueBrands" :key="b" :value="b">{{ b }}</option>
-        </select>
-      </div>
+    <v-divider />
 
-      <div class="mb-2">
-        <label class="form-label">座位數</label>
-        <select v-model.number="filters.seatCapacity" class="form-select">
-          <option :value="null">全部</option>
-          <option v-for="s in uniqueSeats" :key="s" :value="s">{{ s }}</option>
-        </select>
-      </div>
+    <v-container>
+      <!-- 品牌 -->
+      <v-select
+          v-model="filters.brand"
+          :items="brandItems"
+          item-title="title"
+          item-value="value"
+          label="品牌"
+          density="comfortable"
+          variant="outlined"
+          clearable
+      />
 
-      <div class="mb-2">
-        <label class="form-label">顏色</label>
-        <select v-model="filters.color" class="form-select">
-          <option value="">全部</option>
-          <option v-for="c in uniqueColors" :key="c" :value="c">{{ c }}</option>
-        </select>
-      </div>
+      <!-- 座位數 -->
+      <v-select
+          v-model.number="filters.seatCapacity"
+          :items="seatItems"
+          item-title="title"
+          item-value="value"
+          label="座位數"
+          density="comfortable"
+          variant="outlined"
+          clearable
+      />
 
-      <div class="mb-3">
-        <label class="form-label">最高價格</label>
-        <div class="d-flex align-items-center">
-          <input
-              type="number"
-              class="form-control me-2"
-              style="width: 140px"
+      <!-- 顏色 -->
+      <v-select
+          v-model="filters.color"
+          :items="colorItems"
+          item-title="title"
+          item-value="value"
+          label="顏色"
+          density="comfortable"
+          variant="outlined"
+          clearable
+      />
+
+      <!-- 最高價格 -->
+      <div class="mt-4">
+        <div class="text-subtitle-2 mb-2">最高價格（元）</div>
+        <div class="d-flex align-center mb-2">
+          <v-text-field
               v-model.number="filters.dailyRentMax"
+              type="number"
+              hide-details
+              density="comfortable"
+              class="mr-2"
+              style="max-width: 160px"
               :min="0"
               :max="maxDailyRent"
               step="50"
+              variant="outlined"
           />
           <span>元</span>
         </div>
-        <input
-            type="range"
-            class="form-range mt-2"
+        <v-slider
+            v-model.number="filters.dailyRentMax"
             :min="0"
             :max="maxDailyRent"
             step="50"
-            v-model.number="filters.dailyRentMax"
+            hide-details
         />
-        <small class="text-muted">目前上限：{{ filters.dailyRentMax?.toLocaleString?.() ?? 0 }} 元</small>
+        <div class="text-caption text-medium-emphasis mt-1">
+          目前上限：{{ filters.dailyRentMax?.toLocaleString?.() ?? 0 }} 元
+        </div>
       </div>
 
-      <button class="btn btn-outline-secondary w-100" @click="clearFilters">清除篩選條件</button>
-    </div>
-  </div>
+      <v-btn class="mt-4" variant="outlined" block @click="clearFilters">
+        清除篩選條件
+      </v-btn>
+    </v-container>
+  </v-navigation-drawer>
 
   <!-- 清單區 -->
-  <div class="container mt-3">
-    <div v-if="loading" class="text-center text-muted py-5">載入中...</div>
-    <div v-else-if="fetchError" class="alert alert-danger">{{ fetchError }}</div>
-    <template v-else>
-      <div v-if="!filteredCars.length" class="alert alert-info">沒有符合條件的車輛</div>
+  <v-container class="mt-3">
+    <div v-if="loading" class="text-center py-10">
+      <v-progress-circular indeterminate />
+      <div class="mt-2 text-medium-emphasis">載入中...</div>
+    </div>
 
-      <div class="row g-4">
-        <div class="col-12" v-for="car in filteredCars" :key="car.vehicleId">
-          <router-link
+    <v-alert v-else-if="fetchError" type="error" variant="tonal" class="mb-4">
+      {{ fetchError }}
+    </v-alert>
+
+    <template v-else>
+      <v-alert v-if="!filteredCars.length" type="info" variant="tonal" class="mb-4">
+        沒有符合條件的車輛
+      </v-alert>
+
+      <v-row dense>
+        <v-col v-for="car in filteredCars" :key="car.vehicleId" cols="12" class="mb-3">
+          <RouterLink
               :to="{
               name: 'carDetail',
               params: { id: car.vehicleId },
@@ -188,90 +253,54 @@ function clearFilters() {
                 returnDateTime: searchParams.returnDateTime
               }
             }"
-              class="text-decoration-none car-card-link"
+              class="text-decoration-none"
           >
-            <div class="card d-flex flex-row align-items-center justify-content-between p-3 car-card"
-                 style="min-height: 150px;">
+            <v-card class="pa-3" elevation="2" rounded="lg" hover>
+              <div class="d-flex align-center justify-space-between" style="min-height: 150px;">
+                <!-- 圖片 -->
+                <v-img
+                    :src="`/carPicture/${car.image}`"
+                    :alt="car.brand + ' ' + car.model"
+                    width="180"
+                    height="120"
+                    cover
+                    class="rounded-lg"
+                />
 
-              <!-- 圖片 -->
-              <img
-                  :src="`/carPicture/${car.image}`"
-                  :alt="car.brand + ' ' + car.model"
-                  class="img-fluid rounded"
-                  style="width: 180px; height: 120px; object-fit: cover;"
-              />
-              <div class="flex-grow-1 ms-4">
-                <h5 class="fw-bold text-dark mb-2">
-                  {{ car.brand.toUpperCase() }} - {{ car.model }}
-                </h5>
+                <!-- 文字資訊 -->
+                <div class="mx-4 flex-grow-1">
+                  <div class="text-h6 font-weight-bold mb-2">
+                    {{ car.brand.toUpperCase() }} - {{ car.model }}
+                  </div>
 
-                <div class="mb-2">
-                  <span class="badge bg-light text-dark me-2">小型車</span>
-                  <span class="badge bg-primary me-2">{{ car.seatCapacity }}人座</span>
-                  <span class="badge bg-info text-dark">{{ car.brand }}</span>
+                  <div class="mb-2">
+                    <v-chip size="small" variant="outlined" class="mr-2">小型車</v-chip>
+                    <v-chip size="small" color="primary" class="mr-2">{{ car.seatCapacity }}人座</v-chip>
+                    <v-chip size="small" variant="tonal" color="info">{{ car.brand }}</v-chip>
+                  </div>
+
+                  <div class="text-medium-emphasis">
+                    <v-icon size="18" class="mr-1">mdi-account</v-icon> {{ car.seatCapacity }}人座　
+                    <v-icon size="18" class="mr-1">mdi-automatic</v-icon> {{ car.transmission }}　
+                    <v-icon size="18" class="mr-1">mdi-gas-station</v-icon> {{ car.fuelCapacity }} 公升
+                  </div>
                 </div>
 
-                <div class="text-muted">
-                  <i class="bi bi-person-fill"></i> {{ car.seatCapacity }}人座　
-                  <i class="bi bi-gear-fill"></i> {{ car.transmission }}　
-                  <i class="bi bi-droplet-fill"></i> {{ car.fuelCapacity }} 公升
+                <!-- 價格 -->
+                <div class="text-right">
+                  <div class="text-primary text-h6 font-weight-bold">
+                    NT${{ car.dailyRent.toLocaleString() }} /日起
+                  </div>
                 </div>
               </div>
-
-              <div class="text-end">
-                <div class="text-primary fw-bold fs-5">NT${{ car.dailyRent.toLocaleString() }} /日起</div>
-              </div>
-            </div>
-          </router-link>
-        </div>
-      </div>
+            </v-card>
+          </RouterLink>
+        </v-col>
+      </v-row>
     </template>
-  </div>
+  </v-container>
 </template>
 
 <style scoped>
-.filter-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: transparent;
-  pointer-events: none;
-  transition: background-color .25s ease;
-  z-index: 1000;
-}
-
-.filter-overlay.active {
-  background-color: rgba(0, 0, 0, .4);
-  pointer-events: auto;
-}
-
-.filter-panel {
-  background: #fff;
-  width: 22rem;
-  max-width: 90vw;
-  height: 100%;
-  transform: translateX(-100%);
-  transition: transform .25s ease;
-  padding: 20px;
-}
-
-.filter-panel.active {
-  transform: translateX(0);
-}
-
-.car-card-link {
-  color: inherit;
-}
-
-.car-card {
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  transition: box-shadow .2s ease, transform .15s ease;
-}
-
-.car-card:hover {
-  background-color: #f8f9fa;
-  box-shadow: 0 0 10px rgba(0, 0, 0, .15);
-  transform: translateY(-2px);
-  cursor: pointer;
-}
+.text-right { text-align: right; }
 </style>
