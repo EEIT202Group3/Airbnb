@@ -23,6 +23,7 @@ const items = [
     to: "/AdminOrder",
   },
   { title: "租車服務", icon: "mdi-car", to: "/car-rent/back-homepage" },
+  { title: "客服聊天室", icon: "mdi-chat", to: "/chat" },
 ];
 
 // const reviewLinks = [{
@@ -241,7 +242,7 @@ async function login() {
     </v-list>   
   </v-navigation-drawer>
   <!-- 登入表單 -->
-  <v-dialog v-model="loginDialog">
+<!-- <v-dialog v-model="loginDialog">
     <v-card class="pa-6 mx-auto" style="width: 25%; height: auto">
       <form @submit.prevent="login">
         <v-text-field
@@ -302,8 +303,6 @@ async function login() {
     </v-list>
   </v-navigation-drawer> -->
 <!-- 登入表單 -->
-
-<!-- </template> -->
 <style scoped>
 /* 標題字體 */
 .sidebar-title {
