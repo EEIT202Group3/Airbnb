@@ -14,7 +14,8 @@ public class OrderAllResponseDto {
     private String bookingstatus;
     private LocalDateTime checkindate;
     private LocalDateTime checkoutdate;
-    private BigDecimal totalamount;
+    private BigDecimal grandtotal;
+   
     
     
     
@@ -78,11 +79,13 @@ public class OrderAllResponseDto {
 	public void setCheckoutdate(LocalDateTime checkoutdate) {
 		this.checkoutdate = checkoutdate;
 	}
-	public BigDecimal getTotalamount() {
-		return totalamount;
+	public BigDecimal getGrandtotal() {
+		return grandtotal;
 	}
-	public void setTotalamount(BigDecimal totalamount) {
-		this.totalamount = totalamount;
+	public void setGrandtotal(BigDecimal grandtotal) {
+		this.grandtotal = grandtotal;
 	}
+
+
 
 }

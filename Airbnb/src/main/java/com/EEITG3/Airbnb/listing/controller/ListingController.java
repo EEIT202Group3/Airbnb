@@ -133,6 +133,8 @@ public class ListingController {
             // 新增時強制狀態為待審核
             lisBean.setApproved(null); 
           
+            lisBean.setApproved(null); // Boolean 欄位
+            // 或 lisBean.setAuditStatus("PENDING"); // String 欄位
 
             Integer listId = listingService.saveListingWithPhotosAndEquipments(lisBean, photos, equipmentIds);
             return ResponseEntity.ok(listId);

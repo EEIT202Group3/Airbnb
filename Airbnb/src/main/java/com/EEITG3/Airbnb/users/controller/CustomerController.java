@@ -1,13 +1,16 @@
 package com.EEITG3.Airbnb.users.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -17,7 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EEITG3.Airbnb.users.CookieUtil;
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
@@ -34,7 +39,6 @@ import jakarta.validation.Valid;
 public class CustomerController {
 
 	private CustomerService service;
-	
 	@Autowired
 	public CustomerController(CustomerService service) {
 		this.service = service;
@@ -50,6 +54,8 @@ public class CustomerController {
 			return ResponseEntity.ok(token);
 		} catch (BadCredentialsException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+		} catch (DisabledException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
 		}
 	}
 	
@@ -67,16 +73,24 @@ public class CustomerController {
 			}
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 		}
-		service.customerSignup(request);
-		return ResponseEntity.ok("已送出驗證信");
+		try {
+			service.customerSignup(request);
+			return ResponseEntity.ok("已送出驗證信");
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+		}
 	}
 	
 	//接收驗證信
 	@GetMapping("/customers/verify")
-	public ResponseEntity<?> verify(@RequestParam("token") String token, HttpServletResponse response){
+	public void verify(@RequestParam("token") String token, HttpServletResponse response){
 		String jwt = service.verify(token);
 		CookieUtil.saveCustomerCookie(response, jwt);
-		return ResponseEntity.ok("驗證成功");
+		try {
+			response.sendRedirect("http://localhost:5173");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//客戶登出
@@ -101,6 +115,43 @@ public class CustomerController {
 	@GetMapping("/customers/current")
 	public Customer getCurrentCustomer(@AuthenticationPrincipal CustomerDetails customerDetails) {
 		return service.currentCustomer(customerDetails);
+	}
+	//更新大頭照
+	@PostMapping(value = "/customers/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> updateAvatar(@RequestPart MultipartFile avatar, @AuthenticationPrincipal CustomerDetails customerDetails) {
+		try {
+			Customer customer = service.updateAvatar(service.currentCustomer(customerDetails), avatar);
+			return ResponseEntity.ok(customer);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	//忘記密碼
+	@PostMapping("/customers/forgetpwd")
+	public ResponseEntity<?> forgetpwd(@RequestBody Map<String, Object> data){
+		try {
+			//送驗證信給他
+			String email = (String)data.get("email");
+			System.out.println(email);
+			service.forgetPwd(email);
+			//回傳OK
+			return ResponseEntity.ok("已送出驗證信");
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("你還未註冊");
+		}
+	}
+	
+	@GetMapping("/customers/pwdverify")
+	public void pwdVerify(@RequestParam("token") String token,HttpServletResponse response){
+		String jwt = service.verify(token);
+		CookieUtil.saveCustomerCookie(response, jwt);
+		try {
+			response.sendRedirect("http://localhost:5173/password");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

@@ -7,6 +7,7 @@ public class OrderRequestDto {
 	//前端傳來的訂單資料
 
 	    private Integer listid;
+	    private String hostid;
 	    private String customerid;
 	    private String username;
 	    private String housename;
@@ -16,14 +17,22 @@ public class OrderRequestDto {
 	    private LocalDate checkindate;
 	    private LocalDate checkoutdate;
 	    private int people;
-	    private int price;
+	    private int roomprice;
 	    private int days;
-	    private int total;
+	    private int cartotal;
+	    private int grandtotal;
+	    private String bookingmethod;
 		public Integer getListid() {
 			return listid;
 		}
 		public void setListid(Integer listid) {
 			this.listid = listid;
+		}
+		public String getHostid() {
+			return hostid;
+		}
+		public void setHostid(String hostid) {
+			this.hostid = hostid;
 		}
 		public String getCustomerid() {
 			return customerid;
@@ -79,23 +88,35 @@ public class OrderRequestDto {
 		public void setPeople(int people) {
 			this.people = people;
 		}
-		public int getPrice() {
-			return price;
-		}
-		public void setPrice(int price) {
-			this.price = price;
-		}
 		public int getDays() {
 			return days;
 		}
 		public void setDays(int days) {
 			this.days = days;
 		}
-		public int getTotal() {
-			return total;
+		public int getRoomprice() {
+			return roomprice;
 		}
-		public void setTotal(int total) {
-			this.total = total;
+		public void setRoomprice(int roomprice) {
+			this.roomprice = roomprice;
+		}
+		public int getCartotal() {
+			return cartotal;
+		}
+		public void setCartotal(int cartotal) {
+			this.cartotal = cartotal;
+		}
+		public int getGrandtotal() {
+			return grandtotal;
+		}
+		public void setGrandtotal(int grandtotal) {
+			this.grandtotal = grandtotal;
+		}
+		public String getBookingmethod() {
+			return bookingmethod;
+		}
+		public void setBookingmethod(String bookingmethod) {
+			this.bookingmethod = bookingmethod;
 		}
 
 

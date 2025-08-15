@@ -1,6 +1,8 @@
 package com.EEITG3.Airbnb.carRent.repository;
 
 import com.EEITG3.Airbnb.carRent.entity.Vehicle;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,4 +28,14 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Integer> {
             @Param("returnDateTime") LocalDateTime returnDateTime
     );
 
+    Page<Vehicle> findByPlateNoContainingIgnoreCase(String plateNo, Pageable pageable);
+
+    interface StatusCount {
+        String getStatus();
+
+        long getCnt();
+    }
+
+    @Query("select v.status as status, count(v) as cnt from Vehicle v group by v.status")
+    List<StatusCount> countByStatus();
 }

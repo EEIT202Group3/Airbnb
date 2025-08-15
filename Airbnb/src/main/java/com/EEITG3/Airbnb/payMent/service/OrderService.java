@@ -2,6 +2,7 @@ package com.EEITG3.Airbnb.payMent.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,7 +11,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.EEITG3.Airbnb.listing.entity.LisBean;
 import com.EEITG3.Airbnb.listing.repository.ListRepository;
 import com.EEITG3.Airbnb.payMent.dto.OrderAllResponseDto;
 import com.EEITG3.Airbnb.payMent.dto.OrderDetailResponseDto;
@@ -30,52 +30,71 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class OrderService {
 
-
 	    @Autowired
 	    private OrderRepository orderRepository;
-
 	    @Autowired
 	    private ListRepository listRepository;
-
 	    @Autowired
 	    private CustomerRepository customerRepository;
 
-	    public Order createOrder(OrderRequestDto dto,String email) {
-	        // 根據 username 找 Customer
-	        Optional<Customer> temp = customerRepository.findCustomerByEmail(email);
-	        if(!temp.isPresent()) {
-	        	throw new RuntimeException("找不到客戶");
-	        	//throw new IllegalArgumentException("找不到使用者：" + dto.getUsername());
-	        }
-	    	Customer customer = temp.get();
+	    //新增訂單
+	    public Order createOrder(OrderRequestDto dto, String email) {
+	        var customer = customerRepository.findCustomerByEmail(email)
+	                .orElseThrow(() -> new RuntimeException("會員不存在"));
 
-	        // 根據 list_id 找房源
-	        LisBean listing = listRepository.findById(dto.getListid())
+	        var listing = listRepository.findById(dto.getListid())
 	                .orElseThrow(() -> new IllegalArgumentException("找不到房源，ID：" + dto.getListid()));
 
+	        long days = ChronoUnit.DAYS.between(dto.getCheckindate(), dto.getCheckoutdate());
+	        int people = Optional.ofNullable(dto.getPeople()).orElse(1);
+
+	        // 房租（以房源售價 * 晚數 * 人數 / 2）
+	        int roomPrice = listing.getPrice();
+	        BigDecimal roomTotal = BigDecimal.valueOf(roomPrice)
+	                .multiply(BigDecimal.valueOf(days))
+	                .multiply(BigDecimal.valueOf(people))
+	                .divide(BigDecimal.valueOf(2));
+
+	        // carRent 金額：寫進 total_amount
+	        BigDecimal carTotal = Optional.ofNullable(dto.getCartotal())
+	                .map(BigDecimal::valueOf).orElse(BigDecimal.ZERO);
+
+	        // 訂單總金額（房租 + 租車）：寫進 total
+	        BigDecimal grandTotal = roomTotal.add(carTotal);
+
 	        Order order = new Order();
-	        order.setListing(listing);   // 設定房源對象
-	        order.setCustomerId(dto.getCustomerid());
-	        order.setUsername(dto.getUsername()); // 顯示用
-	        order.setHousename(dto.getHousename());
-	        order.setAddress(dto.getAddress());
-	        order.setTel(dto.getTel());
-	        order.setBed(dto.getBed());
-	        order.setPeople(dto.getPeople());
-	        LocalDateTime now = LocalDateTime.now();
+	        order.setListing(listing);
+	        order.setHostId(
+	        	    listing.getHostId() != null ? listing.getHostId().toString() : null
+	        	);          
+	        order.setCustomerId(
+	        	    customer.getCustomerId() != null ? customer.getCustomerId().toString() : null
+	        	);   
+	        order.setUsername(customer.getUsername());            // 顯示用
+	        order.setHousename(listing.getHouseName());
+	        order.setAddress(listing.getAds());
+	        order.setTel(listing.getTel());
+	        order.setBed(listing.getBed());
+	        order.setPeople(people);
 	        order.setCheckindate(dto.getCheckindate().atStartOfDay());
 	        order.setCheckoutdate(dto.getCheckoutdate().atStartOfDay());
-	        order.setCreatedtime(now);
-	        String booking_method = "現金";
-	        order.setBookingmethod(booking_method);
-	        order.setMentstatus("現金".equals(booking_method) ? "待付款" : "已付款");
-	        order.setBookingstatus("待入住");
+	        order.setRoomPrice(roomPrice);     // price
+	        order.setCarTotal(carTotal);       // total（租車金額）
+	        order.setGrandTotal(grandTotal);   // total_amount（整筆總金額）
+	        order.setBookingmethod(
+	                Optional.ofNullable(dto.getBookingmethod()).orElse("CASH"));
 	        order.setPaymentid(UUID.randomUUID().toString());
-	        order.setPrice(dto.getPrice());
-	        order.setTotal(BigDecimal.valueOf(dto.getTotal()));//租車金額
-	        order.setTotalamount(BigDecimal.valueOf(dto.getPrice() * dto.getDays()));//總金額
-	        order.setPaidtime(now);
-
+	        
+	        boolean paidByCard = "CREDIT_NEWEBPAY".equalsIgnoreCase(order.getBookingmethod())
+                    || "CREDIT".equalsIgnoreCase(order.getBookingmethod());
+	        
+	        if (paidByCard) {
+	            order.setMentstatus("已付款");
+	            order.setPaidtime(LocalDateTime.now());
+	        } else {
+	            order.setMentstatus("待付款");
+	            order.setPaidtime(null);
+	        }
 	        return orderRepository.save(order);
 	    }
 
@@ -83,10 +102,9 @@ public class OrderService {
 	    private EntityManager entityManager;
 	    //日期判斷邏輯
 	    public boolean isRoomBooked(String houseName, LocalDateTime checkinDate, LocalDateTime checkoutDate) {
-	        String hql = "SELECT COUNT(o) FROM Order o " +
-	                     "WHERE o.houseName = :houseName AND " +
-	                     "o.checkinDate < :checkoutDate AND o.checkoutDate > :checkinDate";
-
+	    	String hql = "SELECT COUNT(o) FROM Order o " +
+	    		    "WHERE o.houseName = :houseName AND " +
+	    		    "o.checkinDate < :checkoutDate AND o.checkoutDate > :checkinDate";
 	        Long count = entityManager.createQuery(hql, Long.class)
 	            .setParameter("houseName", houseName)
 	            .setParameter("checkinDate", checkinDate)
@@ -114,7 +132,7 @@ public class OrderService {
 				dto.setPeople(order.getPeople());
 				dto.setBookingstatus(order.getBookingstatus());
 				dto.setUsername(order.getUsername());
-				dto.setTotalamount(order.getTotalamount());
+				dto.setGrandtotal(order.getGrandTotal());
 				dto.setCheckindate(order.getCheckindate());
 				dto.setCheckoutdate(order.getCheckoutdate());
 				return dto;
@@ -126,25 +144,27 @@ public class OrderService {
 	    	            .orElseThrow(() -> new IllegalArgumentException("查無此訂單：" + bookingid));
 
 	    	    OrderDetailResponseDto dto = new OrderDetailResponseDto();
-	    	    dto.setBookingid(order.getBookingid());
+	       	    dto.setBookingId(order.getBookingid());
 	    	    dto.setUsername(order.getUsername());
-	    	    dto.setHousename(order.getHousename());
+	    	    dto.setHouseName(order.getHousename());
 	    	    dto.setAddress(order.getAddress());
 	    	    dto.setTel(order.getTel());
 	    	    dto.setBed(order.getBed());
-	    	    dto.setCheckindate(order.getCheckindate());
-	    	    dto.setCheckoutdate(order.getCheckoutdate());
+	    	    dto.setCheckinDate(order.getCheckindate());
+	    	    dto.setCheckoutDate(order.getCheckoutdate());
 	    	    dto.setPeople(order.getPeople());
-	    	    dto.setLocationid(order.getLocationid());
-	    	    dto.setPaymentid(order.getPaymentid());
-	    	    dto.setPrice(order.getPrice());
-	    	    dto.setBookingstatus(order.getBookingstatus());
-	    	    dto.setMentstatus(order.getMentstatus());
-	    	    dto.setTotalamount(order.getTotalamount());
-	    	    dto.setPaidtime(order.getPaidtime());
-	    	    dto.setBookingmethod(order.getBookingmethod());
-	    	    dto.setBookingstatus(order.getBookingstatus());
+	    	    dto.setLocationId(order.getLocationid());
+	    	    dto.setPaymentId(order.getPaymentid());
+	    	    dto.setRoomprice(order.getRoomPrice());
+	    	    dto.setBookingStatus(order.getBookingstatus());
+	    	    dto.setMentStatus(order.getMentstatus());
+	    	    dto.setCartotal(order.getCarTotal());
+	    	    dto.setGrandtotal(order.getGrandTotal());
+	    	    dto.setPaidTime(order.getPaidtime());
+	    	    dto.setBookingMethod(order.getBookingmethod());
+	    	    dto.setBookingStatus(order.getBookingstatus());
 
 	    	    return dto;
 	    }
+	
 	}

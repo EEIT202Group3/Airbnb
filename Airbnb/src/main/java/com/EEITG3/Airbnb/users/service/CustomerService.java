@@ -1,8 +1,11 @@
 package com.EEITG3.Airbnb.users.service;
 
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
@@ -24,6 +27,12 @@ public interface CustomerService {
 	//客戶更新資料
 	Customer customerUpdate(Map<String, Object> patchPayload, CustomerDetails customerDetails);
 	//登出
+	
+	//更新大頭貼
+	Customer updateAvatar(Customer customer, MultipartFile avatar) throws IOException;
+	//忘記密碼時送驗證信
+	void forgetPwd(String email);
+	
 	
 //後台功能
 	//找全部客戶

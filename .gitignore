@@ -109,3 +109,4 @@ cypress/screenshots/
 *.sw?
 *.swo
 *.swp
+/Airbnb/photo

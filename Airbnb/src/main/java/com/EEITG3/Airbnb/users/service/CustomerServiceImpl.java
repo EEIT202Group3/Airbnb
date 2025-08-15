@@ -1,5 +1,10 @@
 package com.EEITG3.Airbnb.users.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 
@@ -7,12 +12,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EEITG3.Airbnb.jwt.EmailService;
 import com.EEITG3.Airbnb.jwt.JwtService;
@@ -33,6 +41,9 @@ public class CustomerServiceImpl implements CustomerService {
 	private AuthenticationManager authManager;
 	private PasswordEncoder encoder;
 	private EmailService emailService;
+	
+	@Value("${app.storage.base-dir}")
+    private String baseDir;
 	
 	@Autowired
 	public CustomerServiceImpl(CustomerRepository repo, ObjectMapper objectMapper, JwtService jwtService,
@@ -61,7 +72,7 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer customer = temp.get();
 		//如果沒有驗證過，拋出Exception，請先完成驗證
 		if(!customer.isVerified()) {
-			throw new BadCredentialsException("請先完成驗證");
+			throw new DisabledException("請先完成驗證");
 		}
 		//上面的三個驗證都過了，產生JWT並回傳
 		return jwtService.generateToken(customer.getEmail(), "ROLE_CUSTOMER");
@@ -69,10 +80,11 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public void customerSignup(SignUpRequest request) {
+		System.out.println(request.getEmail());
 		Optional<Customer> temp = repo.findCustomerByEmail(request.getEmail());
 		//表示已經有註冊過了
 		if(temp.isPresent()) {
-			throw new IllegalArgumentException("已註冊");
+			throw new IllegalArgumentException("帳號已存在");
 		}
 		//先對密碼進行加密
 		String encodedPassword = encoder.encode(request.getPassword());
@@ -126,11 +138,54 @@ public class CustomerServiceImpl implements CustomerService {
 		return repo.save(updatedCustomer);
 	}
 	private Customer apply(Map<String, Object> patchPayload, Customer customer) {
+		if(patchPayload.get("password")!=null) {
+			String pwd = (String) patchPayload.get("password");
+			String newPwd = encoder.encode(pwd);
+			patchPayload.put("password", newPwd);
+		}
 		ObjectNode customerNode = objectMapper.convertValue(customer, ObjectNode.class);
 		ObjectNode patchNode = objectMapper.convertValue(patchPayload, ObjectNode.class);
 		customerNode.setAll(patchNode);
 		return objectMapper.convertValue(customerNode, Customer.class);
 	}
+	
+	@Override
+	public Customer updateAvatar(Customer customer, MultipartFile avatar) throws IOException {
+		Path avatarDir = Paths.get(baseDir,"avatar","customers");
+		Files.createDirectories(avatarDir);
+		String ext = getExtension(avatar.getOriginalFilename());
+		String filename = customer.getCustomerId()+"."+ext;
+		Files.copy(avatar.getInputStream(), avatarDir.resolve(filename),StandardCopyOption.REPLACE_EXISTING);
+		String avatarURL = "/images/avatar/customers/"+filename;
+		customer.setAvatarURL(avatarURL);
+		return repo.save(customer);
+	}
+	//取得副檔名.jpg之類的
+	private String getExtension(String filename) {
+        if (filename == null) return "png";
+        int dotIndex = filename.lastIndexOf('.');
+        return (dotIndex >= 0) ? filename.substring(dotIndex + 1).toLowerCase() : "png";
+    }
+	
+	@Override
+	public void forgetPwd(String email) {
+		//用email找客戶
+		System.out.println(email);
+		Optional<Customer> temp = repo.findCustomerByEmail(email);
+		System.out.println(temp.isPresent());
+		if(!temp.isPresent()) {
+			throw new IllegalArgumentException("你還未註冊");
+		}
+		Customer customer = temp.get();
+		//設定驗證用的UUID token
+		String token = UUID.randomUUID().toString();
+		customer.setVerificationToken(token);
+		repo.save(customer);
+		//呼叫發送驗證信的service
+		emailService.sendCustomerForgetPwdEmail(email,token);
+		
+	}
+	
 	
 	@Override
 	public List<Customer> findAllCustomers() {
@@ -179,5 +234,9 @@ public class CustomerServiceImpl implements CustomerService {
 		String likePhone = "%"+phone+"%";
 		return repo.findLikeByPhone(likePhone);
 	}
+
+
+
+	
 	
 }

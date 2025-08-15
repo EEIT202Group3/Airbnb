@@ -1,17 +1,24 @@
 package com.EEITG3.Airbnb.users.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EEITG3.Airbnb.jwt.EmailService;
 import com.EEITG3.Airbnb.jwt.JwtService;
@@ -32,6 +39,9 @@ public class HostServiceImpl implements HostService {
 	private AuthenticationManager authManager;
 	private PasswordEncoder encoder;
 	private EmailService emailService;
+	
+	@Value("${app.storage.base-dir}")
+	private String baseDir;
 	
 	@Autowired
 	public HostServiceImpl(HostRepository repo, ObjectMapper objectMapper, JwtService jwtService,
@@ -118,6 +128,24 @@ public class HostServiceImpl implements HostService {
 		customerNode.setAll(patchNode);
 		return objectMapper.convertValue(customerNode, Host.class);
 	}
+	
+	@Override
+	public Host updateAvatar(Host host, MultipartFile avatar) throws IOException {
+		Path avatarDir = Paths.get(baseDir,"avatar","hosts");
+		Files.createDirectories(avatarDir);
+		String ext = getExtension(avatar.getOriginalFilename());
+		String filename = host.getHostId()+"."+ext;
+		Files.copy(avatar.getInputStream(), avatarDir.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+		String avatarURL = "/images/avatar/hosts/"+filename;
+		host.setAvatarURL(avatarURL);
+		return repo.save(host);
+	}
+	
+	private String getExtension(String filename) {
+		if(filename==null) return "png";
+		int dotIndex = filename.lastIndexOf('.');
+		return(dotIndex>=0)?filename.substring(+1).toLowerCase():"png";
+	}
 
 	@Override
 	public List<Host> findAllHosts() {
@@ -164,6 +192,8 @@ public class HostServiceImpl implements HostService {
 		String likePhone = "%"+phone+"%";
 		return repo.findLikeByPhone(likePhone);
 	}
+
+	
 
 	
 }

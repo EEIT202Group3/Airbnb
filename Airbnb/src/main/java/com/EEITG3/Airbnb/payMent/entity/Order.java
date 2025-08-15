@@ -14,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 
@@ -31,6 +32,9 @@ public class Order implements java.io.Serializable {
 		@ManyToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "list_id")
 		private LisBean listing;              // 房源ID (外來鍵)
+		
+		@Column(name = "host_id")
+		private String hostId;
 
 		@Column(name = "customer_id")
 		private String customerId;
@@ -78,13 +82,13 @@ public class Order implements java.io.Serializable {
 	    private String paymentId;          // 付款編號
 
 	    @Column(name = "price")
-	    private Integer price;              // 房租金額
+	    private Integer roomPrice;              // 房租金額
 
-	    @Column(name = "total_amount")
-	    private BigDecimal total;    // 租車金額
+	    @Column(name = "total_amount", precision = 10, scale = 0)
+	    private BigDecimal carTotal;    // 租車金額
 
-	    @Column(name = "total")
-	    private BigDecimal totalAmount;              // 總金額
+	    @Column(name = "total", precision = 10, scale = 0)
+	    private BigDecimal grandTotal;              // 總金額
 
 	    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	    @Column(name = "paid_time")
@@ -96,9 +100,17 @@ public class Order implements java.io.Serializable {
 	    @Column(name = "ment_status")
 	    private String mentStatus;         // 付款狀態
 
-
+	    @PrePersist
+	    protected void onCreate() {
+	        if (createdTime == null) createdTime = LocalDateTime.now();
+	        if (bookingStatus == null) bookingStatus = "待入住";
+	        if (mentStatus == null) mentStatus = "待付款";
+	    }
+	    
+	    
 
 	    public Order() {}
+
 
 
 
@@ -108,6 +120,9 @@ public class Order implements java.io.Serializable {
 		public LisBean getListing() {return listing;}
 		public void setListing(LisBean listing) {this.listing = listing;}
 
+		public String getHostId() {return hostId;}
+		public void setHostId(String hostId) {this.hostId = hostId;}
+		
 		public String getCustomerId() {return customerId;}
 		public void setCustomerId(String customerId) {this.customerId = customerId;}
 
@@ -150,14 +165,14 @@ public class Order implements java.io.Serializable {
 		public String getPaymentid() {return paymentId;}
 		public void setPaymentid(String paymentId) {this.paymentId = paymentId;}
 
-		public Integer getPrice() {return price;}
-		public void setPrice(Integer price) {this.price = price;}
+		public Integer getRoomPrice() {return roomPrice;}
+		public void setRoomPrice(Integer roomPrice) {this.roomPrice = roomPrice;}
 
-		public BigDecimal getTotal() {return total;}
-		public void setTotal(BigDecimal total) {this.total = total;}
+		public BigDecimal getCarTotal() {return carTotal;}
+		public void setCarTotal(BigDecimal carTotal) {this.carTotal = carTotal;}
 
-		public BigDecimal getTotalamount() {return totalAmount;}
-		public void setTotalamount(BigDecimal totalAmount) {this.totalAmount = totalAmount;}
+		public BigDecimal getGrandTotal() {return grandTotal;}
+		public void setGrandTotal(BigDecimal grandTotal) {this.grandTotal = grandTotal;}
 
 		public LocalDateTime getPaidtime() {return paidTime;}
 		public void setPaidtime(LocalDateTime paidTime) {this.paidTime = paidTime;}
@@ -169,7 +184,10 @@ public class Order implements java.io.Serializable {
 		public void setMentstatus(String mentStatus) {this.mentStatus = mentStatus;}
 
 
-
+		public static final String STATUS_PENDING = "PENDING"; // 下單成功未付款
+		public static final String STATUS_CONFIRMED = "CONFIRMED"; // 付款成功
+		public static final String STATUS_COMPLETED = "COMPLETED"; // 履約完成（退房）
+		public static final String STATUS_CANCELLED = "CANCELLED";
 
 
 

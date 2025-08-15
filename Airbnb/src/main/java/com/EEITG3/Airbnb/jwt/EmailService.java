@@ -97,4 +97,46 @@ public class EmailService {
 			e.printStackTrace();
 		}
 	}
+	
+	public void sendCustomerForgetPwdEmail(String to, String token) {
+		String url = "http://localhost:8080/api/customers/pwdverify?token=" + token;
+		//MimeMessageHelper 是 Spring 提供的一個輔助類，用來簡化設定 Mail 寄送的內容
+		MimeMessage message = mailSender.createMimeMessage();
+		try {
+			//用剛剛產生的郵件物件來設定這個helper，true代表支援multipart(因為我們要傳html回去)
+			MimeMessageHelper helper = new MimeMessageHelper(message,true,"UTF-8");
+			//設定送件人名稱
+			helper.setFrom("eeit202@gmail.com", "Ctwify");
+			//設定收件人
+			helper.setTo(to);
+			//設定主旨
+			helper.setSubject("重設密碼");
+			String content = """
+					<html>
+					<body style="font-family: Arial, sans-serif; padding: 20px;">
+					    <h2 style="color: #2c3e50;">重設密碼</h2>
+					        <p>請點擊下方按鈕以重設密碼：</p>
+					        <p>
+					            <a href="%s" style="background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+					                 重設密碼
+					            </a>
+					        </p>
+					        <p style="margin-top: 20px; color: gray; font-size: 12px;">
+					           如果您沒有註冊本平台，請忽略此封信。
+					        </p>
+					</body>
+					</html>
+					""".formatted(url);
+			//設定內容，true表示html格式
+			helper.setText(content, true);
+			//發送
+			mailSender.send(message);
+		} catch (MessagingException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+	
 }

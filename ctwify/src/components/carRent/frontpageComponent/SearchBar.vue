@@ -1,98 +1,152 @@
 <script setup lang="ts">
-import {reactive, computed} from "vue";
-import {useRouter} from "vue-router";
+import { reactive, computed, ref } from "vue";
+import { useRouter } from "vue-router";
 
-const router = useRouter()
+const router = useRouter();
+const formRef = ref<any>(null);
+
 const formData = reactive({
-  location: '',
-  pickupDate: '',
-  pickupTime: '',
-  returnDate: '',
-  returnTime: '',
-  ageChecked: true
-})
+  location: "",
+  pickupDate: "",
+  pickupTime: "",
+  returnDate: "",
+  returnTime: "",
+  ageChecked: true,
+});
+
+const required = (v: any) => (!!v ? true : "必填");
+
+const todayStr = computed(() => {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+});
 
 function onSubmit() {
-  const pickupDateTime = formData.pickupDate && formData.pickupTime
-      ? formData.pickupDate + 'T' + formData.pickupTime
-      : null;
-  const returnDateTime = formData.returnDate && formData.returnTime
-      ? formData.returnDate + 'T' + formData.returnTime
-      : null;
+  // Vuetify 3 的 validate() 會回傳 { valid: boolean }
+  formRef.value?.validate().then((res: { valid: boolean }) => {
+    if (!res?.valid) return;
 
-  if (!pickupDateTime || !returnDateTime) {
-    alert("請填寫完整的日期與時間");
-    return;
-  }
+    const pickupDateTime =
+        formData.pickupDate && formData.pickupTime
+            ? formData.pickupDate + "T" + formData.pickupTime
+            : null;
+    const returnDateTime =
+        formData.returnDate && formData.returnTime
+            ? formData.returnDate + "T" + formData.returnTime
+            : null;
 
-  router.push({
-    path: '/car-select',
-    query: {
-      location: formData.location,
-      pickupDateTime,
-      returnDateTime,
-      ageChecked: formData.ageChecked ? 'true' : 'false'
-    }
+    if (!pickupDateTime || !returnDateTime) return;
+
+    router.push({
+      path: "/car-select",
+      query: {
+        location: formData.location,
+        pickupDateTime,
+        returnDateTime,
+        ageChecked: formData.ageChecked ? "true" : "false",
+      },
+    });
   });
 }
 
-const timeOptions = computed(function () {
-  const times: string[] = []
+const timeOptions = computed(() => {
+  const times: string[] = [];
   for (let hour = 9; hour <= 18; hour++) {
-    times.push(`${hour.toString().padStart(2, '0')}:00`);
-    if (hour < 18) {
-      times.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
+    times.push(`${hour.toString().padStart(2, "0")}:00`);
+    if (hour < 18) times.push(`${hour.toString().padStart(2, "0")}:30`);
   }
   return times;
-})
-
+});
 </script>
 
 <template>
-  <!--  搜尋欄-->
-  <section class="bg-cover text-white py-5">
-    <div class="container bg-dark rounded p-4">
-      <form class="row g-2 align-items-end" @submit.prevent="onSubmit">
-        <div class="col-md-4">
-          <label for="location" class="form-label text-white">取車地點</label>
-          <input type="text" class="form-control" id="location" name="location" placeholder="輸入城市或地區"
-                 v-model="formData.location">
-        </div>
-        <div class="col-md-2">
-          <label for="pickupDate" class="form-label text-white">取車日期</label>
-          <input type="date" class="form-control" id="pickupDate" name="pickupDate" v-model="formData.pickupDate">
-        </div>
-        <div class="col-md-2">
-          <label for="pickupTime" class="form-label text-white">取車時間</label>
-          <select class="form-select" id="pickupTime" name="pickupTime" v-model="formData.pickupTime">
-            <option selected value="" disabled>請選擇時間</option>
-            <option v-for="time in timeOptions" :key="time" :value="time">{{ time }}</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <label for="returnDate" class="form-label text-white">還車日期</label>
-          <input type="date" class="form-control" id="returnDate" name="returnDate" v-model="formData.returnDate">
-        </div>
-        <div class="col-md-2">
-          <label for="returnTime" class="form-label text-white">還車時間</label>
-          <select class="form-select" id="returnTime" name="returnTime" v-model="formData.returnTime">
-            <option selected value="" disabled>請選擇時間</option>
-            <option v-for="time in timeOptions" :key="time" :value="time">{{ time }}</option>
-          </select>
-        </div>
-        <div class="col-md-3 d-flex flex-column">
-          <div class="form-check text-white mb-2">
-            <input class="form-check-input" type="checkbox" id="ageCheck" checked v-model="formData.ageChecked">
-            <label class="form-check-label" for="ageCheck">駕駛年齡介於 25 - 70</label>
-          </div>
-          <button type="submit" class="btn btn-primary">搜尋</button>
-        </div>
-      </form>
-    </div>
-  </section>
+  <v-container class="py-6">
+    <v-sheet
+        color="grey-darken-4"
+        theme="dark"
+        class="pa-4 rounded-lg"
+        elevation="2"
+    >
+      <v-form ref="formRef" @submit.prevent="onSubmit">
+        <v-row align="end" no-gutters>
+          <v-col cols="12" md="4" class="pr-md-2 pb-2 pb-md-0">
+            <v-text-field
+                v-model="formData.location"
+                label="取車地點"
+                placeholder="輸入城市或地區"
+                clearable
+                prepend-inner-icon="mdi-map-marker"
+                variant="outlined"
+                density="comfortable"
+            />
+          </v-col>
+
+          <v-col cols="12" md="2" class="px-md-1 pb-2 pb-md-0">
+            <v-text-field
+                v-model="formData.pickupDate"
+                label="取車日期"
+                type="date"
+                :min="todayStr"
+                :rules="[required]"
+                variant="outlined"
+                density="comfortable"
+            />
+          </v-col>
+
+          <v-col cols="12" md="2" class="px-md-1 pb-2 pb-md-0">
+            <v-select
+                v-model="formData.pickupTime"
+                :items="timeOptions"
+                label="取車時間"
+                :rules="[required]"
+                clearable
+                variant="outlined"
+                density="comfortable"
+            />
+          </v-col>
+
+          <v-col cols="12" md="2" class="px-md-1 pb-2 pb-md-0">
+            <v-text-field
+                v-model="formData.returnDate"
+                label="還車日期"
+                type="date"
+                :min="formData.pickupDate || todayStr"
+                :rules="[required]"
+                variant="outlined"
+                density="comfortable"
+            />
+          </v-col>
+
+          <v-col cols="12" md="2" class="pl-md-1 pb-2 pb-md-0">
+            <v-select
+                v-model="formData.returnTime"
+                :items="timeOptions"
+                label="還車時間"
+                :rules="[required]"
+                clearable
+                variant="outlined"
+                density="comfortable"
+            />
+          </v-col>
+
+          <v-col cols="12" md="3" class="pt-2 pt-md-0">
+            <v-checkbox
+                v-model="formData.ageChecked"
+                label="駕駛年齡介於 25 - 70"
+                color="primary"
+                hide-details
+                class="mb-2"
+            />
+            <v-btn type="submit" color="primary" size="large" block>搜尋</v-btn>
+          </v-col>
+        </v-row>
+      </v-form>
+    </v-sheet>
+  </v-container>
 </template>
 
 <style scoped>
-
 </style>
