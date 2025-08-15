@@ -1,6 +1,8 @@
 package com.EEITG3.Airbnb.carRent.repository;
 
 import com.EEITG3.Airbnb.carRent.entity.Reservation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -81,4 +83,37 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
                 WHERE status = '取消'
             """, nativeQuery = true)
     Integer countCancelledReservations();
+
+    @Query("""
+                SELECT r FROM Reservation r
+                WHERE
+                  ( :kw IS NULL OR :kw = '' OR
+                    LOWER(r.license) LIKE LOWER(CONCAT('%', :kw, '%')) OR
+                    LOWER(r.driverPhone) LIKE LOWER(CONCAT('%', :kw, '%'))
+                  )
+                  AND ( :fromDt IS NULL OR r.createdAt >= :fromDt )
+                  AND ( :toDt   IS NULL OR r.createdAt <  :toDt )
+            """)
+    Page<Reservation> searchByCreatedAt(
+            @Param("kw") String keyword,
+            @Param("fromDt") LocalDateTime fromDt,
+            @Param("toDt") LocalDateTime toDt,
+            Pageable pageable
+    );
+
+    @Query("""
+              SELECT r FROM Reservation r
+              WHERE
+                ( :kw IS NULL OR :kw = '' OR
+                  LOWER(REPLACE(r.license, ' ', '')) LIKE LOWER(CONCAT('%', REPLACE(:kw,' ','') ,'%')) OR
+                  LOWER(REPLACE(r.driverPhone, ' ', '')) LIKE LOWER(CONCAT('%', REPLACE(:kw,' ','') ,'%'))
+                )
+                AND ( :fromDt IS NULL OR r.returnDate >= :fromDt )  
+                AND ( :toDt   IS NULL OR r.pickupDate <  :toDt )    
+            """)
+    Page<Reservation> searchByPeriodOverlap(
+            @Param("kw") String keyword,
+            @Param("fromDt") LocalDateTime fromDt,
+            @Param("toDt") LocalDateTime toDt,
+            Pageable pageable);
 }

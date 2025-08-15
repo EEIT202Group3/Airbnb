@@ -1,43 +1,30 @@
 import { createRouter, createWebHistory } from "vue-router";
-
+import CarRentFrontHomepage from "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue";
+import CarSelect from "@/components/carRent/frontpageComponent/CarSelect.vue";
+import CarDetail from "@/components/carRent/frontpageComponent/CarDetail.vue";
 // import List from "../components/listing/List.vue";
 // import Add from "../components/listing/AddListing.vue";
 // import Detail from "../components/listing/Detail.vue";
 // import Edit from "../components/listing/EditListing.vue";
-import { compile } from "vue";
-
-// //import getList from "@/layouts/ListLayout.vue";
-
-// import ListingPage from "../components/payment/ListingPage.vue";
-// import BookingPage from "../components/payment/BookingPage.vue";
-// import ConfirmationPage from "../components/payment/ConfirmationPage.vue";
-// // import Ecpay from '../components/payment/Ecpay.vue';
-// import PaymentPage from "../components/payment/PaymentPage.vue";
-// import PaymentSuccessPage from "../components/payment/PaymentSuccessPage.vue";
-// import { compile } from "vue";
-
+//import getList from "@/layouts/ListLayout.vue";
 const routes = [
   {
-    path: "/",
+    path: '/',
     component: () => import("@/layouts/MainLayout.vue"),
-    name: "Homepage",
     children: [
       {
-        path: "customer",
+        path: '/customer',
         component: () => import("@/components/user/customer/CustomerPage.vue"),
-        redirect: { name: "CustomerInfo" },
         children: [
           {
-            path: "",
-            component: () =>
-              import("@/components/user/customer/CustomerInfo.vue"),
-            name: "CustomerInfo",
+            path: '',
+            component: () => import('@/components/user/customer/CustomerInfo.vue'),
+            name: 'CustomerInfo',
           },
           {
-            path: "history",
-            component: () =>
-              import("@/components/user/customer/TripHistory.vue"),
-            name: "TripHistory",
+            path: '/history',
+            component: () => import('@/components/user/customer/TripHistory.vue'),
+            name: 'TripHistory',
           },
         ],
       },
@@ -90,6 +77,16 @@ const routes = [
           import(
             "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue"
           ),
+      },
+      {
+        path: "/reviews",
+        component: () => import("@/components/reviews/ReviewView.vue"),
+        name: "Reviews",
+      },
+      {
+        path: "reviews/insert",
+        component: () =>
+          import("@/components/reviews/customer/InsertReview.vue"),
       },
 
       {
@@ -149,6 +146,31 @@ const routes = [
       },
     ],
   },
+
+        ]
+      },
+      {
+        path: '/login',
+        component: () => import('@/components/user/LoginSignup.vue')
+      },
+      {
+        path: '/car-front-homepage',
+        name: 'carFrontHomepage',
+        component: CarRentFrontHomepage
+      },
+      {
+        path: '/car-select',
+        name: 'carSelect',
+        component: CarSelect
+      },
+      {
+        path: '/car-detail/:id',
+        name: 'carDetail',
+        component: CarDetail,
+        props: true
+      }
+    ]
+  }
 
   // {
   //   path: "/main",

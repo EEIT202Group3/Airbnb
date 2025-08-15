@@ -32,7 +32,7 @@ const props = defineProps<{
         <v-list-item
             :router="true"
             to="/car-rent/reservations/1"
-            title="新增預定"
+            title="新增預約"
             prepend-icon="mdi-account"
         />
         <v-divider class="my-2" />
