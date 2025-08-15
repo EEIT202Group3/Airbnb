@@ -58,7 +58,7 @@ public class ReviewController {
 		return rService.findByCustId(id);
 	}
 
-	@DeleteMapping("/admins/reviews/del/{id}")
+	@DeleteMapping("/reviews/del/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable Integer id) {
 		System.out.println("此api接收參數:" + id);
 		try {

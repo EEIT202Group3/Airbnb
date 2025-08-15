@@ -1,7 +1,9 @@
 <template>
-  <v-footer>這是頁尾</v-footer>
+  <v-footer><robot></robot></v-footer>
 </template>
 
-<script setup></script>
+<script setup>
+import Robot from "@/components/chat/Robot.vue";
+</script>
 
 <style></style>

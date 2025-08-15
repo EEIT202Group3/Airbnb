@@ -18,10 +18,11 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 	@Query("SELECT o FROM Order o WHERE o.customerId = :customerId")
 	List<Order> findByCustomerId(String customerId);
 
-	// @Query("SELECT o FROM Order o WHERE o.booking_id = :booking_id")
-	Optional<Order> findByBookingId(String bookingId);
+	@Query("SELECT o FROM Order o WHERE o.bookingId = :bookingId")
+	Optional<Order> findByBookingId(@Param("bookingId") String bookingId);
 
-	Optional<Order> findByPaymentId(String paymentId);
+	@Query("SELECT o FROM Order o WHERE o.paymentId = :paymentId")
+	Optional<Order> findByPaymentId(@Param("paymentId") String paymentId);
 
 	//JBQL
 	@Query("SELECT new com.EEITG3.Airbnb.payMent.dto.HostOrderAggDto(" +

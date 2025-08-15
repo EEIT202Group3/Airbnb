@@ -1,8 +1,9 @@
 <template>
   <Nav></Nav>
-  <v-main>
+  <v-main style="height: 75vh; overflow: auto">
     <router-view></router-view>
   </v-main>
+
   <Footer></Footer>
 </template>
 <script setup>

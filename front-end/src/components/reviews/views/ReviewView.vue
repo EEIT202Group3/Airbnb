@@ -118,7 +118,7 @@ import axios from "axios";
 const reviews = ref([]);
 // 封裝取得數據方法
 const fetchReviews = async (keyword = "", type = "") => {
-  const res = await axios.get("http://localhost:8080/api/admins/reviews", {
+  const res = await axios.get("http://localhost:8080/api/reviews", {
     params: {
       keyword,
       type,
@@ -145,7 +145,7 @@ const viewReview = async (item) => {
   loading.value = true;
   try {
     const resp = await axios.get(
-      `http://localhost:8080/api/admins/reviews/get/${id}`,
+      `http://localhost:8080/api/reviews/get/${id}`,
       { withCredentials: true }
     );
     selectedReview.value = resp.data;
@@ -186,7 +186,7 @@ const handleDelete = async (item) => {
 
   if (!confirmed) return;
   try {
-    await axios.delete(`http://localhost:8080/api/admins/reviews/del/${id}`, {
+    await axios.delete(`http://localhost:8080/api/reviews/del/${id}`, {
       withCredentials: true,
     });
     await fetchReviews(); // 刪除成功後局部刷新 table

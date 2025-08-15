@@ -200,14 +200,24 @@ public class SecurityConfig{
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:5174"));
+		config.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:5174","http://localhost:3000",
+		        "http://localhost:8080",
+		        "https://eb63c6411934.ngrok-free.app"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		//藍新金流專用 CORS - 最寬鬆設定
+		CorsConfiguration newebpay = new CorsConfiguration();
+		newebpay.addAllowedOriginPattern("*");  // 允許所有來源
+		newebpay.addAllowedMethod("*");         // 允許所有方法
+		newebpay.addAllowedHeader("*");         // 允許所有標頭
+		newebpay.setAllowCredentials(false);    // 不需要憑證
+		source.registerCorsConfiguration("/api/newebPay/**", newebpay);
 		source.registerCorsConfiguration("/**", config);
 
 		return source;
 	}
+	
 }
