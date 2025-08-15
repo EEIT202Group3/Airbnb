@@ -114,51 +114,38 @@ public class ReviewService {
 	 	 }
 	}
 	
-	public ResponseEntity<?> patchReview(Integer id, ReviewPatchRequest req, List<MultipartFile> images) {
-        Review r = rRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Review not found"));
-        ImageStorageService iss = new ImageStorageService();
-        if (req.getCleanScore()!=null) r.setCleanScore(req.getCleanScore());
-        if (req.getCommScore()!=null)  r.setCommScore(req.getCommScore());
-        if (req.getValueScore()!=null) r.setValueScore(req.getValueScore());
-        if (req.getCusComm()!=null)    r.setCusComm(req.getCusComm());
+	public ResponseEntity<Review> patchReview(Integer id, ReviewPatchRequest req, MultipartFile image1,
+		      MultipartFile image2,
+		      MultipartFile image3) {
+      Review r = rRepository.findById(id)
+              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Review not found"));
+   // 1) 局部更新非檔案欄位
+      if (req != null) {
+        if (req.getCleanScore() != null) r.setCleanScore(req.getCleanScore());
+        if (req.getCommScore()  != null) r.setCommScore(req.getCommScore());
+        if (req.getValueScore() != null) r.setValueScore(req.getValueScore());
+        if (req.getCusComm()    != null) r.setCusComm(req.getCusComm());
+      }
+   // 2) 只有在收到新檔案時才覆蓋；否則不動舊值（也不刪檔）
+      
+      if (image1 != null && !image1.isEmpty()) {
+        // 視需求：若要覆蓋前刪舊檔，可加 storage.deleteQuietly(r.getImage1());
+        r.setImage1(storage.saveImg(image1));
+      }
+      if (image2 != null && !image2.isEmpty()) {
+        // storage.deleteQuietly(r.getImage2());
+        r.setImage2(storage.saveImg(image2));
+      }
+      if (image3 != null && !image3.isEmpty()) {
+        // storage.deleteQuietly(r.getImage3());
+        r.setImage3(storage.saveImg(image3));
+      }
 
-        // 處理每一張圖片（0, 1, 2）
-        for (int i = 0; i < 3; i++) {
-            MultipartFile file = (images != null && images.size() > i) ? images.get(i) : null;
+      Review saved = rRepository.save(r);
 
-            if (file != null && !file.isEmpty()) {
-                // 有新圖要上傳
-                String oldFilename = getImageBySlot(r, i + 1);
-                iss.deleteImg(oldFilename);
-
-                String newName = iss.saveImg(file);
-                setImageBySlot(r, i + 1, newName);
-            }
-            // else: 沒檔案傳來，保留原圖
-        }
-
-        rRepository.save(r);
-        return ResponseEntity.ok().build();
-    }
+      return ResponseEntity.ok(saved);
+  }
 	
-	private String getImageBySlot(Review review, int slot) {
-	    return switch (slot) {
-	        case 1 -> review.getImage1();
-	        case 2 -> review.getImage2();
-	        case 3 -> review.getImage3();
-	        default -> throw new IllegalArgumentException("圖片槽位必須是 1~3");
-	    };
-	}
-
-	private void setImageBySlot(Review review, int slot, String filename) {
-	    switch (slot) {
-	        case 1 -> review.setImage1(filename);
-	        case 2 -> review.setImage2(filename);
-	        case 3 -> review.setImage3(filename);
-	        default -> throw new IllegalArgumentException("圖片槽位必須是 1~3");
-	    }
-	}
 	
 	
 
