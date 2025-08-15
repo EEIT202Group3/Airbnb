@@ -1,6 +1,7 @@
 package com.EEITG3.Airbnb.carRent.controller;
 
 import com.EEITG3.Airbnb.carRent.entity.Vehicle;
+
 import com.EEITG3.Airbnb.carRent.repository.VehicleRepository;
 import com.EEITG3.Airbnb.carRent.service.VehicleService;
 import org.springframework.data.domain.Page;

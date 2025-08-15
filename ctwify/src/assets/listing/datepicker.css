@@ -1,0 +1,109 @@
+
+/* customerdetail樣式 */
+
+/* 彈窗外觀 */
+.dp__cell_inner {
+  font-size: 18px;    /* 日期數字大小 */
+  width: 40px;        /* 日期格寬度 */
+  height: 40px;       /* 日期格高度 */
+  line-height: 40px;  /* 文字置中 */
+}
+
+.airbnb-datepicker .dp__menu {
+  width: 650px;
+  max-height: 400px;
+  border-radius: 18px;               /* 柔和圓角 */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); /* 柔和陰影 */
+  padding: 12px;
+  background-color: #fffaf7;         /* 暖色背景 */
+  border: none;
+  animation: fadeSlideIn 0.25s ease-out; /* 彈出動畫 */
+  transform-origin: top center;      /* 動畫基準點 */
+}
+
+/* 彈出動畫 */
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 月份切換列 */
+.airbnb-datepicker .dp__month_year_row {
+  font-weight: 700;
+  font-size: 16px;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+/* 日期方格 */
+.airbnb-datepicker .dp__cell_inner {
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.airbnb-datepicker .dp__cell_inner:hover {
+  background-color: #fff0e6; /* 暖色 hover */
+}
+
+/* 範圍起點與終點 */
+.airbnb-datepicker .dp__range_start,
+.airbnb-datepicker .dp__range_end {
+  background-color: #f59919 !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+/* 範圍中間日期 */
+.airbnb-datepicker .dp__range_between {
+  background-color: #f2cb8250 !important;
+}
+
+/* 禁用日期 */
+.airbnb-datepicker .dp__cell_disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+
+/* ListingCard樣式 */
+
+.dp__menu {
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  background-color: #fffaf7;
+  border: none;
+  animation: fadeSlideIn 0.25s ease-out;
+  transform-origin: top center;
+}
+
+.dp__cell_inner {
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dp__cell_inner:hover {
+  background-color: #fff0e6;
+}
+
+.dp__range_start,
+.dp__range_end {
+  background-color: #f59919 !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+.dp__range_between {
+  background-color: #f2cb8250 !important;
+}
+
+.dp__cell_disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}

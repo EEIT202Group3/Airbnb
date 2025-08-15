@@ -94,7 +94,7 @@
         <!-- 照片上傳 -->
         <div class="mb-3">
           <label class="form-label">照片上傳（最多十張）</label>
-          <input type="file" multiple accept="image/*" @change="handleFileUpload" class="form-control" />
+          <input type="file" multiple accept="image/listings/*" @change="handleFileUpload" class="form-control" />
         </div>
 
         <!-- 設備選擇 -->
@@ -268,5 +268,6 @@ export default {
 @import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css";
 @import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css";
 @import '/src/assets/listing/list3.css';
+@import '/src/assets/listing/euqipment.css';
 </style>
 

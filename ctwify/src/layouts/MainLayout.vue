@@ -1,13 +1,12 @@
 <template>
   <Nav></Nav>
-  <v-main style="height: 75vh; overflow: auto">
+  <v-main>
     <router-view></router-view>
   </v-main>
-
-  <Footer></Footer>
+  <Footer app fixed></Footer>
 </template>
 <script setup>
-import Nav from "@/layouts/NBar.vue";
+import Nav from "@/layouts/Navbar.vue";
 import Footer from "@/layouts/Footer.vue";
 </script>
 <style scoped>

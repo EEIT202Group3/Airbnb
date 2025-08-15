@@ -1,10 +1,5 @@
 <template>
   <!-- 主畫面區塊 -->
-  <div>
-    <h1>主畫面內容</h1>
-    <p>這裡可以操作主畫面，不受聊天視窗影響。</p>
-  </div>
-
   <div class="chat-wrapper" v-show="chatVisible">
     <v-card width="350" class="elevation-8">
       <v-card-title class="text-h6 d-flex justify-space-between">
@@ -233,4 +228,6 @@ onBeforeUnmount(disconnect);
   margin-top: 4px;
   font-size: 14px;
 }
+
+
 </style>

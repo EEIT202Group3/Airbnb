@@ -3,7 +3,7 @@
     <v-card text="...">
       <template #title>
         <router-link :to="`/main/getList/${list.listId}`">
-            <img :src="`http://localhost:8080/images/${list.photo1}`" height="300px" style="cursor: pointer" />
+            <img :src="`http://localhost:8080/images/listings/${list.photo1}`" height="300px" style="cursor: pointer" />
         </router-link>
         <div>title插槽</div>
        </template>

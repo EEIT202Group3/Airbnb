@@ -27,11 +27,13 @@ public class EquipmentService {
 		}
 		
 				
-		//新增設備
-		public boolean insertEquipment(String equipName) {
+		// 新增設備（包含名稱、圖示、分類）
+		public boolean insertEquipment(String equipName, String equipIcon, String equipCategory) {
 		    try {
 		        EquipmentBean equip = new EquipmentBean();
 		        equip.setEquip_name(equipName);
+		        equip.setEquip_icon(equipIcon);
+		        equip.setEquip_category(equipCategory);
 		        equipmentRepository.save(equip);
 		        return true;
 		    } catch (Exception e) {
@@ -39,6 +41,7 @@ public class EquipmentService {
 		        throw e; 
 		    }
 		}
+
 				
 		// 刪除設備
 	    public boolean deleteEquipment(int equipId) {

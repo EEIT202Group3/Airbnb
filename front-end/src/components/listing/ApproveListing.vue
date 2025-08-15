@@ -1,6 +1,6 @@
 <template>
   <v-container class="my-4">
-    <h2 class="mb-4">房源管理後台</h2>
+    <h2 class="mb-4">房源管理</h2>
 
     <!-- 下拉選單 -->
     <v-select
