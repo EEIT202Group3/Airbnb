@@ -7,6 +7,18 @@ import CarDetail from "@/components/carRent/frontpageComponent/CarDetail.vue";
 // import Detail from "../components/listing/Detail.vue";
 // import Edit from "../components/listing/EditListing.vue";
 //import getList from "@/layouts/ListLayout.vue";
+
+
+import ListingPage from '../components/payment/ListingPage.vue';
+import BookingPage from '../components/payment/BookingPage.vue';
+import ConfirmationPage from '../components/payment/ConfirmationPage.vue';
+import Ecpay from '../components/payment/Ecpay.vue';
+import PaymentPage from '../components/payment/PaymentPage.vue';
+import PaymentSuccessPage from '../components/payment/PaymentSuccessPage.vue';
+import HomeＰage from '../components/listing/customer/ListingCard.vue';
+import CustomerDetail from "@/components/listing/customer/CustomerDetail.vue";
+
+
 const routes = [
   {
     path: '/',
@@ -151,6 +163,17 @@ const routes = [
       },
       {
         path: '/login',
+        component: () => import('@/components/user/LoginSignup.vue'),
+      },
+
+      {
+        path:'/homepage',
+        component: () => import('@/components/listing/customer/ListingCard.vue'),
+      },
+
+      {
+        path:'/customerdatil/:id',
+        component: () =>import('@/components/listing/customer/CustomerDetail.vue'),
         component: () => import('@/components/user/LoginSignup.vue')
       },
       {
@@ -196,7 +219,7 @@ const routes = [
   //     },
   //   ],
   // },
-  // { path: "/", component: List }, // 建議加這個作為首頁
+  // { path: "/", component: List }, 
   // { path: "/listing/addListing", component: Add },
   // { path: "/listing/detail/:id", component: Detail },
   // { path: "/listing/edit/:id", component: Edit },

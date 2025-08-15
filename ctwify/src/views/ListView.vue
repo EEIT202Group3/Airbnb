@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import Detail from "@/components/listing/Detail.vue";
+import Detail from "@/components/listing/host/Detail.vue";
 import ReviewTable from "@/components/reviews/ReviewTable.vue";
 import { useRoute } from 'vue-router'
 

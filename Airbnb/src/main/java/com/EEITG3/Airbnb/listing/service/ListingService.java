@@ -92,7 +92,7 @@ public class ListingService {
 
         
         List<String> photoUrls = new ArrayList<>();
-        String storageDir = "D:/pohto";
+        String storageDir = "/Users/youm/pohto";
 //        String storageDir = "C:/upload/photo/";
 //        
         File dir = new File(storageDir);
@@ -152,7 +152,7 @@ public class ListingService {
         if (photos != null && !photos.isEmpty()) {
             List<String> photoUrls = new ArrayList<>();
 //            String storageDir = "C:/upload/photo/";
-            String storageDir = "D:/pohto";
+            String storageDir = "/Users/youm/pohto";
 //            
             File dir = new File(storageDir);
             if(!dir.exists()) {

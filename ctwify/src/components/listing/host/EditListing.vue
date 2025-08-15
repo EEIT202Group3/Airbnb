@@ -66,24 +66,48 @@
             </div>
           </div>
 
+          <!-- 設備選擇 -->
           <div class="mb-3">
-            <label class="form-label">設備</label>
-            <div class="row">
-              <div v-for="eq in equipmentList" :key="eq.equip_id" class="col-6 col-md-4 mb-2">
-                <div class="form-check">
+            <label class="form-label">請勾選設備：</label>
+            <div v-for="(equipments, category) in groupedEquipments" :key="category" class="mb-4">
+              <h5 class="equip-category-title">{{ category }}</h5>
+              <div class="d-flex flex-wrap gap-3">
+                <div
+                  v-for="eq in equipments"
+                  :key="eq.equip_id"
+                  class="equip-item"
+                  :class="{ selected: selectedEquipments.includes(eq.equip_id) }"
+                  @click="toggleEquipment(eq.equip_id)"
+                  title="點擊選擇設備"
+                >
+                  <!-- Font Awesome icon -->
+                  <i
+                    v-if="isFontAwesome(eq.equip_icon)"
+                    :class="[eq.equip_icon, 'equip-icon']"
+                    aria-hidden="true"
+                  ></i>
+
+                  <!-- Vuetify (mdi) icon -->
+                  <v-icon
+                    v-else
+                    class="equip-icon"
+                    size="25"
+                  >
+                    {{ eq.equip_icon }}
+                  </v-icon>
+
+                  <div class="equip-name">{{ eq.equip_name }}</div>
                   <input
-                    class="form-check-input"
                     type="checkbox"
                     :value="eq.equip_id"
                     v-model="selectedEquipments"
-                    :id="'equip-' + eq.equip_id"
+                    class="d-none"
                   />
-                  <label class="form-check-label" :for="'equip-' + eq.equip_id">{{ eq.equip_name }}</label>
                 </div>
               </div>
             </div>
           </div>
-
+<br>
           <div class="text-center">
             <button type="submit" class="btn btn-orange btn-lg px-5">更新房源</button>
           </div>
@@ -94,39 +118,68 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
-import Navbar from '@/layouts/Navbar.vue'
-import Swal from "sweetalert2";
+import Navbar from '../components/Navbar.vue'
+import Swal from "sweetalert2"
+import _ from 'lodash'
 
 const route = useRoute()
 const router = useRouter()
 
 const listing = ref({})
+const originalListing = ref({})
 const equipmentList = ref([])
 const selectedEquipments = ref([])
+const originalEquipments = ref([])
 const photos = ref([])
 const currentPhotos = ref([])
+
+// 設備分組
+const groupedEquipments = computed(() => {
+  return equipmentList.value.reduce((groups, eq) => {
+    if (!groups[eq.equip_category]) groups[eq.equip_category] = []
+    groups[eq.equip_category].push(eq)
+    return groups
+  }, {})
+})
+
+// 判斷是否為 Font Awesome
+const isFontAwesome = (icon) => {
+  return icon.startsWith('fa') || icon.includes('fa-')
+}
+
+// 切換設備勾選
+const toggleEquipment = (equipId) => {
+  const index = selectedEquipments.value.indexOf(equipId)
+  if (index === -1) {
+    selectedEquipments.value.push(equipId)
+  } else {
+    selectedEquipments.value.splice(index, 1)
+  }
+}
 
 const fetchListing = async () => {
   const { id } = route.params
   const res = await axios.get(`http://localhost:8080/listings/${id}`)
   listing.value = res.data
+  originalListing.value = _.cloneDeep(res.data)
 
   // 現有圖片預覽
   currentPhotos.value = []
   for (let i = 1; i <= 10; i++) {
     const p = res.data[`photo${i}`]
     if (p) {
-      currentPhotos.value.push(`http://localhost:8080/images/${p}`)
+      currentPhotos.value.push(`http://localhost:8080/images/listings/${p}`)
     }
   }
 
-  // 現有設備ID預設勾選
+  // 現有設備 ID 預設勾選
   selectedEquipments.value = res.data.equipments?.map(e => e.equip_id) || []
+  originalEquipments.value = [...selectedEquipments.value]
 }
-//顯示全部設備
+
 const fetchEquipments = async () => {
   const res = await axios.get('http://localhost:8080/api/equipment/all')
   equipmentList.value = res.data
@@ -137,9 +190,16 @@ const handlePhotos = (e) => {
 }
 
 const updateListing = async () => {
-  const formData = new FormData()
+  // 判斷是否有更動
+  const changed = !_.isEqual(_.omit(listing.value, ['equipments']), _.omit(originalListing.value, ['equipments']))
+  const equipmentsChanged = !_.isEqual([...selectedEquipments.value].sort(), [...originalEquipments.value].sort())
 
-  // 基本資料
+  if (!changed && !equipmentsChanged && photos.value.length === 0) {
+    Swal.fire("提醒", "請修改內容後再提交", "info")
+    return
+  }
+
+  const formData = new FormData()
   formData.append('houseName', listing.value.houseName)
   formData.append('ads', listing.value.ads)
   formData.append('room', listing.value.room)
@@ -148,13 +208,12 @@ const updateListing = async () => {
   formData.append('tel', listing.value.tel)
   formData.append('ppl', listing.value.ppl)
   formData.append('price', listing.value.price)
+  formData.append('approved', '') // 設為待審核
 
-  // 傳送設備 id
   selectedEquipments.value.forEach(id => {
     formData.append('equipments', id)
   })
 
-  // 照片有選才送
   if (photos.value.length > 0) {
     photos.value.forEach(file => formData.append('photos', file))
   }
@@ -163,10 +222,10 @@ const updateListing = async () => {
     await axios.put(`http://localhost:8080/listings/${listing.value.listId}/update`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
-    Swal.fire("成功", "房源編輯成功", "success");
-    router.push('/')
+    Swal.fire("成功", "編輯成功", "success")
+    router.push('/list')
   } catch (err) {
-    Swal.fire("錯誤", "新增失敗，請檢查輸入", "error");
+    Swal.fire("錯誤", "編輯失敗，請檢查輸入", "error")
   }
 }
 
@@ -179,5 +238,47 @@ onMounted(() => {
 <style scoped>
 @import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css";
 @import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css";
-@import '/src/assets/listing/list3.css';
+@import '../assets/list3.css';
+
+/* 設備分類標題 */
+.equip-category-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.25rem;
+}
+
+/* 設備項目容器 */
+.equip-item {
+  width: 80px;
+  cursor: pointer;
+  text-align: center;
+  user-select: none;
+  border-radius: 8px;
+  padding: 6px;
+  transition: background-color 0.3s, border 0.3s;
+  border: 2px solid transparent;
+}
+.equip-item:hover {
+  background-color: #f0f0f0;
+}
+.equip-item.selected {
+  background-color: #959595;
+  color: #fff;
+}
+
+/* 設備圖示 */
+.equip-icon {
+  font-size: 20px;  
+  margin-bottom: 10px;
+  color: inherit;
+}
+
+/* 設備名稱 */
+.equip-name {
+  font-size: 0.85rem;
+  line-height: 1.2;
+  white-space: normal;
+  user-select: none;
+}
 </style>
