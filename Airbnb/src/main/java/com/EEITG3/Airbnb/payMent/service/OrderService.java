@@ -83,7 +83,7 @@ public class OrderService {
 	        order.setGrandTotal(grandTotal);   // total_amount（整筆總金額）
 	        order.setBookingMethod(
 	                Optional.ofNullable(dto.getBookingmethod()).orElse("CASH"));
-	        order.setPaymentId(UUID.randomUUID().toString());
+	        order.setPaymentId("ORD" + System.currentTimeMillis());
 	        
 	        boolean paidByCard = "CREDIT_NEWEBPAY".equalsIgnoreCase(order.getBookingMethod())
                     || "CREDIT".equalsIgnoreCase(order.getBookingMethod());
