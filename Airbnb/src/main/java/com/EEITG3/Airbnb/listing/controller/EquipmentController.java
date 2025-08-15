@@ -24,13 +24,18 @@ public class EquipmentController {
         return equipmentService.getAllEquipments();
     }
 
-    //新增設備
+ // 新增設備
     @PostMapping("/equipment/add")
-    public String addEquipment(@RequestParam String equipName) {
-    	System.out.println("成功新增的設備:"+equipName);
-        boolean result = equipmentService.insertEquipment(equipName);
+    public String addEquipment(
+        @RequestParam String equipName,
+        @RequestParam String equipIcon,
+        @RequestParam String equipCategory
+    ) {
+        System.out.println("成功新增的設備: " + equipName + ", 圖示: " + equipIcon + ", 分類: " + equipCategory);
+        boolean result = equipmentService.insertEquipment(equipName, equipIcon, equipCategory);
         return result ? "新增成功" : "新增失敗";
     }
+
 
     //刪除設備
     @DeleteMapping("/equipment/delete/{id}")

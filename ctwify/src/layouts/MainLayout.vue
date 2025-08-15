@@ -6,7 +6,7 @@
   <Footer></Footer>
 </template>
 <script setup>
-import Nav from "@/layouts/NBar.vue";
+import Nav from "@/layouts/Navbar.vue";
 import Footer from "@/layouts/Footer.vue";
 </script>
 <style scoped>

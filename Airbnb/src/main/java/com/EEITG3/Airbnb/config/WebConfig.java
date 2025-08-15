@@ -11,8 +11,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 將 /images/** 映射到本機磁碟位置
-        registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:D:/pohto/")
+        registry.addResourceHandler("/images/listings/**")
+                .addResourceLocations("file:/Users/youm/pohto")
                 .setCachePeriod(3600); 
     }
 }

@@ -10,7 +10,7 @@
           class="listing"
         >
           <a :href="`/listing/detail/${house.listId}`">
-            <img :src="`http://localhost:8080/images/${house.photo1}`" alt="房源圖片" />
+            <img :src="`http://localhost:8080/images/listings/${house.photo1}`" alt="房源圖片" />
           </a>
           <div class="listing-info">{{ house.houseName }}</div>
           <div class="listing-actions">

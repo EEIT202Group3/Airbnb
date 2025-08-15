@@ -3,6 +3,7 @@ package com.EEITG3.Airbnb.listing.controller;
 import java.util.*;
 
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -130,8 +131,8 @@ public class ListingController {
             lisBean.setPrice(price);
 
             // 新增時強制狀態為待審核
-            lisBean.setApproved(null); // Boolean 欄位
-            // 或 lisBean.setAuditStatus("PENDING"); // String 欄位
+            lisBean.setApproved(null); 
+          
 
             Integer listId = listingService.saveListingWithPhotosAndEquipments(lisBean, photos, equipmentIds);
             return ResponseEntity.ok(listId);

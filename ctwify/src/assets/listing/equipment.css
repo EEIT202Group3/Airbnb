@@ -1,0 +1,104 @@
+.form-container {
+  max-width: 900px;
+  margin: auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgb(0 0 0 / 0.1);
+}
+
+.btn-orange {
+  background-color:#f07b2d;
+  border: none;
+  color: #fff;
+}
+.btn-orange:hover {
+  background-color: #f75c1c;
+}
+
+/* 設備分類標題 */
+.equip-category-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.25rem;
+}
+
+/* 設備項目容器 */
+.equip-item {
+  width: 80px;
+  cursor: pointer;
+  text-align: center;
+  user-select: none;
+  border-radius: 8px;
+  padding: 6px;
+  transition: background-color 0.3s, border 0.3s;
+  border: 2px solid transparent;
+}
+.equip-item:hover {
+  background-color: #f0f0f0;
+}
+.equip-item.selected {
+  background-color: #f07b2d;
+  border-color: #f07b2d;
+  color: #fff;
+}
+
+/* 設備圖示 */
+.equip-icon {
+  font-size: 20px;  
+  margin-bottom: 10px;
+  color: inherit;
+}
+
+/* 設備名稱 */
+.equip-name {
+  font-size: 0.85rem;
+  line-height: 1.2;
+  white-space: normal;
+  user-select: none;
+}
+
+/* 設備樣式 */
+.amenity-list {
+  display: flex;
+  flex-wrap: wrap;
+ column-gap: 60px;
+  row-gap: 40px;   
+}
+/* 設備彈窗內文樣式 */
+.amenity-orge{
+    display: flex;
+  flex-wrap: wrap;
+ column-gap: 20px;
+  row-gap: 60px;
+}
+
+.amenity-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 140px;
+}
+
+.amenity-icon {
+  font-size: 20px;
+  color: #555;
+}
+
+.amenity-category {
+  margin-bottom: 24px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #696767;
+  margin: 16px 0;
+}
+
+.modal-content.large {
+  width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
