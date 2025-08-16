@@ -114,9 +114,9 @@ const submitForm = async () => {
     return;
   }
   const okType = /^image\/(png|jpe?g|webp|gif)$/i.test(selectedFile.value.type);
-  const okSize = selectedFile.value.size <= 2 * 1024 * 1024; // 2MB
+  const okSize = selectedFile.value.size <= 5 * 1024 * 1024;
   if (!okType) return alert("只允許 png/jpg/jpeg/webp/gif 圖片");
-  if (!okSize) return alert("圖片大小需 ≤ 2MB");
+  if (!okSize) return alert("圖片大小需 ≤ 5MB");
 
   const formData = new FormData();
   formData.append("image", selectedFile.value);
@@ -910,14 +910,13 @@ onBeforeUnmount(() => {
           <!-- 圖片 -->
           <v-window-item value="image">
             <v-row dense>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="7">
                 <v-card elevation="1" class="pa-4 d-flex align-center justify-center">
                   <v-img
                       :src="previewUrl || (vehicle.image ? `/carPicture/${vehicle.image}` : undefined)"
                       width="300"
                       height="300"
-                      aspect-ratio="1"
-                      cover
+                      :cover="false"
                       class="rounded"
                   >
                     <template #placeholder>
@@ -929,7 +928,7 @@ onBeforeUnmount(() => {
                 </v-card>
               </v-col>
 
-              <v-col cols="12" md="8">
+              <v-col cols="12" md="5">
                 <v-card elevation="1">
                   <v-card-title class="text-subtitle-1">圖片上傳</v-card-title>
                   <v-card-text>
