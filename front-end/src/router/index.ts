@@ -44,6 +44,7 @@ const routes = [
       },
       {
         path: "car-rent/back-homepage",
+          name: "carRentBackHomePage",
         component: () =>
           import(
             "@/components/carRent/backpageComponent/CarRentBackHomepage.vue"
@@ -51,7 +52,8 @@ const routes = [
       },
       {
         path: "car-rent/reservations/:id",
-        component: () =>
+          name: "ReservationDetail",
+          component: () =>
           import(
             "@/components/carRent/backpageComponent/CarRentReservation.vue"
           ),
@@ -59,7 +61,8 @@ const routes = [
       },
       {
         path: "car-rent/vehicles/:id",
-        component: () =>
+          name: "VehicleDetail",
+          component: () =>
           import("@/components/carRent/backpageComponent/Vehicle.vue"),
         props: true,
       },
