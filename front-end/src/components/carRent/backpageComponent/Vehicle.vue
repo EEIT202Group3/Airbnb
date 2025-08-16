@@ -25,7 +25,7 @@ const currentTab = ref<'summary' | 'image' | 'geo'>('summary');
 onMounted(async () => {
   const id = route.params.id;
   try {
-    const res = await api.get(`/vehicles/${id}`);
+    const res = await api.get(`vehicles/${id}`);
     vehicle.value = res.data;
     if (currentTab.value === "geo") {
       await ensureMap();

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/admins")
 public class VehicleDamageController {
 
     private final VehicleDamageService service;
