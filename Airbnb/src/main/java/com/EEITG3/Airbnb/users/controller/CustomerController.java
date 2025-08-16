@@ -1,11 +1,16 @@
 package com.EEITG3.Airbnb.users.controller;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +35,11 @@ import com.EEITG3.Airbnb.users.dto.SignUpRequest;
 import com.EEITG3.Airbnb.users.entity.Customer;
 import com.EEITG3.Airbnb.users.entity.CustomerDetails;
 import com.EEITG3.Airbnb.users.service.CustomerService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -44,6 +54,11 @@ public class CustomerController {
 		this.service = service;
 	}
 	
+	@Value("${google.oauth.client-id}")
+	private String clientId;
+	
+	private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
+	
 //前台部分
 	//客戶登入
 	@PostMapping("/customers/login")
@@ -51,11 +66,52 @@ public class CustomerController {
 		try {
 			String token = service.customerLogin(request);
 			CookieUtil.saveCustomerCookie(response, token);
+			log.info("登入成功");
 			return ResponseEntity.ok(token);
 		} catch (BadCredentialsException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
 		} catch (DisabledException e) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		}
+	}
+	
+	//使用google登入
+	@PostMapping("/customers/google")
+	public ResponseEntity<?> loginWithGoogle(@RequestBody Map<String, Object> data, HttpServletResponse response){
+		
+		//從 RequestBody 中取得 google id token
+		String token = (String)data.get("token");
+		
+		System.out.println("收到資料"+token);
+		
+		//建立 google id token 的驗證器
+		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
+																  .setAudience(Arrays.asList(clientId))
+																  .build();
+		try {
+			//驗證 google id token
+			GoogleIdToken googleIdToken = verifier.verify(token);
+			if(googleIdToken==null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("無效的 Google Token");
+			}
+			//從 google id token 裡面取得使用者資料
+			Payload payload = googleIdToken.getPayload();
+			//呼叫service執行登入
+			String jwt = service.loginWithGoogle(payload);
+			//把收到的 jwt 存入 cookie
+			if(!(jwt==null)) {
+				CookieUtil.saveCustomerCookie(response, jwt);
+				return ResponseEntity.ok(jwt);
+			}else {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("登入失敗");
+			}
+			
+		} catch (GeneralSecurityException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("Auth temporarily unavailable");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Auth verification error");
 		}
 	}
 	

@@ -70,12 +70,20 @@ export async function updateAvatar(data) {
     }
 }
 
-export async function sendEmailService(email){
-    const response = await axios.post(`${BASE_URL}/api/customers/forgetpwd`,{email},{
-        headers:{
-            'Content-Type':'application/json'
+export async function sendEmailService(email) {
+    const response = await axios.post(`${BASE_URL}/api/customers/forgetpwd`, { email }, {
+        headers: {
+            'Content-Type': 'application/json'
         },
-        withCredentials:true,
+        withCredentials: true,
     });
+    return response.data;
+}
+
+export async function googleLoginService(token) {
+    const response = await axios.post(`${BASE_URL}/api/customers/google`, { token }, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+    })
     return response.data;
 }
