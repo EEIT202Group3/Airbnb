@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { signupService,sendEmailService } from '@/service/user/customerService'
+import { signupService,sendEmailService,googleLoginService } from '@/service/user/customerService'
 import { useCustomerStore } from '@/stores/customer'
+import { GoogleLogin } from 'vue3-google-login';
 
 const customerStore = useCustomerStore();
 
@@ -119,6 +120,19 @@ async function sendEmail(){
   }
 }
 
+//google登入
+async function googleLogin(response:any){
+  try {
+    await googleLoginService(response.credential);
+    await customerStore.fetchUser();
+    alert('登入成功')
+    emit('login-success')
+  } catch (error) {
+    alert('登入失敗')
+    emit('login-success')
+  }
+}
+
 </script>
 
 <template>
@@ -177,6 +191,8 @@ async function sendEmail(){
           :rules="[required]"
           class="mb-1"
         />
+
+        <GoogleLogin :callback="googleLogin"></GoogleLogin>
 
         <div class="text-caption mb-4">
           <a href="#" @click.prevent="forget = true" style="color:	#FF8000;">Forgot password?</a>

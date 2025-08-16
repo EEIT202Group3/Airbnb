@@ -28,7 +28,7 @@ function getList(data:any){
                     <v-item>
                         <v-card
                         class="d-flex flex-column justify-center align-center"
-                        height="200"
+                        height="400"
                         dark
                         @click="getList(l)"
                         @mouseover="hovered = l.id"
