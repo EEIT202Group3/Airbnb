@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import LoginSignup from '@/components/user/LoginSignup.vue';
+import LoginSignup from '@/components/user/customer/LoginSignup.vue';
 const showAuthPage = ref(false);
 
 </script>

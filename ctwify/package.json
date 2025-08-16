@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
-    "@vuepic/vue-datepicker": "^11.0.2",
     "@stomp/stompjs": "^7.1.1",
+    "@vuepic/vue-datepicker": "^11.0.2",
     "axios": "^1.11.0",
     "dayjs": "^1.11.13",
     "pinia": "^3.0.3",
