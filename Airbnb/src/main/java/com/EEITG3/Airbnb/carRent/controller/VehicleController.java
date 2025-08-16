@@ -19,8 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/vehicles")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/admins/vehicles")
 public class VehicleController {
     private final VehicleService vService;
 

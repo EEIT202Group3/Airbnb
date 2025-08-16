@@ -75,7 +75,7 @@ async function fetchReservations(page = 1) {
     } else {
       params.sort = "createdAt,desc";
     }
-    const {data} = await api.get("/reservations/search-eligible", {params});
+    const {data} = await api.get("reservations/search-eligible", {params});
     resPage.value = data;
     resPageNumber.value = (data?.number ?? 0) + 1;
   } catch (e) {
@@ -115,7 +115,7 @@ async function fetchVehicles(page = 1) {
   vehError.value = "";
   try {
     const params: any = {plateNo: plateKw.value?.trim() || "", page: page - 1, size: vehPageSize.value};
-    const {data} = await api.get("/vehicles/search-eligible", {params});
+    const {data} = await api.get("vehicles/search-eligible", {params});
 
     if (data && !("content" in data) && data.vehicleId) {
       vehPage.value = {content: [data], totalElements: 1, totalPages: 1, size: vehPageSize.value, number: 0};
@@ -144,8 +144,9 @@ function onSearchVehicles() {
 const reservationSummary = ref<Record<string, number>>({});
 
 onMounted(async () => {
+  console.log('api baseURL =', api.defaults.baseURL);
   try {
-    const res = await api.get("/reservations/dashboard");
+    const res = await api.get("reservations/dashboard");
     reservationSummary.value = res.data || {};
   } catch (err) {
     console.error("取得 dashboard 資料失敗：", err);
@@ -159,7 +160,7 @@ let chartInstance: Chart | null = null;
 async function loadVehicleStatusChart() {
   if (!chartCanvas.value) return;
   try {
-    const res = await api.get("/vehicles/status-summary");
+    const res = await api.get("vehicles/status-summary");
     const summary = res.data || {};
     const labels = Object.keys(summary);
     const data = Object.values(summary);
