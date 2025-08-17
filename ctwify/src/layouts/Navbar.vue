@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import LoginSignup from '@/components/user/LoginSignup.vue';
+import LoginSignup from '@/components/user/customer/LoginSignup.vue';
 const showAuthPage = ref(false);
 
 </script>
@@ -14,7 +14,7 @@ const showAuthPage = ref(false);
       ></v-img>
 
       <nav> 
-        <router-link to="/listing/addlisting">刊登旅宿</router-link>
+        <router-link to="#">刊登旅宿</router-link>
 
         <!-- 會員登入 -->
        <router-link to="#" @click.prevent="showAuthPage = true">
@@ -45,16 +45,16 @@ const showAuthPage = ref(false);
 @import '/src/assets/listing/list1.css';
 
 .naver {
-  height: 60px;
+  height: 70px;
   position: sticky;
   top: 0;
-  z-index: 999;
+  z-index: 5000;
   background-color: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-left: 0vw;   
-  padding-right: 17vw; 
+  padding-right: 15.5vw; 
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   overflow: visible;
 }
@@ -62,6 +62,7 @@ const showAuthPage = ref(false);
 .logo {
   max-height: 90px;
   width: auto;
-  margin-right: 340px; 
+  margin-right: 300px; 
 }
+
 </style>

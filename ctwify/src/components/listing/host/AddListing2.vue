@@ -8,34 +8,33 @@
           <input v-model="form.houseName" type="text" class="form-control" required />
         </div>
 
-       <!-- 地址：城市與區域 -->
+        <!-- 地址：城市與區域 -->
         <label class="form-label">地址</label>
         <div class="col">
           <input
             type="text"
             class="form-control"
-            :value="address" 
+            :value="address"
             readonly
             placeholder="點擊選擇地址"
-            @click="openDialog" 
+            @click="openDialog"
           />
-        
- <!-- 彈窗 -->
-     <!-- 彈窗 -->
-    <div v-if="showDialog" class="dialog-overlay">
-      <div class="dialog">
-        <h3>選擇地址</h3>
-        <input type="text" v-model="tempAddress" ref="dialogInput" placeholder="輸入地址" />
 
-        <div id="map"></div>
+          <!-- 彈窗 -->
+          <div v-if="showDialog" class="dialog-overlay">
+            <div class="dialog">
+              <h3>選擇地址</h3>
+              <input type="text" v-model="tempAddress" ref="dialogInput" placeholder="輸入地址" />
 
-        <div class="dialog-buttons">
-          <button @click="confirmAddress">確認地址</button>
-          <button @click="closeDialog">取消</button>
+              <div id="map"></div>
+
+              <div class="dialog-buttons">
+                <button @click="confirmAddress">確認地址</button>
+                <button @click="closeDialog">取消</button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    </div>
 
         <!-- 房型 + 床型 + 床數 -->
         <div class="mb-3 row">
@@ -103,51 +102,49 @@
           <input type="file" multiple accept="image/*" @change="handleFileUpload" class="form-control" />
         </div>
 
-       <!-- 設備選擇（依分類排版，點擊圖示選擇） -->
-<div class="mb-3">
-  <label class="form-label">請勾選設備：</label>
-  <div v-for="(equipments, category) in groupedEquipments" :key="category" class="mb-4">
-    <h5 class="equip-category-title">{{ category }}</h5>
-    <div class="d-flex flex-wrap gap-3">
-      <div
-        v-for="eq in equipments"
-        :key="eq.equip_id"
-        class="equip-item"
-        :class="{ selected: form.equipments.includes(eq.equip_id) }"
-        @click="toggleEquipment(eq.equip_id)"
-        title="點擊選擇設備"
-      >
-        <!-- Font Awesome icon -->
-        <i
-          v-if="isFontAwesome(eq.equip_icon)"
-          :class="[eq.equip_icon, 'equip-icon']"
-          aria-hidden="true"
-        ></i>
+        <!-- 設備選擇（依分類排版，點擊圖示選擇） -->
+        <div class="mb-3">
+          <label class="form-label">請勾選設備：</label>
+          <div v-for="(equipments, category) in groupedEquipments" :key="category" class="mb-4">
+            <h5 class="equip-category-title">{{ category }}</h5>
+            <div class="d-flex flex-wrap gap-3">
+              <div
+                v-for="eq in equipments"
+                :key="eq.equip_id"
+                class="equip-item"
+                :class="{ selected: form.equipments.includes(eq.equip_id) }"
+                @click="toggleEquipment(eq.equip_id)"
+                title="點擊選擇設備"
+              >
+                <!-- Font Awesome icon -->
+                <i
+                  v-if="isFontAwesome(eq.equip_icon)"
+                  :class="[eq.equip_icon, 'equip-icon']"
+                  aria-hidden="true"
+                ></i>
 
-        <!-- Vuetify (mdi) icon -->
-        <v-icon
-          v-else
-          class="equip-icon"
-          size="25"
-        >
-          {{ eq.equip_icon }}
-        </v-icon>
+                <!-- Vuetify (mdi) icon -->
+                <v-icon v-else class="equip-icon" size="25">
+                  {{ eq.equip_icon }}
+                </v-icon>
 
-        <div class="equip-name">{{ eq.equip_name }}</div>
-        <input
-          type="checkbox"
-          :value="eq.equip_id"
-          v-model="form.equipments"
-          class="d-none"
-        />
-      </div>
-    </div>
-  </div>
-</div>
+                <div class="equip-name">{{ eq.equip_name }}</div>
+                <input
+                  type="checkbox"
+                  :value="eq.equip_id"
+                  v-model="form.equipments"
+                  class="d-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="text-center">
           <button type="submit" class="btn btn-orange btn-lg px-5">新增房源</button>
         </div>
+
+        <!-- 表單結尾 -->
       </form>
     </div>
   </div>
@@ -156,6 +153,7 @@
 <script>
 import axios from '@/api2';
 import Swal from 'sweetalert2';
+
 
 export default {
   data() {
@@ -194,7 +192,7 @@ export default {
     }
   },
   methods: {
-      openDialog() {
+    openDialog() {
       this.showDialog = true;
       this.$nextTick(() => {
         this.tempAddress = this.address;
@@ -214,14 +212,41 @@ export default {
         center: { lat: 25.0330, lng: 121.5654 },
         zoom: 12
       });
-    },
-    initAutocomplete() {
-      const input = this.$refs.dialogInput;
-      if (!this.autocomplete) {
-        this.autocomplete = new google.maps.places.Autocomplete(input, { types: ['geocode'] });
-        this.autocomplete.addListener('place_changed', this.onPlaceChanged);
+      // 如果有地址，透過 Geocoder 定位地圖
+  if (this.tempAddress) {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: this.tempAddress }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const location = results[0].geometry.location;
+        this.map.setCenter(location);
+        this.map.setZoom(15);
+
+        if (this.marker) {
+          this.marker.setMap(null);
+        }
+
+        this.marker = new google.maps.Marker({
+          map: this.map,
+          position: location
+        });
       }
+    });
+  }
     },
+   initAutocomplete() {
+  const input = this.$refs.dialogInput;
+
+  // 先解除舊的 autocomplete 綁定（如果存在）
+  if (this.autocomplete) {
+    google.maps.event.clearInstanceListeners(this.autocomplete);
+    this.autocomplete.unbindAll?.();
+    this.autocomplete = null;
+  }
+
+  // 重新初始化 Autocomplete
+  this.autocomplete = new google.maps.places.Autocomplete(input, { types: ['geocode'] });
+  this.autocomplete.addListener('place_changed', this.onPlaceChanged);
+},
     onPlaceChanged() {
       const place = this.autocomplete.getPlace();
       if (place.geometry && place.geometry.location) {
@@ -239,7 +264,7 @@ export default {
         this.tempAddress = place.formatted_address;
       }
     },
-    updateDistricts() {
+  updateDistricts() {
       this.availableDistricts = this.cityData[this.selectedCity] || [];
       this.selectedDistrict = '';
     },
@@ -279,7 +304,8 @@ export default {
       const formData = new FormData();
       formData.append("host_id", this.form.hostId);
       formData.append("houseName", this.form.houseName);
-      formData.append("ads", fullAddress, this);
+      const fullAddress = `${this.address}${this.form.detailAddress}`;
+      formData.append("ads", fullAddress);
       formData.append("room", this.form.room);
       formData.append("bed", `${this.form.bedCount} 張 ${this.form.bedType}`);
       formData.append("describe", this.form.describe);
@@ -333,7 +359,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 @import "/src/assets/listing/list3.css";
 /* 設備分類標題 */
 .equip-category-title {
@@ -378,6 +404,7 @@ export default {
   user-select: none;
 }
 
+
 /* 遮罩背景 */
 .dialog-overlay {
   position: fixed;
@@ -399,7 +426,7 @@ export default {
   border-radius: 8px;
   width: 90%;
   max-width: 700px;
-  max-height: 90vh;
+  max-height: 900px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -407,17 +434,14 @@ export default {
 
 /* 文字框 */
 .dialog input {
-  margin-bottom: 10px;
+  margin-bottom: 30px;
 }
 
-/* 地圖自動填滿彈窗剩餘高度 */
 #map {
   flex: 1;
-  min-height: 300px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  min-height: 400px;
+  max-height: 400px; /* 限制最大高度 */
 }
-
 /* 按鈕區塊 */
 .dialog-buttons {
   display: flex;
@@ -429,5 +453,8 @@ export default {
   z-index: 3000 !important;
 }
 
+body {
+  padding-right: 0 !important;
+}
 
 </style>

@@ -9,14 +9,14 @@ import CarDetail from "@/components/carRent/frontpageComponent/CarDetail.vue";
 
 //import getList from "@/layouts/ListLayout.vue";
 
-import ListingPage from '../components/payment/ListingPage.vue';
-import BookingPage from '../components/payment/BookingPage.vue';
-import ConfirmationPage from '../components/payment/ConfirmationPage.vue';
-import Ecpay from '../components/payment/Ecpay.vue';
-import PaymentPage from '../components/payment/PaymentPage.vue';
-import PaymentSuccessPage from '../components/payment/PaymentSuccessPage.vue';
-import HomeＰage from '../components/listing/customer/ListingCard.vue';
-import CustomerDetail from "@/components/listing/customer/CustomerDetail.vue";
+// import ListingPage from '../components/payment/ListingPage.vue';
+// import BookingPage from '../components/payment/BookingPage.vue';
+// import ConfirmationPage from '../components/payment/ConfirmationPage.vue';
+// import Ecpay from '../components/payment/Ecpay.vue';
+// import PaymentPage from '../components/payment/PaymentPage.vue';
+// import PaymentSuccessPage from '../components/payment/PaymentSuccessPage.vue';
+// import HomeＰage from '../components/listing/customer/ListingCard.vue';
+// import CustomerDetail from "@/components/listing/customer/CustomerDetail.vue";
 
 const routes = [
   {
@@ -41,7 +41,7 @@ const routes = [
       },
       {
         path: '/login',
-        component: () => import('@/components/user/LoginSignup.vue'),
+        component: () => import('@/components/user/customer/LoginSignup.vue'),
       },
 
       {
@@ -50,9 +50,21 @@ const routes = [
       },
 
       {
+        path: '/coustomerlistings/:id',
+         component: () =>import('@/components/listing/customer/CustomerDetail.vue'),
+      },
+
+    
+      {
+        path: '/addlistings',
+        component: () => import('@/components/listing/host/AddListing2.vue')
+
+      },
+
+
+      {
         path:'/customerdatil/:id',
-        component: () =>import('@/components/listing/customer/CustomerDetail.vue'),
-        component: () => import('@/components/user/LoginSignup.vue')
+        component: () => import('@/components/user/customer/LoginSignup.vue')
       },
       {
         path: '/car-front-homepage',
