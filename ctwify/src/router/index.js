@@ -52,21 +52,35 @@ const routes = [
         component: () => import("@/components/payment/BookingStart.vue"),
       },
       {
-        path: "/booking/preview",
+        path: "/preview-confirm",
         name: "PreviewConfirm",
         component: () => import("@/components/payment/PreviewConfirm.vue"),
       },
       {
-        path: "/booking/pay",
+        path: '/payment/paypal',
+        name: 'PayPalPayment',
+        component: () => import("@/components/payment/PayPalPayment.vue"),
+        props: route => ({
+          bookingId: route.query.bookingId
+        })
+      },
+      {
+        path: "/payment/redirect",
         name: "PayRedirect",
         component: () => import("@/components/payment/PayRedirect.vue"),
       },
       {
-        path: "/booking/done/:bookingId",
+        path: "/payment/done",
         name: "PaymentDone",
         component: () => import("@/components/payment/PaymentDone.vue"),
         props: true,
       },
+      {
+        path: '/order/list',
+        name: 'OrderList',
+        component: () => import('@/components/payment/OrderList.vue'),
+      },
+
       {
         path: "/carrent",
         name: "CarRentFrontHomepage",
