@@ -12,6 +12,7 @@ import com.EEITG3.Airbnb.users.dto.SignUpRequest;
 
 import com.EEITG3.Airbnb.users.entity.Customer;
 import com.EEITG3.Airbnb.users.entity.CustomerDetails;
+import com.google.api.client.auth.openidconnect.IdToken.Payload;
 
 public interface CustomerService {
 
@@ -32,6 +33,9 @@ public interface CustomerService {
 	Customer updateAvatar(Customer customer, MultipartFile avatar) throws IOException;
 	//忘記密碼時送驗證信
 	void forgetPwd(String email);
+	
+	//google登入
+	String loginWithGoogle(Payload payload);
 	
 	
 //後台功能

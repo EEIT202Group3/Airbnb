@@ -5,6 +5,7 @@ import com.EEITG3.Airbnb.carRent.entity.Vehicle;
 import com.EEITG3.Airbnb.carRent.repository.VehicleRepository;
 import com.EEITG3.Airbnb.carRent.service.VehicleService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/vehicles")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/admins/vehicles")
 public class VehicleController {
     private final VehicleService vService;
 
@@ -116,11 +116,22 @@ public class VehicleController {
     public Map<String, Integer> getStatusSummary() {
         return vService.getVehicleStatusSummary();
     }
-    
+
     @GetMapping("/search-eligible")
-    public Page<Vehicle> search(@RequestParam(required = false) String plateNo,
-                                @PageableDefault(size = 10, sort = "vehicleId") Pageable pageable) {
-        return vService.searchEligibleVehicle(plateNo, pageable);
+    public Page<Vehicle> search(
+            @RequestParam(required = false) String plateNo,
+            @RequestParam(required = false) Integer id,
+            @PageableDefault(size = 10, sort = "vehicleId") Pageable pageable) {
+
+        if (id != null) {
+            Vehicle v = vService.findById(id);
+            return new PageImpl<>(List.of(v), pageable, 1);
+        } else if (plateNo != null && !plateNo.isEmpty()) {
+            return vService.searchEligibleVehicle(plateNo, pageable);
+        } else {
+            return Page.empty(pageable);
+        }
     }
+
 
 }

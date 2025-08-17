@@ -1,308 +1,459 @@
 <template>
   <v-col cols="12" class="d-flex justify-center">
-    <v-card style="max-width: 1000px; width: 100%">
-      <template #title>
-        <img
-          :src="
-            review.image1
-              ? `http://localhost:8080/images/listing/${review.image1}`
-              : defaultImg
-          "
-          height="100px"
-        />
-        {{ title }}
-      </template>
-      <template #text class="text-wrap"> {{ review.cusComm }}</template>
+    <v-card class="w-100" max-width="1000">
+      <!-- Header / Title -->
+      <v-card-title class="d-flex align-center gap-4">
+        <v-img :src="coverSrc" height="100" width="100" class="rounded" cover />
+        <div class="text-subtitle-1 font-weight-medium">{{ title }}</div>
+      </v-card-title>
+
+      <!-- Summary -->
+      <v-card-text class="text-wrap">
+        {{ review?.cusComm || "（尚無評論內容）" }}
+      </v-card-text>
+
+      <!-- Actions -->
       <v-card-actions>
-        <v-btn @click="showDialog(review)">
-          <v-icon>mdi-eye</v-icon>
+        <v-btn
+          @click="showDialog(review)"
+          variant="elevated"
+          prepend-icon="mdi-eye"
+        >
           顯示評論
         </v-btn>
       </v-card-actions>
     </v-card>
 
-    <v-dialog v-model="dialog" max-width="600px">
+    <!-- Dialog -->
+    <v-dialog v-model="dialog" max-width="720">
       <v-card>
-        <v-card-title class="d-flex align-center"
-          >評論詳情
-          <v-btn icon @click="dialog = false" style="margin-left: auto">
+        <v-card-title class="d-flex align-center">
+          <span>評論詳情</span>
+          <v-spacer />
+          <v-btn icon :disabled="saving || deleting" @click="dialog = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
 
         <v-card-text>
-          <div><strong>評論編號：</strong>{{ selectedReview.reviewId }}</div>
-          <div><strong>房源編號：</strong>{{ selectedReview.listId }}</div>
-          <div><strong>訂單編號：</strong>{{ selectedReview.bookingId }}</div>
-          <div><strong>房客編號：</strong>{{ selectedReview.custId }}</div>
-          <div><strong>房東編號：</strong>{{ selectedReview.hostId }}</div>
-          <div><strong>評論日期：</strong>{{ selectedReview.reviewDate }}</div>
-          <!-- 其他不可編輯欄位... -->
-          <div>
+          <!-- Meta -->
+          <v-row dense class="mb-2">
+            <v-col cols="12" sm="6"
+              ><strong>評論編號：</strong>{{ selectedReview.reviewId }}</v-col
+            >
+            <v-col cols="12" sm="6"
+              ><strong>房源編號：</strong>{{ selectedReview.listId }}</v-col
+            >
+            <v-col cols="12" sm="6"
+              ><strong>訂單編號：</strong>{{ selectedReview.bookingId }}</v-col
+            >
+            <v-col cols="12" sm="6"
+              ><strong>房客編號：</strong>{{ selectedReview.custId }}</v-col
+            >
+            <v-col cols="12" sm="6"
+              ><strong>房東編號：</strong>{{ selectedReview.hostId }}</v-col
+            >
+            <v-col cols="12" sm="6"
+              ><strong>評論日期：</strong>{{ selectedReview.reviewDate }}</v-col
+            >
+          </v-row>
+
+          <!-- Ratings -->
+          <div class="mb-2">
             <strong>乾淨評分：</strong>
             <v-rating
               v-model="selectedReview.cleanScore"
-              length="5"
+              :length="5"
               size="32"
-              color="yellow darken-3"
-              background-color="grey lighten-1"
-              label="乾淨度"
+              color="yellow-darken-3"
+              background-color="grey-lighten-1"
               :readonly="!isEditing"
-            ></v-rating>
+            />
           </div>
-          <div>
+
+          <div class="mb-2">
             <strong>溝通評分：</strong>
             <v-rating
               v-model="selectedReview.commScore"
-              length="5"
+              :length="5"
               size="32"
-              color="yellow darken-3"
-              background-color="grey lighten-1"
-              label="溝通"
+              color="yellow-darken-3"
+              background-color="grey-lighten-1"
               :readonly="!isEditing"
-            ></v-rating>
+            />
           </div>
 
-          <div>
+          <div class="mb-4">
             <strong>性價比：</strong>
             <v-rating
               v-model="selectedReview.valueScore"
-              length="5"
+              :length="5"
               size="32"
-              color="yellow darken-3"
-              background-color="grey lighten-1"
-              label="性價比"
+              color="yellow-darken-3"
+              background-color="grey-lighten-1"
               :readonly="!isEditing"
-            ></v-rating>
+            />
           </div>
 
-          <div><strong>房東回覆：</strong>{{ selectedReview.hostComm }}</div>
-          <div>
+          <!-- Texts -->
+          <div class="mb-3">
+            <strong>房東回覆：</strong>
+            <div class="mt-1">
+              {{ selectedReview.hostComm || "（無房東回覆）" }}
+            </div>
+          </div>
+
+          <div class="mb-4">
             <strong>房客評論：</strong>
-            <div v-if="!isEditing">{{ selectedReview.cusComm }}</div>
+            <div v-if="!isEditing" class="mt-1">
+              {{ selectedReview.cusComm || "（無評論）" }}
+            </div>
             <v-textarea
               v-else
               v-model="selectedReview.cusComm"
               label="編輯房客評論"
               rows="3"
-              outlined
+              variant="outlined"
               auto-grow
-            ></v-textarea>
+              density="comfortable"
+              class="mt-1"
+            />
           </div>
-          <v-row class="mt-4">
-            <v-row class="mt-4">
-              <v-col
-                v-for="(img, index) in selectedReview.images"
-                :key="index"
-                cols="4"
-                class="d-flex justify-center"
-              >
-                <div
-                  style="position: relative; width: 150px; aspect-ratio: 1 / 1"
-                >
-                  <v-img
-                    :src="previewUrl(img)"
-                    cover
-                    class="rounded"
-                    style="width: 100%; height: 100%"
-                  />
-                  <div
-                    v-if="isEditing"
-                    @click="removeImage(index)"
-                    style="
-                      position: absolute;
-                      top: 6px;
-                      right: 6px;
-                      width: 24px;
-                      height: 24px;
-                      background: #fff;
-                      border-radius: 50%;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      cursor: pointer;
-                    "
-                  >
-                    <v-icon size="18" color="grey" style="opacity: 0.8"
-                      >mdi-close</v-icon
-                    >
-                  </div>
-                </div>
-              </v-col>
-            </v-row>
 
-            <!-- 新增圖片按鈕 -->
+          <!-- Images -->
+          <v-row dense class="mt-2">
             <v-col
-              cols="12"
-              class="d-flex justify-center mt-4"
-              v-if="isEditing"
+              v-for="(img, index) in selectedReview.images"
+              :key="`img-${index}`"
+              cols="4"
+              class="d-flex justify-center"
             >
-              <v-file-input
-                label="新增圖片"
-                accept="image/*"
-                prepend-icon="mdi-plus"
-                show-size
-                multiple
-                @change="uploadImage"
-                hide-details
-                outlined
-                dense
-                style="max-width: 300px"
-              ></v-file-input>
+              <div class="thumb-wrapper">
+                <v-img :src="previewUrl(img)" cover class="rounded thumb" />
+                <v-btn
+                  v-if="isEditing"
+                  size="x-small"
+                  icon
+                  class="thumb-close"
+                  @click="removeImage(index)"
+                >
+                  <v-icon size="18">mdi-close</v-icon>
+                </v-btn>
+              </div>
             </v-col>
           </v-row>
+
+          <!-- Add Images -->
+          <div class="d-flex justify-center mt-4" v-if="isEditing">
+            <v-file-input
+              label="新增圖片（最多 3 張）"
+              accept="image/*"
+              prepend-icon="mdi-plus"
+              show-size
+              multiple
+              hide-details
+              variant="outlined"
+              density="comfortable"
+              style="max-width: 320px"
+              :disabled="saving"
+              @update:model-value="uploadImage"
+            />
+          </div>
         </v-card-text>
 
-        <v-card-actions>
-          <v-btn color="primary" text @click="toggleEdit">
+        <v-card-actions class="justify-end">
+          <v-btn
+            color="primary"
+            variant="elevated"
+            :loading="saving"
+            :disabled="deleting"
+            @click="toggleEdit"
+          >
             {{ isEditing ? "儲存" : "修改" }}
           </v-btn>
-          <v-btn color="primary" text @click="deleteReview">刪除</v-btn>
-          <v-btn color="primary" text @click="dialog = false">關閉</v-btn>
+          <v-btn
+            color="error"
+            variant="tonal"
+            :loading="deleting"
+            :disabled="saving"
+            @click="deleteReview"
+          >
+            刪除
+          </v-btn>
+          <v-btn
+            variant="text"
+            :disabled="saving || deleting"
+            @click="dialog = false"
+          >
+            關閉
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </v-col>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { ref, computed, onBeforeUnmount } from "vue";
 import axios from "axios";
 
-defineProps(["review"]);
-const emit = defineEmits(["updated"]);
-const defaultImg = "../src/icon/default.png";
-const title = "海漾小木屋：一邊森林一邊太平洋(適合1-3人獨棟+廚房)";
+/** ======== 常數 / 工具 ======== */
+const API_BASE = "http://localhost:8080";
+const MAX_IMAGES = 3;
+const isFile = (v: unknown): v is File =>
+  typeof File !== "undefined" && v instanceof File;
 
+/** ======== Props / Emits ======== */
+type Review = {
+  reviewId: number;
+  listId: number;
+  bookingId: number;
+  custId: number;
+  hostId: number;
+  reviewDate: string;
+  cleanScore: number;
+  commScore: number;
+  valueScore: number;
+  cusComm: string;
+  hostComm: string;
+  // 後端原始三個欄位（檔名或 null）
+  image1?: string | null;
+  image2?: string | null;
+  image3?: string | null;
+};
+
+const props = defineProps<{
+  review: Review;
+  title?: string;
+}>();
+
+const emit = defineEmits<{
+  (e: "update", payload: Review): void;
+  (e: "deleted"): void;
+}>();
+
+/** ======== 靜態資源 ======== */
+// 若你用 Vite，建議用 URL 方式確保路徑正確
+const defaultImg = "../icon/default.png"; // 替換為實際的預設圖片路徑
+
+/** ======== UI 狀態 ======== */
 const dialog = ref(false);
 const isEditing = ref(false);
-// 目前選中的評論（含臨時上傳檔）
-const selectedReview = ref({
-  images: [], // 這是本次欲上傳的新檔案清單（File[]）
+const saving = ref(false);
+const deleting = ref(false);
+
+/** ======== 選中評論與影像槽 ======== */
+type MixedImage = File | string | null;
+
+// 進入對話框時的原始檔名快照（用來判斷哪些槽被刪）
+const originals = ref<(string | null)[]>([null, null, null]);
+
+// 對話框中可編輯的評論物件；images 固定三槽
+const selectedReview = ref<Review & { images: MixedImage[] }>({
+  ...(props.review as Review),
+  images: [
+    props.review?.image1 ?? null,
+    props.review?.image2 ?? null,
+    props.review?.image3 ?? null,
+  ],
 });
 
-function showDialog(item) {
-  // 複製一份，避免直接改到父層資料
+/** ======== 封面圖（卡片標題用） ======== */
+const coverSrc = computed(() => {
+  const src = props.review?.image1
+    ? `${API_BASE}/images/listing/${props.review.image1}`
+    : defaultImg;
+  return src;
+});
+
+/** ======== 標題 ======== */
+const title = computed(
+  () => props.title || "海漾小木屋：一邊森林一邊太平洋(適合1-3人獨棟+廚房)"
+);
+
+/** ======== 預覽與資源釋放 ======== */
+const objectUrlCache = new Map<File, string>();
+
+function previewUrl(img: MixedImage) {
+  if (!img) return defaultImg;
+  if (isFile(img)) {
+    if (!objectUrlCache.has(img)) {
+      objectUrlCache.set(img, URL.createObjectURL(img));
+    }
+    return objectUrlCache.get(img)!;
+  }
+  // 舊檔名
+  return `${API_BASE}/images/listing/${img}`;
+}
+/*
+onBeforeUnmount(() => {
+  for (const url of objectUrlCache.values()) URL.revokeObjectURL(url);
+  objectUrlCache.clear();
+});
+*/
+/** ======== Dialog 開關 ======== */
+function showDialog(item: Review) {
+  // 深拷貝 + 初始化三槽（保持固定長度）
   selectedReview.value = {
-    ...item,
-    images: [item.image1 || null, item.image2 || null, item.image3 || null],
+    ...(item as Review),
+    images: [
+      item.image1 ?? null,
+      item.image2 ?? null,
+      item.image3 ?? null,
+    ].slice(0, MAX_IMAGES),
   };
   originals.value = [
-    item.image1 || null,
-    item.image2 || null,
-    item.image3 || null,
+    item.image1 ?? null,
+    item.image2 ?? null,
+    item.image3 ?? null,
   ];
+  isEditing.value = false;
   dialog.value = true;
 }
 
-function toggleEdit() {
+/** ======== 編輯/儲存 ======== */
+async function toggleEdit() {
   if (isEditing.value) {
-    // 按下「儲存」時送出
-    saveReview();
+    await saveReview();
+  } else {
+    isEditing.value = true;
   }
-  isEditing.value = !isEditing.value;
 }
 
-function deleteReview() {
-  console.log("刪除評論：", selectedReview.value.reviewId);
+async function deleteReview() {
+  if (!selectedReview.value?.reviewId) return;
+  const id = selectedReview.value.reviewId;
+  const confirmed = window.confirm(`確定要刪除評論 #${id} 嗎？`);
+  if (!confirmed) return;
+
+  try {
+    deleting.value = true;
+    await axios.delete(`${API_BASE}/api/reviews/del/${id}`, {
+      withCredentials: true,
+    });
+    dialog.value = false;
+    emit("deleted");
+  } catch (err) {
+    console.error("刪除失敗:", err);
+  } finally {
+    deleting.value = false;
+  }
 }
 
-function removeImage(index) {
+/** ======== 移除某一槽影像 ======== */
+function removeImage(index: number) {
   if (!Array.isArray(selectedReview.value.images)) return;
-  selectedReview.value.images[index] = null; // 標記刪除此槽
+  // 標註為空槽（null）
+  selectedReview.value.images[index] = null;
 }
 
-// 接收 <v-file-input> 選的檔案（多檔）
-function uploadImage(files) {
-  const list = Array.isArray(files)
-    ? files
-    : Array.from(files?.target?.files || []);
+/** ======== 上傳影像（追加到空槽，最多 3 張） ======== */
+function uploadImage(files: File[] | File | null) {
+  const list: File[] = Array.isArray(files) ? files : files ? [files] : [];
   if (!Array.isArray(selectedReview.value.images)) {
-    selectedReview.value.images = [null, null, null];
+    selectedReview.value.images = new Array(MAX_IMAGES).fill(null);
   }
   for (const f of list) {
     const emptyIdx = selectedReview.value.images.findIndex((v) => v === null);
     if (emptyIdx !== -1) {
       selectedReview.value.images[emptyIdx] = f;
     } else {
-      // 三槽都滿→覆蓋第0槽（你也可改成彈窗提示）
+      // 已滿則覆蓋第 0 槽（可改成提示）
       selectedReview.value.images[0] = f;
     }
   }
 }
 
-const originals = ref([null, null, null]); // 記住進入對話框時的原始檔名
-
-function previewUrl(img) {
-  if (!img) return defaultImg; // 無圖→顯示佔位
-  return img instanceof File
-    ? URL.createObjectURL(img) // 新上傳檔→blob URL
-    : `http://localhost:8080/images/listing/${img}`; // 舊檔名→後端 URL
-}
-
+/** ======== 儲存（PATCH） ======== */
 async function saveReview() {
   try {
-    const id = selectedReview.value.reviewId;
-    if (!id) {
+    if (!selectedReview.value?.reviewId) {
       console.error("reviewId 不存在");
       return;
     }
+    saving.value = true;
 
+    const id = selectedReview.value.reviewId;
     const fd = new FormData();
 
+    // 送純文字欄位
     const reviewData = {
       cleanScore: selectedReview.value.cleanScore,
       commScore: selectedReview.value.commScore,
       valueScore: selectedReview.value.valueScore,
       cusComm: selectedReview.value.cusComm,
     };
-
     fd.append(
       "review",
       new Blob([JSON.stringify(reviewData)], { type: "application/json" })
     );
 
-    // 決定圖片處理策略
-    // 計算要刪除的槽（原本有圖，現在是 null）
-    const deleteSlots = [];
-    for (let i = 0; i < 3; i++) {
-      const img = selectedReview.value.images?.[i];
+    // 2) 圖片欄位（重點）
+    //    只要該槽是 File 才 append；若是 null 或 舊檔名（string），一律不 append
+    const imgs = selectedReview.value.images ?? [null, null, null];
+    if (imgs[0] instanceof File) fd.append("image1", imgs[0]);
+    if (imgs[1] instanceof File) fd.append("image2", imgs[1]);
+    if (imgs[2] instanceof File) fd.append("image3", imgs[2]);
+    // ⛔ 不要 append 任何空 Blob 或 deleteSlots
 
-      if (img instanceof File) {
-        fd.append("images", img);
-      } else {
-        // ✅ 核心修正：傳 fake 空檔案＋合法檔名
-        fd.append(
-          "images",
-          new Blob([], { type: "application/octet-stream" }),
-          `empty${i + 1}.jpg`
-        );
-      }
-    }
-
-    // 把要刪的槽傳給後端
-    deleteSlots.forEach((s) => fd.append("deleteSlots", String(s)));
-
-    const url = `http://localhost:8080/api/reviews/update/${id}`;
+    // 若後端是接收多值同 key，可重複 append；若是 JSON，改成一次 append JSON 字串即可。
+    // 這裡用多值同 key：
+    const url = `${API_BASE}/api/reviews/update/${id}`;
     const res = await axios.patch(url, fd, {
-      headers: {},
+      headers: {}, // axios 會自動帶 multipart/form-data 邊界
       withCredentials: true,
     });
 
-    selectedReview.value = { ...selectedReview.value, ...res.data, images: [] };
+    // 後端回傳最新資料後，更新本地並關閉
+    const updated: Review = {
+      ...res.data,
+      reviewId: selectedReview.value.reviewId, // ✅ 補上 ID
+    };
+    selectedReview.value = {
+      ...(updated as Review),
+      images: [
+        updated.image1 ?? null,
+        updated.image2 ?? null,
+        updated.image3 ?? null,
+      ],
+    };
     isEditing.value = false;
     dialog.value = false;
-    emit("updated", res.data);
-  } catch (err) {
+    emit("update", updated);
+    console.log("後端回傳 res.data：", res.data);
+    console.log("更新後的評論：", selectedReview.value);
+    console.log("更新後的評論 ID：", updated.reviewId);
+    console.log("即將 emit 的 review：", updated);
+  } catch (err: any) {
     console.error("更新失敗", err);
     console.log("Server response data:", err?.response?.data);
+  } finally {
+    saving.value = false;
   }
 }
 </script>
 
-<style>
+<style scoped>
 .text-wrap {
   white-space: normal;
   word-break: break-word;
+}
+
+/* 縮圖樣式 */
+.thumb-wrapper {
+  position: relative;
+  width: 150px;
+  aspect-ratio: 1 / 1;
+}
+.thumb {
+  width: 100%;
+  height: 100%;
+}
+.thumb-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #fff;
+  opacity: 0.9;
 }
 </style>

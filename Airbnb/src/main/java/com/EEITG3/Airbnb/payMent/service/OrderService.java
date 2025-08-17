@@ -71,29 +71,29 @@ public class OrderService {
 	        	    customer.getCustomerId() != null ? customer.getCustomerId().toString() : null
 	        	);   
 	        order.setUsername(customer.getUsername());            // 顯示用
-	        order.setHousename(listing.getHouseName());
+	        order.setHouseName(listing.getHouseName());
 	        order.setAddress(listing.getAds());
 	        order.setTel(listing.getTel());
 	        order.setBed(listing.getBed());
 	        order.setPeople(people);
-	        order.setCheckindate(dto.getCheckindate().atStartOfDay());
-	        order.setCheckoutdate(dto.getCheckoutdate().atStartOfDay());
+	        order.setCheckinDate(dto.getCheckindate().atStartOfDay());
+	        order.setCheckoutDate(dto.getCheckoutdate().atStartOfDay());
 	        order.setRoomPrice(roomPrice);     // price
 	        order.setCarTotal(carTotal);       // total（租車金額）
 	        order.setGrandTotal(grandTotal);   // total_amount（整筆總金額）
-	        order.setBookingmethod(
+	        order.setBookingMethod(
 	                Optional.ofNullable(dto.getBookingmethod()).orElse("CASH"));
-	        order.setPaymentid(UUID.randomUUID().toString());
+	        order.setPaymentId("ORD" + System.currentTimeMillis());
 	        
-	        boolean paidByCard = "CREDIT_NEWEBPAY".equalsIgnoreCase(order.getBookingmethod())
-                    || "CREDIT".equalsIgnoreCase(order.getBookingmethod());
+	        boolean paidByCard = "CREDIT_NEWEBPAY".equalsIgnoreCase(order.getBookingMethod())
+                    || "CREDIT".equalsIgnoreCase(order.getBookingMethod());
 	        
 	        if (paidByCard) {
-	            order.setMentstatus("已付款");
-	            order.setPaidtime(LocalDateTime.now());
+	            order.setMentStatus("已付款");
+	            order.setPaidTime(LocalDateTime.now());
 	        } else {
-	            order.setMentstatus("待付款");
-	            order.setPaidtime(null);
+	            order.setMentStatus("待付款");
+	            order.setPaidTime(null);
 	        }
 	        return orderRepository.save(order);
 	    }
@@ -124,17 +124,17 @@ public class OrderService {
 				
 			return orders.stream().map(order -> {
 				OrderAllResponseDto dto = new OrderAllResponseDto();
-				dto.setBookingId(order.getBookingid());
-				dto.setHousename(order.getHousename());
+				dto.setBookingId(order.getBookingId());
+				dto.setHousename(order.getHouseName());
 				dto.setBed(order.getBed());
 				dto.setAddress(order.getAddress());
 				dto.setTel(order.getTel());
 				dto.setPeople(order.getPeople());
-				dto.setBookingstatus(order.getBookingstatus());
+				dto.setBookingstatus(order.getBookingStatus());
 				dto.setUsername(order.getUsername());
 				dto.setGrandtotal(order.getGrandTotal());
-				dto.setCheckindate(order.getCheckindate());
-				dto.setCheckoutdate(order.getCheckoutdate());
+				dto.setCheckindate(order.getCheckinDate());
+				dto.setCheckoutdate(order.getCheckoutDate());
 				return dto;
 			}).collect(Collectors.toList());
 		}
@@ -144,25 +144,25 @@ public class OrderService {
 	    	            .orElseThrow(() -> new IllegalArgumentException("查無此訂單：" + bookingid));
 
 	    	    OrderDetailResponseDto dto = new OrderDetailResponseDto();
-	       	    dto.setBookingId(order.getBookingid());
+	       	    dto.setBookingId(order.getBookingId());
 	    	    dto.setUsername(order.getUsername());
-	    	    dto.setHouseName(order.getHousename());
+	    	    dto.setHouseName(order.getHouseName());
 	    	    dto.setAddress(order.getAddress());
 	    	    dto.setTel(order.getTel());
 	    	    dto.setBed(order.getBed());
-	    	    dto.setCheckinDate(order.getCheckindate());
-	    	    dto.setCheckoutDate(order.getCheckoutdate());
+	    	    dto.setCheckinDate(order.getCheckinDate());
+	    	    dto.setCheckoutDate(order.getCheckoutDate());
 	    	    dto.setPeople(order.getPeople());
 	    	    dto.setLocationId(order.getLocationid());
-	    	    dto.setPaymentId(order.getPaymentid());
+	    	    dto.setPaymentId(order.getPaymentId());
 	    	    dto.setRoomprice(order.getRoomPrice());
-	    	    dto.setBookingStatus(order.getBookingstatus());
-	    	    dto.setMentStatus(order.getMentstatus());
+	    	    dto.setBookingStatus(order.getBookingStatus());
+	    	    dto.setMentStatus(order.getMentStatus());
 	    	    dto.setCartotal(order.getCarTotal());
 	    	    dto.setGrandtotal(order.getGrandTotal());
-	    	    dto.setPaidTime(order.getPaidtime());
-	    	    dto.setBookingMethod(order.getBookingmethod());
-	    	    dto.setBookingStatus(order.getBookingstatus());
+	    	    dto.setPaidTime(order.getPaidTime());
+	    	    dto.setBookingMethod(order.getBookingMethod());
+	    	    dto.setBookingStatus(order.getBookingStatus());
 
 	    	    return dto;
 	    }

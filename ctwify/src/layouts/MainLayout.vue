@@ -3,7 +3,7 @@
   <v-main>
     <router-view></router-view>
   </v-main>
-  <Footer></Footer>
+  <Footer app fixed></Footer>
 </template>
 <script setup>
 import Nav from "@/layouts/Navbar.vue";
