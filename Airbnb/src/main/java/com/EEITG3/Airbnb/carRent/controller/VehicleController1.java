@@ -1,7 +1,6 @@
 package com.EEITG3.Airbnb.carRent.controller;
 
 import com.EEITG3.Airbnb.carRent.entity.Vehicle;
-
 import com.EEITG3.Airbnb.carRent.repository.VehicleRepository;
 import com.EEITG3.Airbnb.carRent.service.VehicleService;
 import org.springframework.data.domain.Page;
@@ -20,11 +19,11 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admins/vehicles")
-public class VehicleController {
+@RequestMapping("/vehicles1")
+public class VehicleController1 {
     private final VehicleService vService;
 
-    public VehicleController(VehicleService vService, VehicleRepository vehicleRepository) {
+    public VehicleController1(VehicleService vService, VehicleRepository vehicleRepository) {
         this.vService = vService;
     }
 
