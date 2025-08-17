@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { reactive, computed, ref } from "vue";
+import { reactive, computed, ref, onMounted } from "vue";
+import api from "@/api";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const formRef = ref<any>(null);
 
+const locations = ref<{ locationId: number; name: string; address: string }[]>([]);
+
 const formData = reactive({
-  location: "",
+  locationId: null as number | null,
   pickupDate: "",
   pickupTime: "",
   returnDate: "",
@@ -24,18 +27,27 @@ const todayStr = computed(() => {
   return `${yyyy}-${mm}-${dd}`;
 });
 
+onMounted(async () => {
+  try {
+    const res = await api.get("/locations");
+    locations.value = res.data ?? [];
+  } catch (e) {
+    console.error("無法取得地點資料", e);
+  }
+});
+
 function onSubmit() {
-  // Vuetify 3 的 validate() 會回傳 { valid: boolean }
   formRef.value?.validate().then((res: { valid: boolean }) => {
     if (!res?.valid) return;
 
     const pickupDateTime =
         formData.pickupDate && formData.pickupTime
-            ? formData.pickupDate + "T" + formData.pickupTime
+            ? `${formData.pickupDate}T${formData.pickupTime}`
             : null;
+
     const returnDateTime =
         formData.returnDate && formData.returnTime
-            ? formData.returnDate + "T" + formData.returnTime
+            ? `${formData.returnDate}T${formData.returnTime}`
             : null;
 
     if (!pickupDateTime || !returnDateTime) return;
@@ -43,7 +55,7 @@ function onSubmit() {
     router.push({
       path: "/car-select",
       query: {
-        location: formData.location,
+        locationId: formData.locationId != null ? String(formData.locationId) : "",
         pickupDateTime,
         returnDateTime,
         ageChecked: formData.ageChecked ? "true" : "false",
@@ -55,8 +67,9 @@ function onSubmit() {
 const timeOptions = computed(() => {
   const times: string[] = [];
   for (let hour = 9; hour <= 18; hour++) {
-    times.push(`${hour.toString().padStart(2, "0")}:00`);
-    if (hour < 18) times.push(`${hour.toString().padStart(2, "0")}:30`);
+    const hh = hour.toString().padStart(2, "0");
+    times.push(`${hh}:00`);
+    if (hour < 18) times.push(`${hh}:30`);
   }
   return times;
 });
@@ -64,26 +77,28 @@ const timeOptions = computed(() => {
 
 <template>
   <v-container class="py-6">
-    <v-sheet
-        color="grey-darken-4"
-        theme="dark"
-        class="pa-4 rounded-lg"
-        elevation="2"
-    >
+    <v-sheet class="search-bar pa-4 rounded-lg" elevation="1">
       <v-form ref="formRef" @submit.prevent="onSubmit">
         <v-row align="end" no-gutters>
+          <!-- 取車地點 -->
           <v-col cols="12" md="4" class="pr-md-2 pb-2 pb-md-0">
-            <v-text-field
-                v-model="formData.location"
+            <v-select
+                v-model="formData.locationId"
+                :items="locations"
+                item-title="name"
+                item-value="locationId"
                 label="取車地點"
-                placeholder="輸入城市或地區"
+                :rules="[required]"
                 clearable
                 prepend-inner-icon="mdi-map-marker"
                 variant="outlined"
                 density="comfortable"
+                color="grey-darken-2"
+                class="search-field"
             />
           </v-col>
 
+          <!-- 取車日期 -->
           <v-col cols="12" md="2" class="px-md-1 pb-2 pb-md-0">
             <v-text-field
                 v-model="formData.pickupDate"
@@ -93,9 +108,12 @@ const timeOptions = computed(() => {
                 :rules="[required]"
                 variant="outlined"
                 density="comfortable"
+                color="grey-darken-2"
+                class="search-field"
             />
           </v-col>
 
+          <!-- 取車時間 -->
           <v-col cols="12" md="2" class="px-md-1 pb-2 pb-md-0">
             <v-select
                 v-model="formData.pickupTime"
@@ -105,9 +123,12 @@ const timeOptions = computed(() => {
                 clearable
                 variant="outlined"
                 density="comfortable"
+                color="grey-darken-2"
+                class="search-field"
             />
           </v-col>
 
+          <!-- 還車日期 -->
           <v-col cols="12" md="2" class="px-md-1 pb-2 pb-md-0">
             <v-text-field
                 v-model="formData.returnDate"
@@ -117,9 +138,12 @@ const timeOptions = computed(() => {
                 :rules="[required]"
                 variant="outlined"
                 density="comfortable"
+                color="grey-darken-2"
+                class="search-field"
             />
           </v-col>
 
+          <!-- 還車時間 -->
           <v-col cols="12" md="2" class="pl-md-1 pb-2 pb-md-0">
             <v-select
                 v-model="formData.returnTime"
@@ -129,18 +153,15 @@ const timeOptions = computed(() => {
                 clearable
                 variant="outlined"
                 density="comfortable"
+                color="grey-darken-2"
+                class="search-field"
             />
           </v-col>
 
           <v-col cols="12" md="3" class="pt-2 pt-md-0">
-            <v-checkbox
-                v-model="formData.ageChecked"
-                label="駕駛年齡介於 25 - 70"
-                color="primary"
-                hide-details
-                class="mb-2"
-            />
-            <v-btn type="submit" color="primary" size="large" block>搜尋</v-btn>
+            <v-btn type="submit" color="orange-darken-2" class="text-white" size="large" block>
+              搜尋
+            </v-btn>
           </v-col>
         </v-row>
       </v-form>
@@ -149,4 +170,12 @@ const timeOptions = computed(() => {
 </template>
 
 <style scoped>
+.search-bar {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+}
+
+:deep(.search-field .v-icon) {
+  color: #616161;
+}
 </style>

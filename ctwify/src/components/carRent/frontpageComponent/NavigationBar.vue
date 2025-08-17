@@ -3,22 +3,24 @@
 
 <template>
   <v-app-bar
+      app
       flat
       color="surface"
-      elevation="1"
       density="comfortable"
+      height="56"
+      elevation="1"
+      border="b"
   >
     <v-container class="d-flex align-center">
-      <RouterLink to="/car-front-homepage" class="text-decoration-none">
-        <v-img
-            src="/carPicture/logo.jpg"
-            alt="logo"
-            width="100"
-            height="80"
-            cover
-            class="mr-2"
-        />
-      </RouterLink>
+      <v-btn
+          icon
+          variant="text"
+          :ripple="false"
+          to="/car-front-homepage"
+          aria-label="回首頁"
+      >
+        <v-icon size="28">mdi-steering</v-icon>
+      </v-btn>
 
       <v-spacer />
     </v-container>
@@ -26,4 +28,5 @@
 </template>
 
 <style scoped>
+.v-btn { margin-left: -4px; }
 </style>

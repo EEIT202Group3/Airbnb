@@ -48,6 +48,7 @@ const resError = ref("");
 const resPageSize = ref(10);
 const resPageNumber = ref(1);
 const showResDialog = ref(false);
+const vehMode = ref<"plateNo" | "vehicleId">("plateNo");
 
 function normalizeDateRange() {
   if (fromDate.value && toDate.value && fromDate.value > toDate.value) {
@@ -75,7 +76,7 @@ async function fetchReservations(page = 1) {
     } else {
       params.sort = "createdAt,desc";
     }
-    const {data} = await api.get("/reservations/search-eligible", {params});
+    const {data} = await api.get("reservations/search-eligible", {params});
     resPage.value = data;
     resPageNumber.value = (data?.number ?? 0) + 1;
   } catch (e) {
@@ -114,8 +115,15 @@ async function fetchVehicles(page = 1) {
   vehLoading.value = true;
   vehError.value = "";
   try {
-    const params: any = {plateNo: plateKw.value?.trim() || "", page: page - 1, size: vehPageSize.value};
-    const {data} = await api.get("/vehicles/search-eligible", {params});
+    const params: any = {page: page - 1, size: vehPageSize.value};
+
+    if (vehMode.value === "plateNo") {
+      params.plateNo = plateKw.value?.trim() || "";
+    } else if (vehMode.value === "vehicleId") {
+      params.id = plateKw.value?.trim() || "";
+    }
+
+    const {data} = await api.get("vehicles/search-eligible", {params});
 
     if (data && !("content" in data) && data.vehicleId) {
       vehPage.value = {content: [data], totalElements: 1, totalPages: 1, size: vehPageSize.value, number: 0};
@@ -144,8 +152,9 @@ function onSearchVehicles() {
 const reservationSummary = ref<Record<string, number>>({});
 
 onMounted(async () => {
+  console.log('api baseURL =', api.defaults.baseURL);
   try {
-    const res = await api.get("/reservations/dashboard");
+    const res = await api.get("reservations/dashboard");
     reservationSummary.value = res.data || {};
   } catch (err) {
     console.error("取得 dashboard 資料失敗：", err);
@@ -159,7 +168,7 @@ let chartInstance: Chart | null = null;
 async function loadVehicleStatusChart() {
   if (!chartCanvas.value) return;
   try {
-    const res = await api.get("/vehicles/status-summary");
+    const res = await api.get("vehicles/status-summary");
     const summary = res.data || {};
     const labels = Object.keys(summary);
     const data = Object.values(summary);
@@ -208,7 +217,7 @@ function formatDateTime(dt?: string) {
     </v-row>
 
     <v-row class="mt-4 mb-4" dense>
-      <!--    預約查詢-->
+      <!-- 預約查詢 -->
       <v-col cols="12" md="6">
         <v-card>
           <v-card-text>
@@ -251,19 +260,38 @@ function formatDateTime(dt?: string) {
         </v-card>
       </v-col>
 
+      <!-- 車輛查詢（新增：搜尋模式 下拉＋動態標籤） -->
       <v-col cols="12" md="6">
         <v-card>
           <v-card-text>
             <div class="d-flex justify-space-between align-center mb-2">
-              <div class="text-subtitle-2">查詢車輛（車牌）</div>
+              <div class="text-subtitle-2">查詢車輛（車牌 / 車輛ID）</div>
             </div>
 
             <v-row dense class="mb-2">
-              <v-col cols="12" md="8">
-                <v-text-field v-model="plateKw" label="車牌" density="comfortable" variant="outlined"
-                              hide-details @keyup.enter="onSearchVehicles"/>
+              <v-col cols="12" md="4">
+                <v-select
+                    v-model="vehMode"
+                    :items="[{ title: '車牌', value: 'plateNo' }, { title: '車輛ID', value: 'vehicleId' }]"
+                    density="comfortable"
+                    variant="outlined"
+                    hide-details
+                    label="搜尋模式"
+                />
               </v-col>
-              <v-col cols="12" md="4" class="d-flex">
+
+              <v-col cols="12" md="5">
+                <v-text-field
+                    v-model="plateKw"
+                    :label="vehMode === 'plateNo' ? '車牌' : '車輛ID'"
+                    density="comfortable"
+                    variant="outlined"
+                    hide-details
+                    @keyup.enter="onSearchVehicles"
+                />
+              </v-col>
+
+              <v-col cols="12" md="3" class="d-flex">
                 <v-btn block color="primary" :loading="vehLoading" @click="onSearchVehicles">查詢</v-btn>
               </v-col>
             </v-row>
@@ -291,45 +319,45 @@ function formatDateTime(dt?: string) {
       <v-col cols="12" md="6">
         <v-card>
           <v-card-text>
-            <div class="text-subtitle-2 mb-2">車型租金一覽表</div>
+            <div class="text-subtitle-2 mb-2">車型租金一覽表（TWD / 日）</div>
             <v-table density="compact" class="text-no-wrap">
               <thead>
               <tr>
                 <th>車型</th>
-                <th>免費里程數</th>
+                <th>免費里程數（公里）</th>
                 <th>日租金</th>
               </tr>
               </thead>
               <tbody>
               <tr>
-                <td>大型轎車</td>
-                <td>100</td>
-                <td>80</td>
-              </tr>
-              <tr>
-                <td>中型車</td>
-                <td>100</td>
-                <td>70</td>
-              </tr>
-              <tr>
-                <td>休旅車</td>
-                <td>100</td>
-                <td>150</td>
-              </tr>
-              <tr>
-                <td>豪華車</td>
-                <td>0</td>
-                <td>60</td>
+                <td>小型車</td>
+                <td>200</td>
+                <td>1200</td>
               </tr>
               <tr>
                 <td>普通轎車</td>
-                <td>0</td>
-                <td>130</td>
+                <td>200</td>
+                <td>1600</td>
               </tr>
               <tr>
-                <td>小型車</td>
-                <td>0</td>
-                <td>10</td>
+                <td>中型車</td>
+                <td>250</td>
+                <td>2000</td>
+              </tr>
+              <tr>
+                <td>大型轎車</td>
+                <td>250</td>
+                <td>2500</td>
+              </tr>
+              <tr>
+                <td>休旅車</td>
+                <td>300</td>
+                <td>3000</td>
+              </tr>
+              <tr>
+                <td>豪華車</td>
+                <td>200</td>
+                <td>5000</td>
               </tr>
               </tbody>
             </v-table>
@@ -384,8 +412,12 @@ function formatDateTime(dt?: string) {
           <div v-else class="text-grey text-caption">尚無資料</div>
 
           <div class="d-flex justify-end mt-2" v-if="resPage && resPage.totalPages > 1">
-            <v-pagination v-model="resPageNumber" :length="resPage.totalPages" density="comfortable"
-                          @update:modelValue="(p:number) => fetchReservations(p)"/>
+            <v-pagination
+                v-model="resPageNumber"
+                :length="resPage.totalPages"
+                density="comfortable"
+                @update:modelValue="(p:number) => fetchReservations(p)"
+            />
           </div>
         </v-card-text>
         <v-card-actions>
@@ -398,7 +430,7 @@ function formatDateTime(dt?: string) {
     <!-- 車輛結果彈窗 -->
     <v-dialog v-model="showVehDialog" max-width="900" scrollable>
       <v-card>
-        <v-card-title class="text-subtitle-1">車牌查詢結果</v-card-title>
+        <v-card-title class="text-subtitle-1">車牌 / 車輛ID 查詢結果</v-card-title>
         <v-card-text>
           <v-alert v-if="vehError" type="error" variant="tonal" density="comfortable" class="mb-2">{{
               vehError
@@ -439,8 +471,12 @@ function formatDateTime(dt?: string) {
           <div v-else class="text-grey text-caption">尚無資料</div>
 
           <div class="d-flex justify-end mt-2" v-if="vehPage && vehPage.totalPages > 1">
-            <v-pagination v-model="vehPageNumber" :length="vehPage.totalPages" density="comfortable"
-                          @update:modelValue="(p:number) => fetchVehicles(p)"/>
+            <v-pagination
+                v-model="vehPageNumber"
+                :length="vehPage.totalPages"
+                density="comfortable"
+                @update:modelValue="(p:number) => fetchVehicles(p)"
+            />
           </div>
         </v-card-text>
         <v-card-actions>
@@ -451,6 +487,7 @@ function formatDateTime(dt?: string) {
     </v-dialog>
   </v-container>
 </template>
+
 
 <style scoped>
 .main-content {

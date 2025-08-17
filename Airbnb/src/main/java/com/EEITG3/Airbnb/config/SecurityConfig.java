@@ -94,7 +94,8 @@ public class SecurityConfig{
 									 "/api/customers/verify",
 									 "/api/customers/logout",
 									 "/api/customers/forgetpwd",
-									 "/api/customers/pwdverify").permitAll()
+									 "/api/customers/pwdverify",
+									 "/api/customers/google").permitAll()
 					.anyRequest().hasRole("CUSTOMER"))
 				.build();	
 	}
