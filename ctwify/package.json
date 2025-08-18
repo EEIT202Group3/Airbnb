@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fawmi/vue-google-maps": "^0.9.79",
     "@mdi/font": "^7.4.47",
     "@stomp/stompjs": "^7.1.1",
     "@vuepic/vue-datepicker": "^11.0.2",

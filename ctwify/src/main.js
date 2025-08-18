@@ -10,24 +10,38 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 
+
+// Google Maps
+import VueGoogleMaps from '@fawmi/vue-google-maps'
+
 import vue3GoogleLogin from 'vue3-google-login'
+
 
 const app = createApp(App)
 
+// Vuetify 設定
 const vuetify = createVuetify({
-    components,
-    directives,
-    icons: {
-        defaultSet: 'mdi',
-    },
+  components,
+  directives,
+  icons: {
+    defaultSet: 'mdi',
+  },
 })
 
-
+// 使用套件
 app.use(createPinia())
 app.use(router)
 app.use(vuetify)
 app.use(vue3GoogleLogin, {
     clientId: '784447494371-8fmribkj12vq9mpsotjopnkk8g8ob29s.apps.googleusercontent.com'
+})
+
+// Google Maps 設定
+app.use(VueGoogleMaps, {
+  load: {
+    key: 'AIzaSyBO1x0gEVOrnpwN1hLYQUbDwMF6wpYgCvg', // 替換成你的 Google Maps API Key
+    libraries: 'places', // 如果要用地點自動補全
+  },
 })
 
 app.mount('#app')
