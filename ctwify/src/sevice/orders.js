@@ -35,13 +35,3 @@ export async function getOrderDetail(bookingId) {
     return res.json(); // OrderDetailResponseDto
 }
 
-export async function payNewebpayCheckout(bookingId) {
-    const res = await fetch('/api/pay/newebpay/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ bookingId }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json(); // { MerchantID, TradeInfo, TradeSha, Version, Gateway }
-}

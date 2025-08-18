@@ -168,7 +168,7 @@
           <v-skeleton-loader type="article, actions" />
         </v-card-text>
 
-        <!-- 真的有資料再渲染內容，避免 undefined -->
+        <!-- 真的有資料再產生ㄋ內容，避免 undefined -->
         <v-card-text v-else-if="selectedOrder" class="py-4">
           <v-list density="comfortable" class="flat-list">
             <v-list-item>

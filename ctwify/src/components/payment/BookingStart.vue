@@ -1,6 +1,5 @@
 <template>
   <v-container class="py-6" max-width="1000">
-    <!-- Title -->
     <div class="header-row">
       <v-icon size="30" class="mr-2" color="deep-orange-darken-1"
         >mdi-calendar-edit</v-icon
@@ -194,10 +193,11 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import axios from "axios";
+import { useBookingStore } from "@/stores/booking";
 
 const route = useRoute();
 const router = useRouter();
+const booking = useBookingStore();
 const error = ref("");
 const submitting = ref(false);
 
@@ -212,7 +212,6 @@ const listing = {
   price: parseInt(route.query.price),
 };
 
-// 表單輸入欄位
 const form = ref({
   checkin: "",
   checkout: "",
@@ -221,7 +220,6 @@ const form = ref({
 
 const today = computed(() => new Date().toISOString().slice(0, 10));
 
-// 傳送預覽訂單請求並導向下一頁
 async function goToPreview() {
   error.value = "";
 
@@ -238,35 +236,16 @@ async function goToPreview() {
   try {
     submitting.value = true;
 
-    const payload = {
-      listid: parseInt(listing.listid),
-      checkindate: form.value.checkin,
-      checkoutdate: form.value.checkout,
-      people: form.value.people,
-    };
-
-    const { data } = await axios.post("/api/orderconfirm/preview", payload);
-
-    router.push({
-      name: "PreviewConfirm",
-      query: {
-        listid: listing.listid,
-        houseName: listing.houseName,
-        address: listing.address,
-        tel: listing.tel,
-        bed: listing.bed,
-        type: listing.type,
-        price: listing.price,
-        checkInDate: form.value.checkin,
-        checkOutDate: form.value.checkout,
-        guests: form.value.people,
-        days: data.days,
-        total: data.total,
-        username: data.customer?.name || data.customer?.username,
-      },
+    booking.setListing(listing);
+    booking.setBookingParams({
+      listid: Number(listing.listid),
+      checkInDate: form.value.checkin,
+      checkOutDate: form.value.checkout,
+      guests: Number(form.value.people),
     });
+    router.push({ name: "PreviewConfirm" });
   } catch (err) {
-    error.value = err?.response?.data || err?.message || "預覽訂單失敗";
+    error.value = err?.message || "預覽訂單失敗";
   } finally {
     submitting.value = false;
   }
@@ -278,12 +257,9 @@ function formatAmount(n) {
 </script>
 
 <style scoped>
-/* 柔和暖橘卡片 */
 .soft-card {
-  background: #fff7ed; /* orange-50 風格 */
+  background: #fff7ed;
 }
-
-/* 標題區 */
 .header-row {
   display: flex;
   align-items: center;
@@ -299,8 +275,6 @@ function formatAmount(n) {
   font-size: 25px;
   font-weight: 700;
 }
-
-/* 扁平化 list + 文字樣式 */
 .flat-list {
   --v-list-padding-start: 0;
   --v-list-padding-end: 0;

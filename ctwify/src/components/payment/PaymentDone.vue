@@ -279,7 +279,7 @@ async function fetchDetailOnce() {
   }
 }
 
-/** PayPal 且未定時才輪詢 */
+/** PayPal **/
 function startPolling() {
   clearInterval(pollTimer);
   pollTimer = setInterval(async () => {
@@ -303,8 +303,6 @@ async function retry() {
 function goHome() {
   router.push("/");
 }
-
-/** lifecycle */
 onMounted(async () => {
   if (!bookingId) {
     error.value = "缺少訂單編號";
@@ -322,12 +320,9 @@ onBeforeUnmount(() => clearInterval(pollTimer));
 </script>
 
 <style scoped>
-/* 柔和暖橘卡片 */
 .soft-card {
-  background: #fff7ed; /* orange-50 感 */
+  background: #fff7ed;
 }
-
-/* 標題區 */
 .header-row {
   display: flex;
   align-items: center;
@@ -344,14 +339,10 @@ onBeforeUnmount(() => clearInterval(pollTimer));
   font-weight: 700;
   color: #7c2d12;
 }
-
-/* 載入文字 */
 .loading-text {
   font-size: 16px;
   color: #7c2d12;
 }
-
-/* Key-Value 列表 */
 .flat-list {
   --v-list-padding-start: 0;
   --v-list-padding-end: 0;
