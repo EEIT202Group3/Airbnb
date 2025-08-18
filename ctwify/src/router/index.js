@@ -32,10 +32,38 @@ const routes = [
         name: "HostLogin",
       },
       {
+
+        path: '/login',
+        component: () => import('@/components/user/customer/LoginSignup.vue'),
+      },
+
+      {
+        path:'/homepage',
+        component: () => import('@/components/listing/customer/ListingCard.vue'),
+      },
+
+      {
+        path: '/coustomerlistings/:id',
+         component: () =>import('@/components/listing/customer/CustomerDetail.vue'),
+      },
+
+    
+      {
+        path: '/addlistings',
+        component: () => import('@/components/listing/host/AddListing2.vue')
+
+      },
+
+
+      {
+        path:'/customerdatil/:id',
+        component: () => import('@/components/user/customer/LoginSignup.vue')
+
         path: "customerprofile",
         component: () =>
           import("@/components/user/customer/CustomerProfile.vue"),
         name: "CustomerProfile",
+
       },
       {
         path: "login",
@@ -83,6 +111,7 @@ const routes = [
         props: true,
       },
       {
+
 
         path: '/order/list',
         name: 'OrderList',

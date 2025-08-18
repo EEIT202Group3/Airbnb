@@ -36,13 +36,16 @@
    font-weight: 600;
  }
 
- nav a {
-   margin-left: 25px;
-   text-decoration: none;
-   color: #333;
-   font-weight: 400;
-   transition: color 0.3s;
- }
+nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 23px 24px;
+  color: #0b0b0b;
+  font-weight: 500;
+  text-decoration: none;
+}
+
 
  .highlight {
    color: #f07b2d;
@@ -161,10 +164,10 @@
    background-color: #e7630b;
  }
 
- nav a:hover {
-   color: #D35400;
- }
-
+nav a:hover {
+  background-color: #edececb7;
+  color: #000;
+}
  #menu-toggle {
    display: none;
  }
@@ -173,11 +176,16 @@
    font-size: 16px;
    cursor: pointer;
    display: inline-block;
-   padding: 5px;
-   margin-left: 15px;
-   transition: color 0.3s;
+   padding: 26px;
+    color:#0b0b0b;
+    text-decoration: none;
+    cursor: pointer;
+    background: transparent;
  }
-
+ .menu-icon i {
+  position: relative;
+  top: -3px; /* 可以調整為 -2px、-4px 看起來最順 */
+}
 
  .menu {
    position: relative;
@@ -202,6 +210,7 @@
    padding: 10px;
    color: #333;
    text-decoration: none;
+   font-size: 17px; 
  }
 
  .dropdown a:hover {
@@ -212,9 +221,10 @@
    display: block;
  }
 
- .menu-icon:hover {
-   color: #D35400;
- }
+.menu-icon:hover {
+  background-color: #edececb7;
+  color: #000;
+}
 
  .description-text {
    white-space: pre-line;

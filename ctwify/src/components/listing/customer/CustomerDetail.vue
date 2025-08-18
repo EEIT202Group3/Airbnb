@@ -87,6 +87,33 @@
           <br />
           <hr />
 
+          <br>
+              <!-- Google 地圖區塊 -->
+        <div class="map-section" v-if="listing">
+        <h4>住宿地點</h4>
+        <br>
+        <div class="map-wrapper">
+        <GMapMap
+  :center="mapCenter"
+  :zoom="15"
+  style="width: 100%; height: 500px;"
+>
+  <GMapCircle
+    :center="mapCenter"
+    :radius="350" 
+    :options="{
+      strokeColor: '#888',
+      strokeOpacity: 0.7,
+      fillColor: '#888',
+      fillOpacity: 0.4
+    }"
+  />
+</GMapMap>
+
+         </div>
+        </div>
+
+          <br>
           <!-- 設備列表 -->
           <div class="amenities" v-if="listing.equipments?.length">
             <h4>有提供的設備與服務</h4>
@@ -212,7 +239,7 @@
 import axios from '@/api';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
-import { ref, onMounted,watch, computed } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
@@ -225,7 +252,6 @@ const photos = ref([])
 
 const isModalOpen = ref(false)
 const showFullDescription = ref(false)
-
 const isAmenitiesModalOpen = ref(false)
 const limitCount = 6
 
@@ -233,44 +259,45 @@ const limitCount = 6
 const checkIn = ref('')
 const checkOut = ref('')
 const guests = ref(1)
-// 日期範圍
-const dateRange = ref([new Date(), new Date(new Date().getTime() + 86400000)]) // 預設今天 + 明天
+const dateRange = ref([new Date(), new Date(new Date().getTime() + 86400000)])
 
+// 地圖
+const mapCenter = ref({ lat: 25.0340, lng: 121.5645 }) // 預設台北市中心
+const mapBounds = ref(null);  // 用來放 viewport bounds
+const mapRef = ref(null);
+const zoomLevel = ref(3); 
 
 const baseImageUrl = 'http://localhost:8080/images/listings/'
 
+// 切換主圖
 function switchMainPhoto(photo) {
   mainPhoto.value = photo
   selectedPhoto.value = photo
 }
 
+//地址名稱縣市擷取
 const cityName = computed(() => {
   if (!listing.value) return ''
   const address = listing.value.ads || ''
-  const match = address.match(/(.{2,3}[縣市])/)
-  return match ? match[0] : '某地區'
+
+ 
+  const cleanedAddress = address.replace(/台灣/, '')
+
+  const match = cleanedAddress.match(/([\u4e00-\u9fa5]{2,3}[縣市])/)
+  
+  return match ? match[1] : '國外地區'
 })
 
-function editHouse(listId) {
-  router.push(`/edit/${listId}`)
-}
 
-function openModal() {
-  isModalOpen.value = true
-}
+// 房源介紹彈窗
+function openModal() { isModalOpen.value = true }
+function closeModal() { isModalOpen.value = false }
 
-function closeModal() {
-  isModalOpen.value = false
-}
+// 設備彈窗
+function openAmenitiesModal() { isAmenitiesModalOpen.value = true }
+function closeAmenitiesModal() { isAmenitiesModalOpen.value = false }
 
-function openAmenitiesModal() {
-  isAmenitiesModalOpen.value = true
-}
-
-function closeAmenitiesModal() {
-  isAmenitiesModalOpen.value = false
-}
-
+// 文字截斷
 const truncatedText = computed(() => {
   if (!listing.value?.describe) return ''
   return listing.value.describe.length > 100
@@ -278,28 +305,20 @@ const truncatedText = computed(() => {
     : listing.value.describe
 })
 
-const reviewCount = computed(() => {
-  return listing.value?.reviewCount ?? 0
-})
-
+// 評分星星
+const reviewCount = computed(() => listing.value?.reviewCount ?? 0)
 const starIcons = computed(() => {
   const stars = []
   const avg = reviewCount.value
-
   for (let i = 1; i <= 5; i++) {
-    if (avg >= i) {
-      stars.push('full')
-    } else if (avg >= i - 0.5) {
-      stars.push('half')
-    } else {
-      stars.push('empty')
-    }
+    if (avg >= i) stars.push('full')
+    else if (avg >= i - 0.5) stars.push('half')
+    else stars.push('empty')
   }
-
   return stars
 })
 
-// 計算晚數
+// 晚數與總價
 const nights = computed(() => {
   if (!checkIn.value || !checkOut.value) return 0
   const start = new Date(checkIn.value)
@@ -307,34 +326,10 @@ const nights = computed(() => {
   const diffTime = end - start
   return diffTime > 0 ? diffTime / (1000 * 60 * 60 * 24) : 0
 })
+const totalPrice = computed(() => listing.value ? listing.value.price * nights.value : 0)
 
-// 總價計算
-const totalPrice = computed(() => {
-  if (!listing.value) return 0
-  return listing.value.price * nights.value
-})
-
-// 預設日期：今天 + 明天
-onMounted(() => {
-  const today = new Date()
-  const tomorrow = new Date(today)
-  tomorrow.setDate(today.getDate() + 1)
-  checkIn.value = today.toISOString().split('T')[0]
-  checkOut.value = tomorrow.toISOString().split('T')[0]
-})
-// 監聽 dateRange 變動，自動更新 checkIn / checkOut
-watch(dateRange, (newVal) => {
-  if (newVal && newVal.length === 2) {
-    checkIn.value = newVal[0]?.toISOString().split('T')[0] || ''
-    checkOut.value = newVal[1]?.toISOString().split('T')[0] || ''
-  }
-})
-
-
-const limitedEquipments = computed(() => {
-  return listing.value?.equipments?.slice(0, limitCount) || []
-})
-
+// 限制設備數量
+const limitedEquipments = computed(() => listing.value?.equipments?.slice(0, limitCount) || [])
 const groupedEquipments = computed(() => {
   if (!listing.value?.equipments) return {}
   return listing.value.equipments.reduce((acc, equip) => {
@@ -350,31 +345,109 @@ function isFontAwesome(icon) {
   return icon?.startsWith('fa') || icon?.includes('fa-')
 }
 
+// Geocoding API 將地址轉經緯度
+async function geocodeAddress(address) {
+  try {
+    const res = await axios.get(`/api/geocode`, {
+      params: { address }
+    });
+    const data = res.data;
+
+     if (data.status === 'OK' && data.results.length > 0) {
+      const geometry = data.results[0].geometry;
+      return {
+        location: geometry.location,
+        viewport: geometry.viewport
+      };
+    } else {
+      console.error('Geocoding 失敗:', data.status);
+      return null;
+    }
+  } catch (error) {
+    console.error('Geocoding 錯誤', error);
+    return null;
+  }
+}
+
+// 取得房源資料
 onMounted(async () => {
   const id = route.params.id
   try {
     const res = await axios.get(`/listings/${id}`)
     listing.value = res.data
 
-     // 測試用分數
+    // 測試用分數
     listing.value.reviewCount = 4.5
-  
 
+    // 圖片整理
     photos.value = []
     for (let i = 1; i <= 10; i++) {
       const key = `photo${i}`
-      if (listing.value[key]) {
-        photos.value.push(`${baseImageUrl}${listing.value[key]}`)
+      if (listing.value[key]) photos.value.push(`${baseImageUrl}${listing.value[key]}`)
+    }
+    mainPhoto.value = photos.value.length > 0 ? photos.value[0] : ''
+    selectedPhoto.value = mainPhoto.value
+
+        // 地圖設定
+    if (listing.value.lat && listing.value.lng) {
+      const rawLat = parseFloat(listing.value.lat);
+      const rawLng = parseFloat(listing.value.lng);
+
+      // 隨機偏移
+      const offset = () => (Math.random() - 0.5) * 0.004;
+
+      mapCenter.value = {
+        lat: rawLat + offset(),
+        lng: rawLng + offset()
+      };
+    } else if (listing.value.ads) {
+      // 沒有經緯度時用地址 geocode
+      const geocodeResult = await geocodeAddress(listing.value.ads);
+      if (geocodeResult) {
+        mapCenter.value = geocodeResult.location;
+        mapBounds.value = geocodeResult.viewport;
       }
     }
 
-    mainPhoto.value = photos.value.length > 0 ? photos.value[0] : ''
-    selectedPhoto.value = mainPhoto.value
   } catch (error) {
-    console.error('取得房源資料失敗', error)
+    console.error('取得房源資料失敗', error);
   }
 })
+
+// 監聽 mapBounds 變動，當有範圍時調整地圖
+watch(mapBounds, async (newBounds) => {
+  if (newBounds && mapRef.value && mapRef.value.$mapObject) {
+    const bounds = new google.maps.LatLngBounds(
+      new google.maps.LatLng(newBounds.southwest.lat, newBounds.southwest.lng),
+      new google.maps.LatLng(newBounds.northeast.lat, newBounds.northeast.lng)
+    );
+    mapRef.value.$mapObject.fitBounds(bounds);
+
+        // 更新 zoomLevel，保持響應式
+    zoomLevel.value = mapRef.value.$mapObject.getZoom();
+
+  }
+})
+
+// 監聽日期範圍
+watch(dateRange, (newVal) => {
+  if (newVal && newVal.length === 2) {
+    checkIn.value = newVal[0]?.toISOString().split('T')[0] || ''
+    checkOut.value = newVal[1]?.toISOString().split('T')[0] || ''
+  }
+})
+
+
+// 預設日期：今天 + 明天
+onMounted(() => {
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(today.getDate() + 1)
+  checkIn.value = today.toISOString().split('T')[0]
+  checkOut.value = tomorrow.toISOString().split('T')[0]
+})
 </script>
+
 
 <style>
 @import "@/assets/listing/list1.css";
@@ -453,7 +526,7 @@ onMounted(async () => {
   box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.2);
 }
 
-/* 預訂按鈕美化 */
+/* 預訂按鈕 */
 .reserve-btn {
   width: 100%;
   padding: 14px;
@@ -474,6 +547,26 @@ onMounted(async () => {
 
 .reserve-btn:active {
   transform: translateY(0);
+}
+
+
+.map-section {
+  margin-top: 24px;
+}
+
+.map-section h4 {
+  margin-bottom: 12px;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+/* 地圖樣式 */
+.map-wrapper {
+  width: 960px;
+  height: 500px;       
+  border-radius: 16px;  
+  overflow: hidden;      
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
 }
 
 

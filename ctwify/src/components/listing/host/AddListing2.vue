@@ -9,24 +9,30 @@
         </div>
 
         <!-- 地址：城市與區域 -->
-        <div class="mb-3 row">
-          <div class="col">
-            <label class="form-label">城市</label>
-            <select v-model="selectedCity" class="form-select" required @change="updateDistricts">
-              <option disabled value="">請選擇縣市</option>
-              <option v-for="(districts, city) in cityData" :key="city" :value="city">{{ city }}</option>
-            </select>
-          </div>
-          <div class="col">
-            <label class="form-label">區域</label>
-            <select v-model="selectedDistrict" class="form-select" required>
-              <option disabled value="">請選擇區域</option>
-              <option v-for="d in availableDistricts" :key="d">{{ d }}</option>
-            </select>
-          </div>
-          <div class="col">
-            <label class="form-label">詳細地址</label>
-            <input v-model="form.detailAddress" type="text" class="form-control" required />
+        <label class="form-label">地址</label>
+        <div class="col">
+          <input
+            type="text"
+            class="form-control"
+            :value="address"
+            readonly
+            placeholder="點擊選擇地址"
+            @click="openDialog"
+          />
+
+          <!-- 彈窗 -->
+          <div v-if="showDialog" class="dialog-overlay">
+            <div class="dialog">
+              <h3>選擇地址</h3>
+              <input type="text" v-model="tempAddress" ref="dialogInput" placeholder="輸入地址" />
+
+              <div id="map"></div>
+
+              <div class="dialog-buttons">
+                <button @click="confirmAddress">確認地址</button>
+                <button @click="closeDialog">取消</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -96,51 +102,49 @@
           <input type="file" multiple accept="image/*" @change="handleFileUpload" class="form-control" />
         </div>
 
-       <!-- 設備選擇（依分類排版，點擊圖示選擇） -->
-<div class="mb-3">
-  <label class="form-label">請勾選設備：</label>
-  <div v-for="(equipments, category) in groupedEquipments" :key="category" class="mb-4">
-    <h5 class="equip-category-title">{{ category }}</h5>
-    <div class="d-flex flex-wrap gap-3">
-      <div
-        v-for="eq in equipments"
-        :key="eq.equip_id"
-        class="equip-item"
-        :class="{ selected: form.equipments.includes(eq.equip_id) }"
-        @click="toggleEquipment(eq.equip_id)"
-        title="點擊選擇設備"
-      >
-        <!-- Font Awesome icon -->
-        <i
-          v-if="isFontAwesome(eq.equip_icon)"
-          :class="[eq.equip_icon, 'equip-icon']"
-          aria-hidden="true"
-        ></i>
+        <!-- 設備選擇（依分類排版，點擊圖示選擇） -->
+        <div class="mb-3">
+          <label class="form-label">請勾選設備：</label>
+          <div v-for="(equipments, category) in groupedEquipments" :key="category" class="mb-4">
+            <h5 class="equip-category-title">{{ category }}</h5>
+            <div class="d-flex flex-wrap gap-3">
+              <div
+                v-for="eq in equipments"
+                :key="eq.equip_id"
+                class="equip-item"
+                :class="{ selected: form.equipments.includes(eq.equip_id) }"
+                @click="toggleEquipment(eq.equip_id)"
+                title="點擊選擇設備"
+              >
+                <!-- Font Awesome icon -->
+                <i
+                  v-if="isFontAwesome(eq.equip_icon)"
+                  :class="[eq.equip_icon, 'equip-icon']"
+                  aria-hidden="true"
+                ></i>
 
-        <!-- Vuetify (mdi) icon -->
-        <v-icon
-          v-else
-          class="equip-icon"
-          size="25"
-        >
-          {{ eq.equip_icon }}
-        </v-icon>
+                <!-- Vuetify (mdi) icon -->
+                <v-icon v-else class="equip-icon" size="25">
+                  {{ eq.equip_icon }}
+                </v-icon>
 
-        <div class="equip-name">{{ eq.equip_name }}</div>
-        <input
-          type="checkbox"
-          :value="eq.equip_id"
-          v-model="form.equipments"
-          class="d-none"
-        />
-      </div>
-    </div>
-  </div>
-</div>
+                <div class="equip-name">{{ eq.equip_name }}</div>
+                <input
+                  type="checkbox"
+                  :value="eq.equip_id"
+                  v-model="form.equipments"
+                  class="d-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="text-center">
           <button type="submit" class="btn btn-orange btn-lg px-5">新增房源</button>
         </div>
+
+        <!-- 表單結尾 -->
       </form>
     </div>
   </div>
@@ -150,37 +154,16 @@
 import axios from '@/api2';
 import Swal from 'sweetalert2';
 
+
 export default {
   data() {
     return {
-      selectedCity: '',
-      selectedDistrict: '',
-      availableDistricts: [],
-     cityData : {
-  "台北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
-  "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "樹林區", "鶯歌區", "三峽區", "淡水區", "汐止區", "瑞芳區", "土城區", "蘆洲區", "五股區", "泰山區", "林口區", "八里區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "金山區", "萬里區", "烏來區"],
-  "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
-  "桃園市": ["桃園區", "中壢區", "平鎮區", "八德區", "楊梅區", "蘆竹區", "大溪區", "龍潭區", "龜山區", "觀音區", "新屋區", "復興區"],
-  "新竹市": ["東區", "北區", "香山區"],
-  "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "芎林鄉", "新豐鄉", "五峰鄉", "尖石鄉"],
-  "苗栗縣": ["苗栗市", "頭份市", "苑裡鎮", "通霄鎮", "竹南鎮", "後龍鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "三義鄉", "南庄鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "泰安鄉"],
-  "台中市": ["中區", "東區", "南區", "西區", "北區", "北屯區", "西屯區", "南屯區", "太平區", "大里區", "霧峰區", "烏日區", "豐原區", "后里區", "石岡區", "東勢區", "和平區", "新社區", "潭子區", "大雅區", "神岡區", "大肚區", "沙鹿區", "龍井區", "梧棲區", "清水區", "大甲區", "外埔區", "大安區"],
-  "彰化縣": ["彰化市", "員林市", "和美鎮", "鹿港鎮", "溪湖鎮", "田中鎮", "北斗鎮", "二林鎮", "田尾鄉", "埤頭鄉", "溪州鄉", "竹塘鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "永靖鄉", "社頭鄉", "埔心鄉", "溪州鄉", "二水鄉"],
-  "南投縣": ["南投市", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
-  "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "臺西鄉", "東勢鄉", "褒忠鄉", "四湖鄉", "口湖鄉", "水林鄉"],
-  "嘉義市": ["東區", "西區"],
-  "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
-  "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
-  "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區", "茄萣區"],
-  "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
-  "宜蘭縣": ["宜蘭市", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "羅東鎮", "三星鄉", "大同鄉", "五結鄉", "冬山鄉", "蘇澳鎮", "南澳鄉"],
-  "花蓮縣": ["花蓮市", "新城鄉", "吉安鄉", "壽豐鄉", "鳳林鎮", "光復鄉", "豐濱鄉", "瑞穗鄉", "萬榮鄉", "玉里鎮", "卓溪鄉", "富里鄉"],
-  "台東縣": ["臺東市", "成功鎮", "關山鎮", "卑南鄉", "鹿野鄉", "池上鄉", "東河鄉", "長濱鄉", "太麻里鄉", "大武鄉", "綠島鄉", "蘭嶼鄉", "延平鄉", "達仁鄉"],
-  "澎湖縣": ["馬公市", "西嶼鄉", "望安鄉", "七美鄉", "白沙鄉", "湖西鄉"],
-  "金門縣": ["金沙鎮", "金湖鎮", "金寧鄉", "金城鎮", "烈嶼鄉"],
-  "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"],
-},
-
+      address: '',         
+      tempAddress: '',     
+      showDialog: false,   
+      autocomplete: null,
+      map: null,
+      marker: null,
       equipList: [],
       form: {
         hostId: "6d4d8eb1-4e79-4c3e-9a1c-820ebcb8a8ee",
@@ -209,7 +192,79 @@ export default {
     }
   },
   methods: {
-    updateDistricts() {
+    openDialog() {
+      this.showDialog = true;
+      this.$nextTick(() => {
+        this.tempAddress = this.address;
+        this.initMap();
+        this.initAutocomplete();
+      });
+    },
+    closeDialog() {
+      this.showDialog = false;
+    },
+    confirmAddress() {
+      this.address = this.tempAddress;
+      this.closeDialog();
+    },
+    initMap() {
+      this.map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 25.0330, lng: 121.5654 },
+        zoom: 12
+      });
+      // 如果有地址，透過 Geocoder 定位地圖
+  if (this.tempAddress) {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: this.tempAddress }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const location = results[0].geometry.location;
+        this.map.setCenter(location);
+        this.map.setZoom(15);
+
+        if (this.marker) {
+          this.marker.setMap(null);
+        }
+
+        this.marker = new google.maps.Marker({
+          map: this.map,
+          position: location
+        });
+      }
+    });
+  }
+    },
+   initAutocomplete() {
+  const input = this.$refs.dialogInput;
+
+  // 先解除舊的 autocomplete 綁定（如果存在）
+  if (this.autocomplete) {
+    google.maps.event.clearInstanceListeners(this.autocomplete);
+    this.autocomplete.unbindAll?.();
+    this.autocomplete = null;
+  }
+
+  // 重新初始化 Autocomplete
+  this.autocomplete = new google.maps.places.Autocomplete(input, { types: ['geocode'] });
+  this.autocomplete.addListener('place_changed', this.onPlaceChanged);
+},
+    onPlaceChanged() {
+      const place = this.autocomplete.getPlace();
+      if (place.geometry && place.geometry.location) {
+        this.map.setCenter(place.geometry.location);
+        this.map.setZoom(15);
+
+        if (this.marker) {
+          this.marker.setMap(null);
+        }
+        this.marker = new google.maps.Marker({
+          map: this.map,
+          position: place.geometry.location
+        });
+
+        this.tempAddress = place.formatted_address;
+      }
+    },
+  updateDistricts() {
       this.availableDistricts = this.cityData[this.selectedCity] || [];
       this.selectedDistrict = '';
     },
@@ -249,10 +304,8 @@ export default {
       const formData = new FormData();
       formData.append("host_id", this.form.hostId);
       formData.append("houseName", this.form.houseName);
-
-      const fullAddress = `${this.selectedCity}${this.selectedDistrict}${this.form.detailAddress}`;
+      const fullAddress = `${this.address}${this.form.detailAddress}`;
       formData.append("ads", fullAddress);
-
       formData.append("room", this.form.room);
       formData.append("bed", `${this.form.bedCount} 張 ${this.form.bedType}`);
       formData.append("describe", this.form.describe);
@@ -268,7 +321,7 @@ export default {
         formData.append("equipments", id);
       });
       try {
-        const res = await axios.post("http://localhost:8080/listings/add", formData);
+        const res = await axios.post("/listings/add", formData); 
         if (res.status === 200) {
           Swal.fire("新增成功", "房源新增成功！", "success");
           this.resetForm();
@@ -278,7 +331,7 @@ export default {
         console.error(err);
       }
     },
-
+  
     resetForm() {
       this.form = {
         hostId:"6d4d8eb1-4e79-4c3e-9a1c-820ebcb8a8ee",
@@ -306,7 +359,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 @import "/src/assets/listing/list3.css";
 /* 設備分類標題 */
 .equip-category-title {
@@ -350,4 +403,58 @@ export default {
   white-space: normal;
   user-select: none;
 }
+
+
+/* 遮罩背景 */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+/* 彈窗本體 */
+.dialog {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 文字框 */
+.dialog input {
+  margin-bottom: 30px;
+}
+
+#map {
+  flex: 1;
+  min-height: 400px;
+  max-height: 400px; /* 限制最大高度 */
+}
+/* 按鈕區塊 */
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+.pac-container {
+  z-index: 3000 !important;
+}
+
+body {
+  padding-right: 0 !important;
+}
+
 </style>
