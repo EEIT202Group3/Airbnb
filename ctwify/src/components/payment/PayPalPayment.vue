@@ -123,7 +123,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { createPayPalOrder, capturePayPalPayment } from "./paypal";
+import { createPayPalOrder, capturePayPalPayment } from "../../sevice/paypal";
 
 const route = useRoute();
 const router = useRouter();
@@ -140,7 +140,7 @@ const buttonReady = ref(false);
 const initializingButton = ref(false);
 
 const PAYPAL_CLIENT_ID =
-  "AbVU0JVezhR-EKuGsmsOrcV8fjk_VqlwkDNDaaj63RPXtDm43ZW74IiFnKH41dZTs_8jS1I7j4R5WiNK";
+  "AcEqMs9hMZ6okj-3IDrydnmdGcaX9lCWkIHuaLOqVFg8Xq_0an34uEOiSgH7buMWB1PI-r_pukLmnAX5";
 
 let paypalInstance = null;
 let sdkLoaded = false;

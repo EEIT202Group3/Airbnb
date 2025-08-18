@@ -8,6 +8,7 @@ public class OrderRequestDto {
 
 	    private Integer listid;
 	    private String hostid;
+	    private Integer reservationId; 
 	    private String customerid;
 	    private String username;
 	    private String houseName;
@@ -16,6 +17,7 @@ public class OrderRequestDto {
 	    private String bed;
 	    private LocalDate checkindate;
 	    private LocalDate checkoutdate;
+	    private Integer locationId;  
 	    private int people;
 	    private int roomprice;
 	    private int days;
@@ -118,6 +120,18 @@ public class OrderRequestDto {
 		}
 		public void setBookingmethod(String bookingmethod) {
 			this.bookingmethod = bookingmethod;
+		}
+		public Integer getReservationId() {
+			return reservationId;
+		}
+		public void setReservationId(Integer reservationId) {
+			this.reservationId = reservationId;
+		}
+		public Integer getLocationId() {
+			return locationId;
+		}
+		public void setLocationId(Integer locationId) {
+			this.locationId = locationId;
 		}
 
 

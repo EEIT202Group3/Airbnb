@@ -1,6 +1,5 @@
 <template>
   <v-container class="py-6" max-width="1000">
-    <!-- Title -->
     <div class="header-row">
       <v-icon size="30" class="mr-2" color="deep-orange-darken-1"
         >mdi-file-document-check-outline</v-icon
@@ -22,7 +21,12 @@
     </v-alert>
 
     <!-- 房源資訊 -->
-    <v-card v-if="preview" class="mb-4 soft-card" elevation="2" rounded="xl">
+    <v-card
+      v-if="booking.selectedListing"
+      class="mb-4 soft-card"
+      elevation="2"
+      rounded="xl"
+    >
       <v-card-title class="text-h6 d-flex align-center">
         <v-icon class="mr-2" color="deep-orange-accent-3">mdi-home-city</v-icon>
         <span class="card-title">房源資訊</span>
@@ -43,7 +47,7 @@
                 >
                 <v-list-item-title class="kv"
                   >房名：<span class="value">{{
-                    preview.listing.houseName
+                    booking.selectedListing.houseName
                   }}</span></v-list-item-title
                 >
               </v-list-item>
@@ -54,7 +58,7 @@
                 >
                 <v-list-item-title class="kv"
                   >地址：<span class="value">{{
-                    preview.listing.address || preview.listing.ads
+                    booking.selectedListing.address
                   }}</span></v-list-item-title
                 >
               </v-list-item>
@@ -65,7 +69,7 @@
                 >
                 <v-list-item-title class="kv"
                   >電話：<span class="value">{{
-                    preview.listing.tel
+                    booking.selectedListing.tel
                   }}</span></v-list-item-title
                 >
               </v-list-item>
@@ -82,7 +86,8 @@
                 >
                 <v-list-item-title class="kv"
                   >房型：<span class="value"
-                    >{{ preview.listing.type }}{{ preview.listing.bed }}</span
+                    >{{ booking.selectedListing.type
+                    }}{{ booking.selectedListing.bed }}</span
                   ></v-list-item-title
                 >
               </v-list-item>
@@ -95,7 +100,7 @@
                 >
                 <v-list-item-title class="kv"
                   >每晚價格：<span class="value"
-                    >NT$ {{ formatAmount(preview.listing.price) }}</span
+                    >NT$ {{ formatAmount(booking.selectedListing.price) }}</span
                   ></v-list-item-title
                 >
               </v-list-item>
@@ -106,7 +111,12 @@
     </v-card>
 
     <!-- 入住資訊 -->
-    <v-card v-if="preview" class="mb-4 soft-card" elevation="2" rounded="xl">
+    <v-card
+      v-if="booking.hasBookingData"
+      class="mb-4 soft-card"
+      elevation="2"
+      rounded="xl"
+    >
       <v-card-title class="text-h6 d-flex align-center">
         <v-icon class="mr-2" color="deep-orange-accent-3"
           >mdi-calendar-range</v-icon
@@ -128,7 +138,7 @@
                 >
                 <v-list-item-title class="kv"
                   >入住日：<span class="value">{{
-                    formatDate(preview.checkindate)
+                    formatDate(booking.bookingParams.checkInDate)
                   }}</span></v-list-item-title
                 >
               </v-list-item>
@@ -145,7 +155,7 @@
                 >
                 <v-list-item-title class="kv"
                   >退房日：<span class="value">{{
-                    formatDate(preview.checkoutdate)
+                    formatDate(booking.bookingParams.checkOutDate)
                   }}</span></v-list-item-title
                 >
               </v-list-item>
@@ -162,11 +172,11 @@
                 >
                 <v-list-item-title class="kv"
                   >入住人數：<span class="value"
-                    >{{ preview.people }} 人</span
+                    >{{ booking.bookingParams.guests }} 人</span
                   ></v-list-item-title
                 >
               </v-list-item>
-              <v-list-item>
+              <v-list-item v-if="preview">
                 <template #prepend
                   ><v-icon color="deep-orange"
                     >mdi-moon-waning-crescent</v-icon
@@ -190,29 +200,56 @@
         <v-icon class="mr-2" color="deep-orange-accent-3"
           >mdi-receipt-text-check</v-icon
         >
-        <span class="card-title">金額</span>
+        <span class="card-title">金額明細</span>
       </v-card-title>
 
       <v-divider class="mx-4"></v-divider>
 
       <v-card-text class="py-4">
+        <div class="mb-3">
+          <div class="d-flex justify-space-between mb-2">
+            <span class="text-body-1">房租小計</span>
+            <span class="text-body-1"
+              >NT$ {{ formatAmount(preview.roomTotal || 0) }}</span
+            >
+          </div>
+          <div
+            v-if="preview.carTotal > 0"
+            class="d-flex justify-space-between mb-2"
+          >
+            <span class="text-body-1">租車小計</span>
+            <span class="text-body-1"
+              >NT$ {{ formatAmount(preview.carTotal) }}</span
+            >
+          </div>
+        </div>
+
+        <v-divider class="my-3" />
+
         <div class="total-row">
           <span class="total-label text-h5">應付金額</span>
-          <span class="total-value">NT$ {{ formatAmount(preview.total) }}</span>
+          <span class="total-value"
+            >NT$ {{ formatAmount(preview.grandtotal) }}</span
+          >
         </div>
         <div
           v-if="payMethod === 'PAYPAL'"
           class="text-caption text-grey-darken-1 mt-2 d-flex align-center"
         >
           <v-icon size="16" class="mr-1">mdi-information-outline</v-icon>
-          PayPal 付款金額約：${{ convertToUSD(preview.total) }} USD（示意匯率 1
-          USD = 31 TWD）
+          PayPal 付款金額約：${{ convertToUSD(preview.grandTotal) }}
+          USD（示意匯率 1 USD = 31 TWD）
         </div>
       </v-card-text>
     </v-card>
 
     <!-- 租車 -->
-    <v-card v-if="preview" class="mb-6 soft-card" elevation="2" rounded="xl">
+    <v-card
+      v-if="booking.hasBookingData"
+      class="mb-6 soft-card"
+      elevation="2"
+      rounded="xl"
+    >
       <v-card-title class="text-h6 d-flex align-center">
         <v-icon class="mr-2" color="deep-orange-accent-3">mdi-car</v-icon>
         <span class="card-title">是否需要租車</span>
@@ -245,11 +282,16 @@
           </v-col>
         </v-row>
 
-        <div v-if="form.carId" class="text-caption mt-3 d-flex align-center">
+        <div
+          v-if="booking.hasCarData"
+          class="text-caption mt-3 d-flex align-center"
+        >
           <v-icon size="16" class="mr-1" color="deep-orange"
             >mdi-check-decagram</v-icon
           >
-          已選擇車輛：{{ form.carLabel || form.carId }}
+          已選擇車輛：租車訂單 {{ booking.vehicleDraft.reservationId }}｜門市
+          {{ booking.vehicleDraft.locationId ?? "-" }}｜NT$
+          {{ formatAmount(booking.vehicleDraft.totalAmount) }}
           <v-btn
             size="small"
             variant="text"
@@ -302,7 +344,7 @@
         size="large"
         class="px-6"
         :loading="loading"
-        :disabled="!preview"
+        :disabled="!preview || !booking.hasBookingData"
         @click="submitOrder"
       >
         <v-icon start>mdi-check-circle-outline</v-icon>
@@ -323,24 +365,22 @@
 
 <script setup>
 import { useRoute, useRouter } from "vue-router";
-import { ref, onMounted, reactive, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import dayjs from "dayjs";
-import { previewOrder, finalizeOrder as finalizeOrderApi } from "./order";
+import {
+  previewOrder,
+  finalizeOrder as finalizeOrderApi,
+} from "../../sevice/order";
+import { useBookingStore } from "@/stores/booking";
 
 const route = useRoute();
 const router = useRouter();
+const booking = useBookingStore();
 
 const preview = ref(null);
 const error = ref("");
 const loading = ref(false);
-const payMethod = ref("PAYPAL"); // 預設使用 PayPal
-
-// 租車選擇暫存
-const form = reactive({
-  bookingId: "",
-  carId: null,
-  carLabel: "",
-});
+const payMethod = ref("PAYPAL");
 
 function getButtonText() {
   switch (payMethod.value) {
@@ -362,27 +402,46 @@ function convertToUSD(twdAmount) {
 function formatDate(dateStr) {
   return dayjs(dateStr).format("YYYY-MM-DD");
 }
+
 function formatAmount(n) {
   return new Intl.NumberFormat("zh-TW").format(n || 0);
 }
 
 onMounted(loadPreview);
 
+// 監聽租車資料變化，重新載入預覽
+watch(
+  () => booking.vehicleDraft,
+  () => {
+    if (booking.hasBookingData) {
+      loadPreview();
+    }
+  },
+  { deep: true }
+);
+
 async function loadPreview() {
-  error.value = "";
-  const { listid, checkInDate, checkOutDate, guests } = route.query;
-  if (!listid || !checkInDate || !checkOutDate || !guests) {
-    error.value = "參數不足，請重新選擇預訂資訊";
+  if (!booking.hasBookingData) {
+    error.value = "缺少訂房資料，請重新選擇預訂資訊";
     return;
   }
+
+  error.value = "";
+  loading.value = true;
+
   try {
-    loading.value = true;
-    const data = await previewOrder({
-      listid: Number(listid),
-      checkindate: checkInDate,
-      checkoutdate: checkOutDate,
-      people: Number(guests),
-    });
+    const payload = {
+      listid: booking.bookingParams.listid,
+      checkindate: booking.bookingParams.checkInDate,
+      checkoutdate: booking.bookingParams.checkOutDate,
+      people: booking.bookingParams.guests,
+      // 租車相關資料
+      reservationId: booking.vehicleDraft.reservationId || null,
+      carLocationId: booking.vehicleDraft.locationId || null,
+      cartotal: booking.vehicleDraft.totalAmount || 0,
+    };
+
+    const data = await previewOrder(payload);
     preview.value = data;
   } catch (e) {
     error.value = e?.response?.data || e?.message || "取得預覽資料失敗";
@@ -392,24 +451,30 @@ async function loadPreview() {
 }
 
 async function submitOrder() {
+  if (!booking.hasBookingData) {
+    error.value = "缺少訂房資料";
+    return;
+  }
+
   error.value = "";
   loading.value = true;
 
   try {
-    const { listid, checkInDate, checkOutDate, guests } = route.query;
-
     const orderData = {
-      listid: Number(listid),
-      checkindate: checkInDate,
-      checkoutdate: checkOutDate,
-      people: Number(guests),
-      cartotal: form.carId ? 1000 : 0, // 有租車加 1000，否則 0（示意）
+      listid: booking.bookingParams.listid,
+      checkindate: booking.bookingParams.checkInDate,
+      checkoutdate: booking.bookingParams.checkOutDate,
+      people: booking.bookingParams.guests,
+      // 租車相關資料
+      reservationId: booking.vehicleDraft.reservationId || null,
+      carLocationId: booking.vehicleDraft.locationId || null,
+      cartotal: booking.vehicleDraft.totalAmount || 0,
       bookingmethod: payMethod.value,
     };
 
     const response = await finalizeOrderApi(orderData);
 
-    // 回傳可能是字串或物件 → 統一取 bookingId
+    // 回傳可能是字串或物件 統一取 bookingId
     let bookingId;
     if (typeof response === "string") {
       const match = response.match(/訂單編號[:：]\s*([A-Za-z0-9-]+)/);
@@ -418,8 +483,6 @@ async function submitOrder() {
       bookingId = response.bookingId || response.data?.bookingId;
     }
     if (!bookingId) throw new Error("無法取得訂單編號");
-
-    form.bookingId = bookingId;
 
     if (payMethod.value === "PAYPAL") {
       router.push({ name: "PayPalPayment", query: { bookingId } });
@@ -437,50 +500,33 @@ async function submitOrder() {
 
 // 租車：導向租車首頁
 function goCarRent() {
-  const { listid, checkInDate, checkOutDate, guests } = route.query;
   router.push({
     name: "CarRentFrontHomepage",
     query: {
       from: "booking",
-      bookingId: form.bookingId || "",
-      listid,
-      checkin: checkInDate,
-      checkout: checkOutDate,
-      guests,
+      listid: booking.bookingParams.listid,
+      checkin: booking.bookingParams.checkInDate,
+      checkout: booking.bookingParams.checkOutDate,
+      guests: booking.bookingParams.guests,
     },
   });
 }
 
 // 不租車：清空 carId
 function noCar() {
-  form.carId = null;
-  form.carLabel = "";
-}
-function clearCar() {
-  form.carId = null;
-  form.carLabel = "";
+  booking.resetVehicleDraft();
 }
 
-// 從租車頁回來帶 carId/carLabel 當 query
-watch(
-  () => ({ id: route.query.carId, label: route.query.carLabel }),
-  ({ id, label }) => {
-    if (id) {
-      form.carId = String(id);
-      form.carLabel = String(label || "");
-    }
-  },
-  { immediate: true }
-);
+function clearCar() {
+  booking.resetVehicleDraft();
+}
 </script>
 
 <style scoped>
-/* 柔和暖橘卡片 */
 .soft-card {
   background: #fff7ed; /* orange-50 風格 */
 }
 
-/* 標題區 */
 .header-row {
   display: flex;
   align-items: center;
@@ -496,8 +542,6 @@ watch(
   font-size: 25px;
   font-weight: 700;
 }
-
-/* Key-Value 列表 */
 .flat-list {
   --v-list-padding-start: 0;
   --v-list-padding-end: 0;
@@ -509,8 +553,6 @@ watch(
   font-weight: 700;
   color: #7c2d12;
 }
-
-/* 金額 */
 .total-row {
   display: flex;
   align-items: baseline;

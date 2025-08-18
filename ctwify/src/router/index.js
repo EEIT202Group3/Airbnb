@@ -81,12 +81,6 @@ const routes = [
         component: () => import("@/components/payment/BookingStart.vue"),
       },
       {
-        // 測試從房源抓資料用
-        path: "/booking/start1",
-        name: "BookingStart1",
-        component: () => import("@/components/payment/BookingStart1.vue"),
-      },
-      {
         path: "/preview-confirm",
         name: "PreviewConfirm",
         component: () => import("@/components/payment/PreviewConfirm.vue"),
@@ -111,17 +105,9 @@ const routes = [
         props: true,
       },
       {
-
-
         path: '/order/list',
         name: 'OrderList',
         component: () => import('@/components/payment/OrderList.vue'),
-      },
-      {
-        // 測試從房源抓資料用
-        path: "/orders1",
-        name: "OrderList1",
-        component: () => import("@/components/payment/OrderList1.vue"),
       },
       {
         path: "/carrent",
@@ -130,10 +116,6 @@ const routes = [
           import(
             "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue"
           ),
-      },
-      {
-        // 測試從房源抓資料用
-          path: '/test/listing-preview', component: () => import('@/components/payment/TestListingPreview.vue')
       },
       {
         path: "/reviews",
