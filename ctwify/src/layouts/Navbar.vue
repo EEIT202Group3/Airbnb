@@ -14,8 +14,9 @@ const showAuthPage = ref(false);
       ></v-img>
 
       <nav> 
-        <router-link to="#">刊登旅宿</router-link>
 
+        <router-link to="#">刊登旅宿</router-link>
+        
         <!-- 會員登入 -->
        <router-link to="#" @click.prevent="showAuthPage = true">
         <i class="fa-regular fa-circle-user fa-lg"></i> 登入/註冊
@@ -64,5 +65,4 @@ const showAuthPage = ref(false);
   width: auto;
   margin-right: 300px; 
 }
-
 </style>

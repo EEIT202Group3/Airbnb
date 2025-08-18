@@ -43,7 +43,7 @@ const editingNote = ref("");
 onMounted(async () => {
   const id = route.params.id;
   try {
-    const res = await api.get(`/reservations/${id}`);
+    const res = await api.get(`reservations/${id}`);
     reservation.value = res.data;
   } catch (err) {
     console.error("載入預約資料失敗：", err);
@@ -56,7 +56,7 @@ async function loadDamages() {
   try {
     damageLoading.value = true;
     const id = route.params.id;
-    const {data} = await api.get<Damage[]>(`/reservations/${id}/damages`);
+    const {data} = await api.get<Damage[]>(`reservations/${id}/damages`);
     damages.value = data ?? [];
   } catch (e) {
     console.error("載入損壞紀錄失敗：", e);

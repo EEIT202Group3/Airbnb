@@ -27,17 +27,17 @@ public class AdminOrderService {
 
 		return orders.stream().map(order -> {
 			AdminOrderAllResponseDto dto = new AdminOrderAllResponseDto();
-			dto.setBookingId(order.getBookingid());
-			dto.setHousename(order.getHousename());
+			dto.setBookingId(order.getBookingId());
+			dto.setHousename(order.getHouseName());
 			dto.setBed(order.getBed());
 			dto.setAddress(order.getAddress());
 			dto.setTel(order.getTel());
 			dto.setPeople(order.getPeople());
-			dto.setBookingstatus(order.getBookingstatus());
+			dto.setBookingstatus(order.getBookingStatus());
 			dto.setUsername(order.getUsername());
 			dto.setGrandtotal(order.getGrandTotal());
-			dto.setCheckindate(order.getCheckindate());
-			dto.setCheckoutdate(order.getCheckoutdate());
+			dto.setCheckindate(order.getCheckinDate());
+			dto.setCheckoutdate(order.getCheckoutDate());
 			return dto;
 		}).collect(Collectors.toList());
 	}
@@ -49,25 +49,25 @@ public class AdminOrderService {
     	            .orElseThrow(() -> new IllegalArgumentException("查無此訂單：" + bookingId));
 
     	 	AdminOrderDetailResponseDto dto = new AdminOrderDetailResponseDto();
-    	    dto.setBookingId(order.getBookingid());
+    	    dto.setBookingId(order.getBookingId());
     	    dto.setUsername(order.getUsername());
-    	    dto.setHouseName(order.getHousename());
+    	    dto.setHouseName(order.getHouseName());
     	    dto.setAddress(order.getAddress());
     	    dto.setTel(order.getTel());
     	    dto.setBed(order.getBed());
-    	    dto.setCheckinDate(order.getCheckindate());
-    	    dto.setCheckoutDate(order.getCheckoutdate());
+    	    dto.setCheckinDate(order.getCheckinDate());
+    	    dto.setCheckoutDate(order.getCheckoutDate());
     	    dto.setPeople(order.getPeople());
     	    dto.setLocationId(order.getLocationid());
-    	    dto.setPaymentId(order.getPaymentid());
+    	    dto.setPaymentId(order.getPaymentId());
     	    dto.setRoomprice(order.getRoomPrice());
-    	    dto.setBookingStatus(order.getBookingstatus());
-    	    dto.setMentStatus(order.getMentstatus());
+    	    dto.setBookingStatus(order.getBookingStatus());
+    	    dto.setMentStatus(order.getMentStatus());
     	    dto.setCartotal(order.getCarTotal());
     	    dto.setGrandtotal(order.getGrandTotal());
-    	    dto.setPaidTime(order.getPaidtime());
-    	    dto.setBookingMethod(order.getBookingmethod());
-    	    dto.setBookingStatus(order.getBookingstatus());
+    	    dto.setPaidTime(order.getPaidTime());
+    	    dto.setBookingMethod(order.getBookingMethod());
+    	    dto.setBookingStatus(order.getBookingStatus());
 
     	    return dto;
     }

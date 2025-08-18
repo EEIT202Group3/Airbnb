@@ -58,7 +58,7 @@ public class ReviewController {
 		return rService.findByCustId(id);
 	}
 
-	@DeleteMapping("/admins/reviews/del/{id}")
+	@DeleteMapping("/reviews/del/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable Integer id) {
 		System.out.println("此api接收參數:" + id);
 		try {
@@ -106,14 +106,14 @@ public class ReviewController {
 	}
 	*/
 	@PatchMapping(value = "/reviews/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> patchReview(
+	public ResponseEntity<Review> patchReview(
 	        @PathVariable("id") Integer reviewId,
 	        @RequestPart("review") ReviewPatchRequest review,
-	        @RequestPart(value = "images", required = false) List<MultipartFile> images,
-	        @RequestPart(value = "deleteSlots", required = false) List<Integer> deleteSlots
-
+	        @RequestPart(value = "image1", required = false) MultipartFile image1,
+	        @RequestPart(value = "image2", required = false) MultipartFile image2,
+	        @RequestPart(value = "image3", required = false) MultipartFile image3
 	        ) {
-		return rService.patchReview(reviewId, review, images);
+		return rService.patchReview(reviewId, review, image1,image2,image3);
 	}
 	
     

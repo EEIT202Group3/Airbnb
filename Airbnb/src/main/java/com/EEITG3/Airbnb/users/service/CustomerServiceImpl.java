@@ -31,6 +31,7 @@ import com.EEITG3.Airbnb.users.entity.CustomerDetails;
 import com.EEITG3.Airbnb.users.repository.CustomerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.api.client.auth.openidconnect.IdToken.Payload;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -186,6 +187,36 @@ public class CustomerServiceImpl implements CustomerService {
 		
 	}
 	
+	@Override
+	public String loginWithGoogle(Payload payload) {
+		String email = (String)payload.get("email");
+		Optional<Customer> temp = repo.findCustomerByEmail(email);
+		if(temp.isPresent()) {
+			Customer customer = temp.get();
+			if(customer.isVerified()) {
+				return jwtService.generateToken(customer.getEmail(), "ROLE_CUSTOMER");
+			}
+			return null;
+		}else {
+			SignUpRequest signUpRequest = new SignUpRequest();
+			signUpRequest.setEmail(email);
+			signUpRequest.setPassword(UUID.randomUUID().toString());
+			signUpRequest.setPhone("");
+			signUpRequest.setUsername((String)payload.get("name"));
+			return signupWithGoogle(signUpRequest);
+		}
+	}
+	
+	//專門為 google 登入做的註冊功能
+	private String signupWithGoogle(SignUpRequest request) {
+		String encodedPassword = encoder.encode(request.getPassword());
+		Customer customer = new Customer(request.getEmail(),encodedPassword,request.getUsername(),request.getPhone());
+		customer.setVerified(true);
+		repo.save(customer);
+		return jwtService.generateToken(customer.getEmail(), "ROLE_CUSTOMER");
+	}
+	
+	
 	
 	@Override
 	public List<Customer> findAllCustomers() {
@@ -234,9 +265,5 @@ public class CustomerServiceImpl implements CustomerService {
 		String likePhone = "%"+phone+"%";
 		return repo.findLikeByPhone(likePhone);
 	}
-
-
-
-	
 	
 }

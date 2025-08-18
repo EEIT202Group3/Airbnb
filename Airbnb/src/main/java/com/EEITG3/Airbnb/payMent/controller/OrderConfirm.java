@@ -1,6 +1,5 @@
 package com.EEITG3.Airbnb.payMent.controller;
 
-import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
@@ -33,94 +32,54 @@ import jakarta.transaction.Transactional;
 //接收 /ordersconfirm 的 POST 請求
 @RestController
 @RequestMapping("/api/orderconfirm")
-@Transactional
+
 public class OrderConfirm {
 
 	@Autowired
 	private OrderService orderService;
 
 	@Autowired
-	private ListRepository listRepository;
-
-	@Autowired
 	private JwtService jwtService;
 
-	@Autowired
-	private CustomerRepository customerRepository;
-
 	@PostMapping("/preview")
-	public ResponseEntity<?> previewOrder(@RequestBody OrderRequestDto dto, @CookieValue(value = "jwt_customer", required = false) String token) {
-		//String email = jwtService.extractEmail(token);
-		//測試用
-		String email ;
-		if(token==null || token.isEmpty()) {
-			email="sa@gmail.com";
-		}else {
-			email=jwtService.extractEmail(token);
+	public ResponseEntity<?> previewOrder(@RequestBody OrderRequestDto dto,
+			@CookieValue(value = "jwt_customer", required = false) String token) {
+
+		try {
+			String email = jwtService.extractEmail(token);
+			Map<String, Object> result = orderService.previewOrderSimple(dto, email);
+			return ResponseEntity.ok(result);
+		} catch (IllegalArgumentException | IllegalStateException ex) {
+			return ResponseEntity.badRequest().body(ex.getMessage());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("預覽失敗：" + e.getMessage());
 		}
-		LisBean listing = listRepository.findById(dto.getListid()).orElseThrow(() -> new RuntimeException("房源不存在"));
-		Customer customer = customerRepository.findCustomerByEmail(email)
-				.orElseThrow(() -> new RuntimeException("會員不存在"));
-		
-		// 驗證必要參數
-	    if (dto.getListid() == null || dto.getCheckindate() == null || 
-	        dto.getCheckoutdate() == null || dto.getPeople() <= 0) {
-	        return ResponseEntity.badRequest().body("缺少必要參數");
-	    }
-	    
-	    // 驗證日期邏輯
-	    if (dto.getCheckindate().isAfter(dto.getCheckoutdate()) || 
-	        dto.getCheckindate().isBefore(LocalDate.now())) {
-	        return ResponseEntity.badRequest().body("日期設定錯誤");
-	    }
-
-		long days = ChronoUnit.DAYS.between(dto.getCheckindate(), dto.getCheckoutdate());
-
-		boolean isBooked = orderService.isRoomBooked(listing.getHouseName(), dto.getCheckindate().atStartOfDay(),
-				dto.getCheckoutdate().atStartOfDay());
-		if (isBooked) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("此日期已被預訂");
-		}
-
-		int total = listing.getPrice() * (int) days * dto.getPeople() / 2;
-
-		Map<String, Object> result = new HashMap<>();
-		result.put("listing", listing);
-		result.put("customer", customer);
-		result.put("days", days);
-		result.put("total", total);
-		result.put("checkindate", dto.getCheckindate());
-		result.put("checkoutdate", dto.getCheckoutdate());
-		result.put("people", dto.getPeople());
-
-		return ResponseEntity.ok(result);
 	}
 
 	@PostMapping("/finalize")
-	public ResponseEntity<?> finalizeOrder(@RequestBody OrderRequestDto dto, @CookieValue(value = "jwt_customer") String token) {
+	public ResponseEntity<?> finalizeOrder(@RequestBody OrderRequestDto dto,
+			@CookieValue(value = "jwt_customer") String token) {
 		try {
 			String email = jwtService.extractEmail(token);
-			Order order = orderService.createOrder(dto,email);
-			return ResponseEntity.ok("訂單成功！訂單編號：" + order.getBookingid());
+			Order order = orderService.createOrder(dto, email);
+			return ResponseEntity.ok("訂單成功！訂單編號：" + order.getBookingId());
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("建立訂單失敗：" + e.getMessage());
 		}
 	}
-	//單筆訂單明細
+
+	// 單筆訂單明細
 	@GetMapping("/detail")
-	public OrderDetailResponseDto getOrderDetail(@RequestParam("booking_id") String booking_id) {
-	return orderService.getOrderByBookingId(booking_id);
-	    }
-	
-	//客戶查詢全部訂單
-    @GetMapping("/byCustomer")
-    public List<OrderAllResponseDto> getOrdersByCustomerId(@CookieValue(value = "jwt_customer") String token) {
-        String email = jwtService.extractEmail(token);
-        
-    	return orderService.getOrdersByCustomerId(email);
-    }	
-    
+	public OrderDetailResponseDto orderDetailResponseDto(@RequestParam("bookingId") String bookingId) {
+		return orderService.getOrderByBookingId(bookingId);
+	}
 
+	// 客戶查詢全部訂單
+	@GetMapping("/byCustomer")
+	public List<OrderAllResponseDto> getOrdersByCustomerId(@CookieValue(value = "jwt_customer") String token) {
+		String email = jwtService.extractEmail(token);
 
-  
+		return orderService.getOrdersByCustomerId(email);
+	}
+
 }

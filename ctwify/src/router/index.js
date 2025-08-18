@@ -2,26 +2,13 @@ import { createRouter, createWebHistory } from "vue-router";
 import CarRentFrontHomepage from "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue";
 import CarSelect from "@/components/carRent/frontpageComponent/CarSelect.vue";
 import CarDetail from "@/components/carRent/frontpageComponent/CarDetail.vue";
-// import List from "../components/listing/List.vue";
-// import Add from "../components/listing/AddListing.vue";
-// import Detail from "../components/listing/Detail.vue";
-// import Edit from "../components/listing/EditListing.vue";
 
-//import getList from "@/layouts/ListLayout.vue";
-
-// import ListingPage from '../components/payment/ListingPage.vue';
-// import BookingPage from '../components/payment/BookingPage.vue';
-// import ConfirmationPage from '../components/payment/ConfirmationPage.vue';
-// import Ecpay from '../components/payment/Ecpay.vue';
-// import PaymentPage from '../components/payment/PaymentPage.vue';
-// import PaymentSuccessPage from '../components/payment/PaymentSuccessPage.vue';
-// import HomeＰage from '../components/listing/customer/ListingCard.vue';
-// import CustomerDetail from "@/components/listing/customer/CustomerDetail.vue";
 
 const routes = [
   {
     path: '/',
     component: () => import("@/layouts/MainLayout.vue"),
+    name: 'Homepage',
     children: [
       {
         path: '/customer',
@@ -37,9 +24,15 @@ const routes = [
             component: () => import('@/components/user/customer/TripHistory.vue'),
             name: 'TripHistory',
           },
-        ]
+        ],
       },
       {
+        path: "hostLogin",
+        component: () => import("@/components/user/host/HostLoginPage.vue"),
+        name: "HostLogin",
+      },
+      {
+
         path: '/login',
         component: () => import('@/components/user/customer/LoginSignup.vue'),
       },
@@ -65,63 +58,166 @@ const routes = [
       {
         path:'/customerdatil/:id',
         component: () => import('@/components/user/customer/LoginSignup.vue')
+
+        path: "customerprofile",
+        component: () =>
+          import("@/components/user/customer/CustomerProfile.vue"),
+        name: "CustomerProfile",
+
       },
       {
-        path: '/car-front-homepage',
-        name: 'carFrontHomepage',
-        component: CarRentFrontHomepage
+        path: "login",
+        component: () => import("@/components/user/customer/LoginSignup.vue"),
+      },
+
+      {
+        path: "/listing/card",
+        name: "ListingCard",
+        component: () => import("@/components/payment/ListingCard.vue"),
       },
       {
-        path: '/car-select',
-        name: 'carSelect',
-        component: CarSelect
+        path: "/booking/start",
+        name: "BookingStart",
+        component: () => import("@/components/payment/BookingStart.vue"),
       },
       {
-        path: '/car-detail/:id',
-        name: 'carDetail',
-        component: CarDetail,
-        props: true
-      }
-    ]
-  }
+        // 測試從房源抓資料用
+        path: "/booking/start1",
+        name: "BookingStart1",
+        component: () => import("@/components/payment/BookingStart1.vue"),
+      },
+      {
+        path: "/preview-confirm",
+        name: "PreviewConfirm",
+        component: () => import("@/components/payment/PreviewConfirm.vue"),
+      },
+      {
+        path: '/payment/paypal',
+        name: 'PayPalPayment',
+        component: () => import("@/components/payment/PayPalPayment.vue"),
+        props: route => ({
+          bookingId: route.query.bookingId
+        })
+      },
+      {
+        path: "/payment/redirect",
+        name: "PayRedirect",
+        component: () => import("@/components/payment/PayRedirect.vue"),
+      },
+      {
+        path: "/payment/done",
+        name: "PaymentDone",
+        component: () => import("@/components/payment/PaymentDone.vue"),
+        props: true,
+      },
+      {
 
-  // {
-  //   path: "/main",
-  //   component: () => import("@/layouts/MainLayout.vue"),
-  //   children: [
-  //     {
-  //       path: "list",
-  //       component: () => import("@/views/MainView.vue"),
-  //     },
-  //     {
-  //       path: "getList/:id?",
-  //       component: (id) => import(`@/views/ListView.vue`),
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: "/getList",
-  //   component: () => import("@/layouts/ListLayout.vue"),
-  //   children: [
-  //     {
-  //       path: "",
-  //       component: () => import("@/views/ListView.vue"),
-  //     },
-  //   ],
-  // },
-  // { path: "/", component: List }, 
-  // { path: "/listing/addListing", component: Add },
-  // { path: "/listing/detail/:id", component: Detail },
-  // { path: "/listing/edit/:id", component: Edit },
 
-  // { path: '/', component: ListingPage, name: 'listing' },
-  // { path: '/booking', component: BookingPage, name: 'booking' },
-  // { path: '/confirmation', component: ConfirmationPage, name: 'confirmation' },
-  // { path: '/ecpay', component: Ecpay, name: 'ecpay' },
-  // { path: '/payment', component: PaymentPage, name: 'payment' },
-  // { path: '/payment-success', component: PaymentSuccessPage, name: 'paymentSuccess' },
+        path: '/order/list',
+        name: 'OrderList',
+        component: () => import('@/components/payment/OrderList.vue'),
+      },
+      {
+        // 測試從房源抓資料用
+        path: "/orders1",
+        name: "OrderList1",
+        component: () => import("@/components/payment/OrderList1.vue"),
+      },
+      {
+        path: "/carrent",
+        name: "CarRentFrontHomepage",
+        component: () =>
+          import(
+            "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue"
+          ),
+      },
+      {
+        // 測試從房源抓資料用
+          path: '/test/listing-preview', component: () => import('@/components/payment/TestListingPreview.vue')
+      },
+      {
+        path: "/reviews",
+        component: () => import("@/components/reviews/ReviewView.vue"),
+        name: "Reviews",
+      },
+      {
+        path: "reviews/insert",
+        component: () =>
+          import("@/components/reviews/customer/InsertReview.vue"),
+      },
+      {
+        path: "password",
+        component: () =>
+          import("@/components/user/customer/ChangePassword.vue"),
+        name: "ChangePassword",
+      },
+    ],
+  },
+  {
+    path: "/host",
+    component: () => import("@/layouts/host/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("@/components/user/host/HostPage.vue"),
+        name: "HostHomepage",
+        redirect: { name: "HostInfo" },
+        children: [
+          {
+            path: "",
+            component: () => import("@/components/user/host/HostInfo.vue"),
+            name: "HostInfo",
+          },
+          {
+            path: "listing",
+            component: () => import("@/components/user/host/HostListing.vue"),
+            name: "HostListing",
+          },
+          {
+            path: "order",
+            component: () => import("@/components/user/host/HostOrder.vue"),
+            name: "HostOrder",
+          },
+        ],
+      },
+      {
+        path: "hostprofile",
+        component: () => import("@/components/user/host/HostProfile.vue"),
+        name: "HostProfile",
+      },
+      {
+        path: "password",
+        component: () => import("@/components/user/host/ChangePassword.vue"),
+        name: "HostPassword",
+      },
+    ],
+  },
 
-];
+  {
+    path: '/homepage',
+    component: () => import('@/components/listing/customer/ListingCard.vue'),
+  },
+
+  {
+    path: '/customerdatil/:id',
+    component: () => import('@/components/listing/customer/CustomerDetail.vue'),
+  },
+  {
+    path: '/car-front-homepage',
+    name: 'carFrontHomepage',
+    component: CarRentFrontHomepage
+  },
+  {
+    path: '/car-select',
+    name: 'carSelect',
+    component: CarSelect
+  },
+  {
+    path: '/car-detail/:id',
+    name: 'carDetail',
+    component: CarDetail,
+    props: true
+  }]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

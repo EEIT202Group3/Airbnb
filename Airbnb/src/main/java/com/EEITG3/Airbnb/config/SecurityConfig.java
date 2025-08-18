@@ -94,7 +94,8 @@ public class SecurityConfig{
 									 "/api/customers/verify",
 									 "/api/customers/logout",
 									 "/api/customers/forgetpwd",
-									 "/api/customers/pwdverify").permitAll()
+									 "/api/customers/pwdverify",
+									 "/api/customers/google").permitAll()
 					.anyRequest().hasRole("CUSTOMER"))
 				.build();	
 	}
@@ -200,7 +201,9 @@ public class SecurityConfig{
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:5174"));
+		config.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:5174","http://localhost:3000",
+		        "http://localhost:8080",
+		        "https://8339e8a2d3bd.ngrok-free.app"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true);
@@ -210,4 +213,5 @@ public class SecurityConfig{
 
 		return source;
 	}
+	
 }
