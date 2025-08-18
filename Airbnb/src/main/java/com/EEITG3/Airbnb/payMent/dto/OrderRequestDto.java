@@ -10,7 +10,7 @@ public class OrderRequestDto {
 	    private String hostid;
 	    private String customerid;
 	    private String username;
-	    private String housename;
+	    private String houseName;
 	    private String address;
 	    private String tel;
 	    private String bed;
@@ -46,11 +46,12 @@ public class OrderRequestDto {
 		public void setUsername(String username) {
 			this.username = username;
 		}
-		public String getHousename() {
-			return housename;
+		
+		public String getHouseName() {
+			return houseName;
 		}
-		public void setHousename(String housename) {
-			this.housename = housename;
+		public void setHouseName(String houseName) {
+			this.houseName = houseName;
 		}
 		public String getAddress() {
 			return address;
