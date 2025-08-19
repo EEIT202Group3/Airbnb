@@ -10,11 +10,13 @@ const routes = [
         path: '/',
         component: () => import("@/layouts/MainLayout.vue"),
         name: 'Homepage',
+        redirect: { name: 'HomeCard' },
         children: [
             //主畫面 + 修維的部分
             {
                 path: '',
                 component: () => import("@/components/listing/customer/ListingCard.vue"),
+                name: 'HomeCard',
             },
             {
                 path: '/coustomerlistings/:id',
