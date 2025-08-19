@@ -23,7 +23,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { payNewebpayCheckout } from "./order";
+import { payNewebpayCheckout } from "../../sevice/order";
 
 const route = useRoute();
 const payForm = ref(null);

@@ -67,7 +67,7 @@
               <p>退房日期：{{ formatDate(orderDetail?.checkoutDate) }}</p>
               <p>房價：$ {{ orderDetail?.price }}</p>
               <p>租車金額：${{ orderDetail?.totalAmount }}</p>
-              <p>總金額：${{ orderDetail?.total }}</p>
+              <p>總金額：${{ orderDetail?.grandtotal }}</p>
               <p>付款編號：{{ orderDetail?.paymentId }}</p>
               <p>付款時間：{{ orderDetail?.paidTime }}</p>
               <p>付款方式：{{ orderDetail?.bookingMethod }}</p>
@@ -173,7 +173,7 @@ const headers = [
   { title: "預訂狀態", key: "bookingstatus" },
   { title: "入住日期", key: "checkindate" },
   { title: "退房日期", key: "checkoutdate" },
-  { title: "總金額", key: "total" },
+  { title: "總金額", key: "grandtotal" },
   { title: "明細", key: "actions", sortable: false },
 ];
 
@@ -187,7 +187,7 @@ async function fetchOrders() {
     const res = await api.get(
       "/api/admins/admingetorderdetail/adminbyCustomer",
       {
-        params: { customerId: customerId.value },
+        params: { email: customerId.value },
         withCredentials: true,
       }
     );

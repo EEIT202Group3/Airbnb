@@ -48,7 +48,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query(value = """  
                 SELECT COUNT(*) FROM reservations 
                 WHERE pickup_date > CURRENT_TIMESTAMP 
-                AND status NOT IN ('取消', '完成訂單')
+                AND status NOT IN ('取消預約', '完成訂單')
             """, nativeQuery = true)
     Integer countUpcomingReservations();
 
@@ -57,7 +57,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
                 SELECT COUNT(*) FROM reservations  
                 WHERE pickup_date <= CURRENT_TIMESTAMP 
                 AND return_date >= CURRENT_TIMESTAMP
-                AND status NOT IN ('取消', '完成訂單')
+                AND status NOT IN ('取消預約', '完成訂單')
             """, nativeQuery = true)
     Integer countOngoingReservations();
 
@@ -73,14 +73,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query(value = """
                 SELECT COUNT(*) FROM reservations
                 WHERE return_date < CURRENT_TIMESTAMP
-                AND status NOT IN ('完成訂單', '取消')
+                AND status NOT IN ('完成訂單', '取消預約')
             """, nativeQuery = true)
     Integer countOverdueReservations();
 
 
     @Query(value = """
                 SELECT COUNT(*) FROM reservations
-                WHERE status = '取消'
+                WHERE status = '取消預約'
             """, nativeQuery = true)
     Integer countCancelledReservations();
 
