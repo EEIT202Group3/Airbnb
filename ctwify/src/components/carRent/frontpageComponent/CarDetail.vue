@@ -182,10 +182,11 @@ const payload = {
                 <v-row>
                   <v-col cols="12" md="4">
                     <v-img
-                        :src="`/carPicture/${vehicle.image}`"
-                        :alt="`${vehicle.brand} ${vehicle.model}`"
+                        :src="`http://localhost:8080/carPicture/${vehicle?.image}`"
+                        :alt="`${vehicle?.brand} ${vehicle?.model}`"
+                        width="100%"
                         height="260"
-                        cover
+                        contain
                         class="rounded"
                     />
                   </v-col>

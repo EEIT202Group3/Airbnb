@@ -35,5 +35,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/images/avatar/hosts/**")
 				.addResourceLocations(hostAvatarPath)
 				.setCachePeriod(3600);
+
+        registry.addResourceHandler("/carPicture/**")
+                .addResourceLocations("file:/C:/Users/User/Documents/GitHub/Airbnb/front-end/public/carPicture/")
+                .setCachePeriod(3600);
     }
 }
