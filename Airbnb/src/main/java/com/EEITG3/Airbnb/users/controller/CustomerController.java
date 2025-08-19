@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -66,7 +67,6 @@ public class CustomerController {
 		try {
 			String token = service.customerLogin(request);
 			CookieUtil.saveCustomerCookie(response, token);
-			log.info("登入成功");
 			return ResponseEntity.ok(token);
 		} catch (BadCredentialsException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
@@ -226,6 +226,8 @@ public class CustomerController {
 			String status = (String) data.get("status");
 			String email = (String) data.get("email");
 			service.permission(status, email);
+			String adminId = MDC.get("userId");
+			log.info("更改客戶權限，客戶：%s;操作者：%s".formatted(email,adminId));
 			return ResponseEntity.ok(Map.of("message","success"));
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -256,6 +258,8 @@ public class CustomerController {
 		if(customers.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("\"message\":\"找不到客戶\"");
 		}
+		String adminId = MDC.get("userId");
+		log.info("查詢客戶資料，操作者：%s".formatted(adminId));
 		return ResponseEntity.ok(customers);
 	}
 }

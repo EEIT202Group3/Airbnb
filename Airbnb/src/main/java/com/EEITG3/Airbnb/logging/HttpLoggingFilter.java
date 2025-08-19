@@ -19,40 +19,62 @@ import jakarta.servlet.http.HttpServletResponse;
 
 //這個class的功能是...
 @Component
-@Order(Ordered.LOWEST_PRECEDENCE-10)
+@Order(Ordered.LOWEST_PRECEDENCE - 10) // 靠後，可拿到 response status
 public class HttpLoggingFilter extends OncePerRequestFilter {
-	
-	private static final Logger log = LoggerFactory.getLogger(HttpLoggingFilter.class);
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		
-		long start = System.currentTimeMillis();
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String userId = (auth != null && auth.isAuthenticated()) ? auth.getName() : "anonymous";
-	    MDC.put("userId", userId);
-	    
-	    try {
-	    	filterChain.doFilter(request, response);
-	    }finally {
-	    	long cost = System.currentTimeMillis() - start;
-            // 只記錄摘要，不含敏感資料與 Body
-            log.info("{} {} status={} cost={}ms ua=\"{}\" ip={}",
+    private static final Logger log = LoggerFactory.getLogger(HttpLoggingFilter.class);
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws ServletException, IOException {
+
+        long start = System.currentTimeMillis();
+
+        // 只在「已登入且非 anonymousUser」時設定 userId
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && auth.getPrincipal() != null) {
+            String principalStr = String.valueOf(auth.getPrincipal());
+            if (!"anonymousUser".equals(principalStr)) {
+                MDC.put("userId", auth.getName()); // 也可改成你的 domain userId
+            }
+        }
+
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            long cost = System.currentTimeMillis() - start;
+
+            // INFO：純摘要（method/uri/status/cost）
+            log.info("{} {} status={} cost={}ms",
                     request.getMethod(),
                     request.getRequestURI(),
                     response.getStatus(),
-                    cost,
-                    safe(request.getHeader("User-Agent")),
-                    request.getRemoteAddr());
-		}
-	}
-	
-	private String safe(String s) {
-        if (s == null) return "";
-        // 避免換行污染日誌
-        return s.replaceAll("[\\r\\n]+", " ");
+                    cost
+            );
+
+            // DEBUG：需要時再看 UA / IP
+            if (log.isDebugEnabled()) {
+                String ua = oneLine(request.getHeader("User-Agent"));
+                String ip = clientIp(request);
+                log.debug("ua=\"{}\" ip={}", ua, ip);
+            }
+        }
     }
 
+    private static String clientIp(HttpServletRequest req) {
+        String xff = req.getHeader("X-Forwarded-For");
+        if (xff != null && !xff.isBlank()) {
+            int comma = xff.indexOf(',');
+            return (comma > 0 ? xff.substring(0, comma) : xff).trim();
+        }
+        String realIp = req.getHeader("X-Real-IP");
+        if (realIp != null && !realIp.isBlank()) return realIp.trim();
+        return req.getRemoteAddr();
+    }
+
+    private static String oneLine(String s) {
+        if (s == null) return "";
+        return s.replaceAll("[\\r\\n]+", " ");
+    }
 }
