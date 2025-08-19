@@ -98,14 +98,37 @@ async function submitReservation() {
     totalAmount: totalAmount.value,
     vehicleId: vehicle.value.vehicleId,
     status: "未付款",
-    locationId: locationId ?? null, // ← 直接帶 query 的 locationId
+    locationId: locationId ?? null,
   };
 
   try {
     const res = await api.post("/reservations1/insert", payload);
     console.log("新增成功", res.data);
     alert("預約成功！");
-    await router.push("/car-front-homepage");
+
+    // 取成新的ID
+    const rid =
+        res?.data?.reservationId ??
+        res?.data?.id ??
+        null;
+    console.log(rid);
+
+    // 將資料存到booking.js
+    booking.setVehicleId(vehicle.value.vehicleId)
+    booking.setDates({
+      pickupDateTime,
+      returnDateTime,
+    })
+    booking.setLocation({
+      locationId: locationId ?? null,
+      locationName: locationName.value,
+      locationAddr: locationAddr.value,
+      businessHours: businessHours.value,
+    })
+    booking.setTotalAmount(totalAmount.value)
+    booking.setReservationId(rid)
+
+    await router.push("/preview-confirm");
   } catch (err) {
     console.error("新增失敗", err);
     alert("預約失敗，請稍後再試");
@@ -127,34 +150,6 @@ const payload = {
   status: '未付款',
   locationId: booking.vehicleDraft.locationId ?? null,
 }
-
-
-function bookVehicleToLocalAndGoOrderList() {
-  if (!vehicle.value) return
-// 1) 寫入車輛 id
-booking.setVehicleId(vehicle.value.vehicleId)
-
-// 2) 寫入取還車時間
-booking.setDates({
-  pickupDateTime,
-  returnDateTime,
-})
-
-// 3) 寫入地點資訊（若有）
-booking.setLocation({
-  locationId: locationId ?? null,
-  locationName: locationName.value,
-  locationAddr: locationAddr.value,
-  businessHours: businessHours.value,
-})
-
-// 4) 寫入金額
-booking.setTotalAmount(totalAmount.value)
-
-// 5) 跳轉到訂單列表
-router.push({ name: 'OrderList1' })
-}
-
 
 </script>
 
@@ -347,21 +342,6 @@ router.push({ name: 'OrderList1' })
                   預定車輛
                 </v-btn>
               </v-card-actions>
-
-<!--              測試傳資料給pinia-->
-              <v-card-actions class="pa-4">
-                <v-btn
-                    size="large"
-                    block
-                    variant="tonal"
-                    @click="bookVehicleToLocalAndGoOrderList"
-                    prepend-icon="mdi-content-save"
-                >
-                  測試：存入並前往訂單
-                </v-btn>
-              </v-card-actions>
-
-
             </v-card>
           </v-col>
         </v-row>
