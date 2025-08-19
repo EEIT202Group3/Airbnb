@@ -135,11 +135,119 @@ const routes = [
                 name: "ChangePassword",
             },
         ],
-    },
-    {
-        path: "/host",
-        component: () => import("@/layouts/host/MainLayout.vue"),
-        children: [
+      },
+      {
+        path: "hostLogin",
+        component: () => import("@/components/user/host/HostLoginPage.vue"),
+        name: "HostLogin",
+      },
+      {
+
+        path: '/login',
+        component: () => import('@/components/user/customer/LoginSignup.vue'),
+      },
+
+      {
+        path: '/homepage',
+        component: () => import('@/components/listing/customer/ListingCard.vue'),
+      },
+
+      {
+        path: '/coustomerlistings/:id',
+        component: () => import('@/components/listing/customer/CustomerDetail.vue'),
+      },
+
+
+      {
+        path: '/addlistings',
+        component: () => import('@/components/listing/host/AddListing2.vue')
+
+      },
+      {
+        path: '/customerdatil/:id',
+        component: () => import('@/components/user/customer/LoginSignup.vue')
+      },
+      {
+        path: "customerprofile",
+        component: () =>
+          import("@/components/user/customer/CustomerProfile.vue"),
+        name: "CustomerProfile",
+
+      },
+      {
+        path: "login",
+        component: () => import("@/components/user/customer/LoginSignup.vue"),
+      },
+
+      {
+        path: "/listing/card",
+        name: "ListingCard",
+        component: () => import("@/components/payment/ListingCard.vue"),
+      },
+      {
+        path: "/booking/start",
+        name: "BookingStart",
+        component: () => import("@/components/payment/BookingStart.vue"),
+      },
+      {
+        path: "/preview-confirm",
+        name: "PreviewConfirm",
+        component: () => import("@/components/payment/PreviewConfirm.vue"),
+      },
+      {
+        path: '/payment/paypal',
+        name: 'PayPalPayment',
+        component: () => import("@/components/payment/PayPalPayment.vue"),
+        props: route => ({
+          bookingId: route.query.bookingId
+        })
+      },
+      {
+        path: "/payment/redirect",
+        name: "PayRedirect",
+        component: () => import("@/components/payment/PayRedirect.vue"),
+      },
+      {
+        path: "/payment/done",
+        name: "PaymentDone",
+        component: () => import("@/components/payment/PaymentDone.vue"),
+        props: true,
+      },
+      {
+        path: '/order/list',
+        name: 'OrderList',
+        component: () => import('@/components/payment/OrderList.vue'),
+      },
+      {
+        path: "/carrent",
+        name: "CarRentFrontHomepage",
+        component: () =>
+          import(
+            "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue"
+          ),
+      },
+      {
+        path: "/reviews",
+        component: () => import("@/components/reviews/ReviewView.vue"),
+        name: "Reviews",
+      },
+      {
+        path: "reviews/insert",
+        component: () =>
+          import("@/components/reviews/customer/InsertReview.vue"),
+      },
+      {
+        path: "password",
+        component: () =>
+          import("@/components/user/customer/ChangePassword.vue"),
+        name: "ChangePassword",
+      },
+    ],
+  },
+  {
+    path: "/host",
+    component: () => import("@/layouts/host/MainLayout.vue"),
+    children: [
             {
                 path: "",
                 component: () => import("@/components/user/host/HostPage.vue"),
