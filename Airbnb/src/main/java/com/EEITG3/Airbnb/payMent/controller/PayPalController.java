@@ -2,6 +2,7 @@ package com.EEITG3.Airbnb.payMent.controller;
 
 import com.EEITG3.Airbnb.payMent.entity.Order;
 import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
+import com.EEITG3.Airbnb.payMent.service.OrderService;
 import com.EEITG3.Airbnb.payMent.service.PayPalService;
 import com.paypal.orders.Capture;
 import com.paypal.orders.PaymentCollection;
@@ -27,6 +28,9 @@ public class PayPalController {
 
     @Autowired
     private OrderRepository orderRepository;
+    
+    @Autowired
+    private OrderService orderService;
 
     //建立 PayPal 訂單
     @PostMapping("/create-order")
@@ -92,33 +96,38 @@ public class PayPalController {
             boolean paymentSuccess = isCaptureCompleted(ppOrder);
 
             if (paymentSuccess) {
-                order.setMentStatus("已付款");
-                order.setPaidTime(LocalDateTime.now());
 
-                // 依 checkin / checkout 與現在時間決定 booking_status
+                // 1) 取第一筆 capture 當憑證
+                Capture first = firstCapture(ppOrder);
+                String txId = (first != null) ? "PP_" + first.id() : "PP_" + paypalOrderId;
+
+                // 2) 交給 Service：標記已付款 + 回寫 paymentId/paidTime + 拆帳（單一交易）
+                orderService.markOrderPaidAndSplit(bookingId, txId, LocalDateTime.now());
+
+                // 3) 付款後才更新顯示用 bookingStatus（可保留在 Controller）
+                Order fresh = orderRepository.findByBookingId(bookingId)
+                        .orElseThrow(() -> new RuntimeException("找不到訂單"));
+
                 LocalDateTime now = LocalDateTime.now();
-                LocalDateTime checkin = order.getCheckinDate();     
-                LocalDateTime checkout = order.getCheckoutDate();   
-
+                LocalDateTime checkin  = fresh.getCheckinDate();
+                LocalDateTime checkout = fresh.getCheckoutDate();
                 if (checkin != null && checkout != null) {
                     if (now.isBefore(checkin)) {
-                        order.setBookingStatus("待入住");
-                    } else if (!now.isAfter(checkout)) { 
-                        order.setBookingStatus("已入住");
+                        fresh.setBookingStatus("待入住");
+                    } else if (!now.isAfter(checkout)) {
+                        fresh.setBookingStatus("已入住");
                     } else {
-                        order.setBookingStatus("完成");
+                        fresh.setBookingStatus("完成");
                     }
                 } else {
-                    order.setBookingStatus("待入住");
+                    fresh.setBookingStatus("待入住");
                 }
+                orderRepository.save(fresh);
 
-                Capture first = firstCapture(ppOrder);
-                if (first != null) {
-                    order.setPaymentId("PP_" + first.id());
-                }
             } else {
                 order.setMentStatus("付款失敗");
                 order.setBookingStatus("已取消");
+                orderRepository.save(order);
             }
 
             orderRepository.save(order);

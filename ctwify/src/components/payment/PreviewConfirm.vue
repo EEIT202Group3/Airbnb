@@ -319,7 +319,6 @@
       <v-card-text class="py-4">
         <v-radio-group v-model="payMethod" inline>
           <v-radio label="PayPal / 信用卡" value="PAYPAL" />
-          <v-radio label="現金付款" value="CASH" />
         </v-radio-group>
 
         <v-alert
@@ -501,7 +500,7 @@ async function submitOrder() {
 // 租車：導向租車首頁
 function goCarRent() {
   router.push({
-    name: "CarRentFrontHomepage",
+    name: "carFrontHomepage",
     query: {
       from: "booking",
       listid: booking.bookingParams.listid,
