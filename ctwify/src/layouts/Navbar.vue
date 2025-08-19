@@ -1,8 +1,32 @@
 <script setup>
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useCustomerStore } from '@/stores/customer';
 import LoginSignup from '@/components/user/customer/LoginSignup.vue';
+import defaultAvatar from '@/images/default.png'
+
 const showAuthPage = ref(false);
 
+const customerStore = useCustomerStore();
+const {customer} = storeToRefs(customerStore);
+
+async function logout(){
+  try {
+    await customerStore.logout()
+    alert('登出成功')
+  } catch (error) {
+    console.log(error.response)
+    alert('登出失敗')
+  }
+}
+
+onMounted(
+  async()=>{
+    if(!customer.value){
+      await customerStore.fetchUser()
+    }
+  }
+)
 </script>
 <template>
   <div class="container2">
@@ -18,8 +42,20 @@ const showAuthPage = ref(false);
         <router-link to="#">刊登旅宿</router-link>
         
         <!-- 會員登入 -->
-       <router-link to="#" @click.prevent="showAuthPage = true">
-        <i class="fa-regular fa-circle-user fa-lg"></i> 登入/註冊
+         <router-link v-if="customer" to="/customer">
+          <v-avatar size="32">
+            <v-img :src="customer?.avatarURL ? 'http://localhost:8080' + customer.avatarURL : defaultAvatar" cover/>
+          </v-avatar>
+        </router-link>
+        <router-link v-else class="text-decoration-none" color="black">
+          <v-btn
+            variant="text"
+            class="d-flex align-center text-black"
+            @click="showAuthPage = true"
+          >
+            <v-icon class="me-1" color="black">mdi-account-circle-outline</v-icon>
+            登入 / 註冊
+          </v-btn>
         </router-link>
 
         <div class="menu">
@@ -37,8 +73,8 @@ const showAuthPage = ref(false);
       </nav>
     </header>
   </div>
-   <v-dialog v-model="showAuthPage" max-width="420" scrollable>
-      <LoginSignup asDialog/>
+  <v-dialog v-model="showAuthPage" max-width="420" scrollable>
+      <LoginSignup asDialog @login-success="showAuthPage=false"/>
   </v-dialog>
 </template>
 
