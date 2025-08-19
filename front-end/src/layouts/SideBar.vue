@@ -20,7 +20,7 @@ const items = [
   { title: "設備管理", icon: "mdi-tools", to:"/addEquipment"},
   { title: "評論清單", icon: "mdi-comment", to: "/reviews/list" },
   {
-    title: "訂單清單",
+    title: "訂單查詢",
     icon: "mdi-invoice-text-multiple-outline",
     to: "/AdminOrder",
   },

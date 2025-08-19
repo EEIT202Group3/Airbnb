@@ -8,8 +8,8 @@
           <v-text-field
             class="search-bar"
             v-model="customerId"
-            hint="請輸入用戶ID"
-            label="用戶ID"
+            hint="請輸入用戶Email"
+            label="用戶Email"
             type="input"
           ></v-text-field>
 
@@ -65,11 +65,11 @@
               <p>取車地址：{{ orderDetail?.locationid }}</p>
               <p>入住日期：{{ formatDate(orderDetail?.checkinDate) }}</p>
               <p>退房日期：{{ formatDate(orderDetail?.checkoutDate) }}</p>
-              <p>房價：$ {{ orderDetail?.price }}</p>
-              <p>租車金額：${{ orderDetail?.totalAmount }}</p>
+              <p>房價：$ {{ orderDetail?.roomprice }}</p>
+              <p>租車金額：${{ orderDetail?.cartotal }}</p>
               <p>總金額：${{ orderDetail?.grandtotal }}</p>
               <p>付款編號：{{ orderDetail?.paymentId }}</p>
-              <p>付款時間：{{ orderDetail?.paidTime }}</p>
+              <p>付款時間：{{ formatDate(orderDetail?.paidTime) }}</p>
               <p>付款方式：{{ orderDetail?.bookingMethod }}</p>
               <p>
                 訂單狀態：{{ orderDetail?.bookingStatus }}
@@ -139,13 +139,10 @@ const router = useRouter();
 //Service
 async function fetchOrderDetail(bookingId: string) {
   try {
-    const response = await api.get(
-      "/api/admins/admingetorderdetail/admindetail",
-      {
-        params: { bookingId: bookingId },
-        withCredentials: true,
-      }
-    );
+    const response = await api.get("/admingetorderdetail/admindetail", {
+      params: { bookingId: bookingId },
+      withCredentials: true,
+    });
     orderDetail.value = response.data;
     detailDialog.value = true;
   } catch (error) {
@@ -180,17 +177,14 @@ const headers = [
 //Service
 async function fetchOrders() {
   if (!customerId.value) {
-    alert("請輸入用戶 ID");
+    alert("請輸入用戶 Email");
     return;
   }
   try {
-    const res = await api.get(
-      "/api/admins/admingetorderdetail/adminbyCustomer",
-      {
-        params: { email: customerId.value },
-        withCredentials: true,
-      }
-    );
+    const res = await api.get("/admingetorderdetail/adminbyCustomer", {
+      params: { email: customerId.value },
+      withCredentials: true,
+    });
     console.log(res.data);
     orders.value = Array.isArray(res.data) ? res.data : [];
   } catch (error) {
@@ -224,8 +218,8 @@ function clearOrders() {
 }
 
 //2
-const bookingStatusOptions = ["待入住", "已入住", "已完成", "已取消"];
-const bookingMethodOptions = ["現金", "信用卡", "Line Pay"];
+const bookingStatusOptions = ["待入住", "已完成", "已取消"];
+const bookingMethodOptions = ["現金", "PayPal"];
 //2
 const mentStatusOptions = ["待付款", "已付款"];
 
@@ -240,17 +234,13 @@ const newMentStatus = ref("");
 //Service
 async function updateBookingStatus() {
   try {
-    await api.post(
-      "/api/admins/admingetorderdetail/updatebookingstatus",
-      null,
-      {
-        params: {
-          bookingId: orderDetail.value.bookingId,
-          bookingStatus: newBookingStatus.value,
-        },
-        withCredentials: true,
-      }
-    );
+    await api.post("/admingetorderdetail/updatebookingstatus", null, {
+      params: {
+        bookingId: orderDetail.value.bookingId,
+        bookingStatus: newBookingStatus.value,
+      },
+      withCredentials: true,
+    });
     alert("訂單狀態更新成功");
     orderDetail.value.bookingStatus = newBookingStatus.value;
   } catch (error) {
@@ -262,7 +252,7 @@ async function updateBookingStatus() {
 //Service
 async function updateMentStatus() {
   try {
-    await api.post("/api/admins/admingetorderdetail/updatementstatus", null, {
+    await api.post("/admingetorderdetail/updatementstatus", null, {
       params: {
         bookingId: orderDetail.value.bookingId,
         mentStatus: newMentStatus.value,

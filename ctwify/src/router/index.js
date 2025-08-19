@@ -38,27 +38,26 @@ const routes = [
       },
 
       {
-        path:'/homepage',
+        path: '/homepage',
         component: () => import('@/components/listing/customer/ListingCard.vue'),
       },
 
       {
         path: '/coustomerlistings/:id',
-         component: () =>import('@/components/listing/customer/CustomerDetail.vue'),
+        component: () => import('@/components/listing/customer/CustomerDetail.vue'),
       },
 
-    
+
       {
         path: '/addlistings',
         component: () => import('@/components/listing/host/AddListing2.vue')
 
       },
-
-
       {
-        path:'/customerdatil/:id',
+        path: '/customerdatil/:id',
         component: () => import('@/components/user/customer/LoginSignup.vue')
-
+      },
+      {
         path: "customerprofile",
         component: () =>
           import("@/components/user/customer/CustomerProfile.vue"),
