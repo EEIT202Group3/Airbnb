@@ -46,7 +46,7 @@ public class HostDetails implements UserDetails {
     }
     @Override
     public boolean isEnabled() {
-        return host.isActive();
+        return host.isVerified();
     }
 	
 	

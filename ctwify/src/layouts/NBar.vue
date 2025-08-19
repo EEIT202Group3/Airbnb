@@ -64,15 +64,9 @@ onMounted(
     </router-link>
     <!-- 漢堡選單（Vuetify Menu） -->
     <v-menu offset-y>
-      <template #activator="{ props }">
-        <v-btn icon v-bind="props">
-          <v-icon>mdi-menu</v-icon>
-        </v-btn>
-      </template>
+      
       <v-list>
-        <v-list-item to="/customer">
-          <v-list-item-title>客戶首頁</v-list-item-title>
-        </v-list-item>
+        
         <v-list-item to="/hostLogin">
           <v-list-item-title>房東專區</v-list-item-title>
         </v-list-item>

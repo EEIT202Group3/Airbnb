@@ -71,6 +71,9 @@ async function onLogin() {
       case 401:
         msg = '帳號或密碼錯誤'
         break
+      case 423:
+        msg = '您已被停權，請聯絡客服'
+        break
       case 403:
         msg = '請先完成驗證'
         break
