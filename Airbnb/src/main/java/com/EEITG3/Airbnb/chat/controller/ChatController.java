@@ -1,9 +1,15 @@
 package com.EEITG3.Airbnb.chat.controller;
 
 
+import java.security.Principal;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Controller;
 
 import com.EEITG3.Airbnb.chat.entity.ChatMessage;
@@ -14,6 +20,8 @@ public class ChatController {
 	
 	private final SimpMessagingTemplate template;
 
+	@Autowired
+    private SimpUserRegistry simpUserRegistry;
     public ChatController(SimpMessagingTemplate template) {
         this.template = template;
     }
@@ -28,21 +36,52 @@ public class ChatController {
 
     // 發送給管理員訊息
     @MessageMapping("/privateMessageToAdmin")
-    public void sendPrivate(ChatMessage message) {
+    public void sendPrivateToAdmin(@Payload ChatMessage message, Principal principal) {
+        // 確保訊息完整性
+        message.setType("PRIVATE");
+        message.setTimestamp(new Date());
+        System.out.println("🟢 訊息來自使用者: " + principal.getName());
+        // Log 發送對象
+        System.out.println("🟡 要推送給: " + message.getReceiver());
+
+        System.out.println("🟢 目前所有連線使用者:");
+        simpUserRegistry.getUsers().forEach(user -> System.out.println(" - " + user.getName()));
+        
+        
+        // 發送給管理員
         template.convertAndSendToUser(
-//            message.getReceiver(),  // 接收者 username
-            "ADMIN",
-        	"/queue/messages",
+            "2025001",           // 接收者 username
+            "/queue/messages", // 目標路徑
             message
         );
-        System.out.println(message.getSender() + "傳送給ADMIN:" + message.getContent() );
+        
+        
+        // 調試日誌
+        System.out.println(message.toString());
     }
+    
+    
     
     @MessageMapping("/adminReply")
     public void adminReply(ChatMessage message) {
-    	template.convertAndSendToUser(message.getReceiver(), "/queue/messages", message);
-    	System.out.println(message.getSender() + "傳送給 :" + message.getReceiver() + " " + message.getContent() );
+        message.setType("ADMIN_REPLY");
+        message.setTimestamp(new Date());
+        
+        if (message.getReceiver() == null || message.getReceiver().trim().isEmpty()) {
+            System.err.println("❌ 錯誤: 接收者為空");
+            return;
+        }
+        
+        // 確保這裡的 receiver 是正確的用戶名
+        System.out.println("發送訊息給: " + message.getReceiver());
+        System.out.println(message.toString());
+        template.convertAndSendToUser(
+            "test",    // 這裡應該是客戶的用戶名，不是 "ADMIN"
+            "/queue/messages",        // 目標路徑
+            message
+        );
     }
+
   
 
 
