@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
     	String customerAvatarPath = Paths.get(baseDir, "avatar", "customers").toAbsolutePath().toUri().toString();
     	
     	String hostAvatarPath = Paths.get(baseDir, "avatar", "hosts").toAbsolutePath().toUri().toString();
-    	
+
     	// 將 /images/** 映射到本機磁碟位置(Mac路徑)
         registry.addResourceHandler("/images/listings/**") 
                 .addResourceLocations(listingPath)
@@ -35,5 +35,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/images/avatar/hosts/**")
 				.addResourceLocations(hostAvatarPath)
 				.setCachePeriod(3600);
+
+        registry.addResourceHandler("/carPicture/**")
+                .addResourceLocations("file:/C:/Users/User/Documents/GitHub/Airbnb/front-end/public/carPicture/")
+                .setCachePeriod(3600);
     }
+
+
 }

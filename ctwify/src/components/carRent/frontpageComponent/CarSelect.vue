@@ -266,7 +266,7 @@ function clearFilters() {
                 <div class="d-flex align-center justify-space-between" style="min-height: 150px;">
                   <!-- 圖片 -->
                   <v-img
-                      :src="`/carPicture/${car.image}`"
+                      :src="`http://localhost:8080/carPicture/${car.image}`"
                       :alt="car.brand + ' ' + car.model"
                       width="180"
                       height="120"
