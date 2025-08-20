@@ -1,9 +1,12 @@
 package com.EEITG3.Airbnb.payMent.service;
 
-import com.EEITG3.Airbnb.payMent.dto.PayoutPreview;
-import com.EEITG3.Airbnb.payMent.dto.PayoutRow;
+import com.EEITG3.Airbnb.payMent.dto.HostPayoutDto;
+import com.EEITG3.Airbnb.payMent.dto.PayoutOrderDto;
+import com.EEITG3.Airbnb.payMent.dto.PayoutPreviewDto;
+import com.EEITG3.Airbnb.payMent.dto.PayoutRowDto;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +29,7 @@ public class PayoutService {
     }
 
     @Transactional(readOnly = true)
-    public PayoutPreview preview(YearMonth month) {
+    public PayoutPreviewDto preview(YearMonth month) {
         String ym = month.toString(); // "YYYY-MM"
         String sql = """
             SELECT host_id,
@@ -45,7 +48,7 @@ public class PayoutService {
             ORDER BY host_id
         """;
 
-        var rows = namedJdbc.query(sql, Map.of("ym", ym), (rs, i) -> new PayoutRow(
+        var rows = namedJdbc.query(sql, Map.of("ym", ym), (rs, i) -> new PayoutRowDto(
             rs.getString("host_id"),
             rs.getString("payout_month"),
             rs.getBigDecimal("total_earnings"),
@@ -53,7 +56,7 @@ public class PayoutService {
             rs.getBigDecimal("total_net_payout"),
             rs.getInt("orders")
         ));
-        return new PayoutPreview(ym, rows);
+        return new PayoutPreviewDto(ym, rows);
     }
 
     @Transactional
@@ -61,7 +64,7 @@ public class PayoutService {
         String ym = month.toString();
 
         var preview = preview(month);
-        for (PayoutRow row : preview.getRows()) {   
+        for (PayoutRowDto row : preview.getRows()) {   
             UUID payoutId;
             try {
                 payoutId = jdbc.queryForObject("""
@@ -94,7 +97,7 @@ public class PayoutService {
                 FROM orderlist o
                 WHERE FORMAT(o.checkout_date,'yyyy-MM') = ?
                   AND o.host_id = ?
-                  AND o.booking_status = N'完成'
+                  AND o.booking_status = N'已完成'
                   AND o.ment_status    = N'已付款'
                   AND o.revenue_status = N'confirmed'
                   AND o.payout_status  = N'pending'
@@ -107,7 +110,7 @@ public class PayoutService {
                 FROM orderlist o
                 WHERE FORMAT(o.checkout_date,'yyyy-MM') = ?
                   AND o.host_id = ?
-                  AND o.booking_status = N'完成'
+                  AND o.booking_status = N'已完成'
                   AND o.ment_status    = N'已付款'
                   AND o.revenue_status = N'confirmed'
                   AND o.payout_status  = N'pending'
@@ -129,5 +132,83 @@ public class PayoutService {
             JOIN payout_orders po ON po.booking_id = o.booking_id
             WHERE po.payout_id = ?
         """, payoutId);
+    }
+    @Transactional(readOnly = true)
+    public java.util.List<HostPayoutDto> findHostPayouts(String hostId, String month, String status) {
+        StringBuilder sb = new StringBuilder("""
+            SELECT hp.payout_id,
+                   hp.host_id,
+                   hp.payout_month,
+                   hp.total_earnings,
+                   hp.total_platform_fee,
+                   hp.total_net_payout,
+                   hp.status,
+                   hp.payout_date,
+                   hp.created_at,
+                   hp.updated_at,
+                   ISNULL(po.cnt, 0) AS orders
+            FROM host_payouts hp
+            OUTER APPLY (
+                SELECT COUNT(*) AS cnt
+                FROM payout_orders o
+                WHERE o.payout_id = hp.payout_id
+            ) po
+            WHERE 1=1
+        """);
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+
+        if (hostId != null && !hostId.isBlank()) {
+            sb.append(" AND hp.host_id = :hostId");
+            params.addValue("hostId", hostId);
+        }
+        if (month != null && !month.isBlank()) {
+            sb.append(" AND hp.payout_month = :month");
+            params.addValue("month", month);
+        }
+        if (status != null && !status.isBlank()) {
+            sb.append(" AND hp.status = :status");
+            params.addValue("status", status);
+        }
+
+        sb.append(" ORDER BY hp.payout_month DESC, hp.updated_at DESC");
+
+        return namedJdbc.query(sb.toString(), params, (rs, i) -> new HostPayoutDto(
+            rs.getObject("payout_id", java.util.UUID.class),
+            rs.getString("host_id"),
+            rs.getString("payout_month"),
+            rs.getBigDecimal("total_earnings"),
+            rs.getBigDecimal("total_platform_fee"),
+            rs.getBigDecimal("total_net_payout"),
+            rs.getString("status"),
+            rs.getTimestamp("payout_date") != null ? rs.getTimestamp("payout_date").toLocalDateTime() : null,
+            rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null,
+            rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null,
+            rs.getInt("orders")
+        ));
+    }
+
+    /**
+     * 依 payoutId 查詢該撥款單涵蓋的所有 payout_orders
+     */
+    @Transactional(readOnly = true)
+    public java.util.List<PayoutOrderDto> findPayoutOrdersByPayoutId(java.util.UUID payoutId) {
+        String sql = """
+            SELECT payout_order_id, payout_id, booking_id, list_id,
+                   gross_amount, platform_fee, net_amount, created_at
+            FROM payout_orders
+            WHERE payout_id = ?
+            ORDER BY created_at DESC
+        """;
+        return jdbc.query(sql, (rs, i) -> new PayoutOrderDto(
+            rs.getObject("payout_order_id", java.util.UUID.class),
+            rs.getObject("payout_id", java.util.UUID.class),
+            rs.getString("booking_id"),             
+            (Integer) rs.getObject("list_id"),     
+            rs.getBigDecimal("gross_amount"),
+            rs.getBigDecimal("platform_fee"),
+            rs.getBigDecimal("net_amount"),
+            rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null
+        ), payoutId);
     }
 }

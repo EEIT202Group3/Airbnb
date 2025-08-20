@@ -2,7 +2,7 @@ package com.EEITG3.Airbnb.payMent.dto;
 
 import java.math.BigDecimal;
 
-public class PayoutRow {
+public class PayoutRowDto {
 	  private String hostId;
 	    private String payoutMonth;
 	    private BigDecimal totalEarnings;
@@ -10,7 +10,7 @@ public class PayoutRow {
 	    private BigDecimal totalNetPayout;
 	    private int orders;
 
-	    public PayoutRow(String hostId, String payoutMonth,
+	    public PayoutRowDto(String hostId, String payoutMonth,
 	                     BigDecimal totalEarnings, BigDecimal totalPlatformFee,
 	                     BigDecimal totalNetPayout, int orders) {
 	        this.hostId = hostId;

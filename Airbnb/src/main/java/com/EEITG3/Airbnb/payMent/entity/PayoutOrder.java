@@ -28,13 +28,13 @@ public class PayoutOrder {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payout_id", nullable = false)
-    private HostPayout hostPayout;  // 對應 host_payouts
+    private HostPayout hostPayout;  
 
     @Column(name = "booking_id", nullable = false, columnDefinition = "uniqueidentifier")
-    private String bookingId;  // 訂單ID
+    private String bookingId;  
 
     @Column(name = "list_id", nullable = false, columnDefinition = "uniqueidentifier")
-    private String listId;  // 房源ID
+    private String listId;  
 
     @Column(name = "gross_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal grossAmount;

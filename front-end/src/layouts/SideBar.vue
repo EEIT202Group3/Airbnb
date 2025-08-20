@@ -29,6 +29,11 @@ const items = [
     icon: "mdi-cash-register",
     to: "/AdminPayout",
   },
+  {
+    title: "每月帳務明細",
+    icon: "mdi-message-settings-outline",
+    to: "/AdminSelect",
+  },
   { title: "租車服務", icon: "mdi-car", to: "/car-rent/back-homepage" },
   { title: "客服聊天室", icon: "mdi-chat", to: "/chat" },
 ];
