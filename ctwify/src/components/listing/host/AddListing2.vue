@@ -166,7 +166,7 @@ export default {
       marker: null,
       equipList: [],
       form: {
-        hostId: "6d4d8eb1-4e79-4c3e-9a1c-820ebcb8a8ee",
+        hostId: "",
         houseName: "",
         detailAddress: "",
         room: "",
@@ -321,7 +321,9 @@ export default {
         formData.append("equipments", id);
       });
       try {
-        const res = await axios.post("/listings/add", formData); 
+        const res = await axios.post("/listings/add", formData,{
+          withCredentials:true,
+        }); 
         if (res.status === 200) {
           Swal.fire("新增成功", "房源新增成功！", "success");
           this.resetForm();
@@ -334,7 +336,7 @@ export default {
   
     resetForm() {
       this.form = {
-        hostId:"6d4d8eb1-4e79-4c3e-9a1c-820ebcb8a8ee",
+        hostId:"",
         houseName: "",
         detailAddress: "",
         room: "",

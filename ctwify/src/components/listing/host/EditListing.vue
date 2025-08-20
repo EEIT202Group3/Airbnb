@@ -221,7 +221,7 @@ const updateListing = async () => {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     Swal.fire("成功", "編輯成功", "success")
-    router.push('/list')
+    router.push('/host')
   } catch (err) {
     Swal.fire("錯誤", "編輯失敗，請檢查輸入", "error")
   }

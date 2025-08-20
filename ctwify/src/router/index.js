@@ -164,8 +164,23 @@ const routes = [
             //放房東頁面
             {
                 path: '/addlistings',
+                name: 'addlistings',
                 component: () => import('@/components/listing/host/AddListing2.vue')
 
+            },
+            {
+                path: 'list',
+                component: () => import('@/components/listing/host/List.vue')
+            },
+            {
+                path: 'edlistings/:id',
+                props: true,
+                component: () => import('@/components/listing/host/EditListing.vue')
+            },
+            {
+                path: 'details/:id',
+                props: true,
+                component: () => import('@/components/listing/host/Detail.vue')
             },
         ],
     },

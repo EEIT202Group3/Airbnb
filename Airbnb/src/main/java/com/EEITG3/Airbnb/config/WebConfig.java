@@ -18,7 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         
-    	String listingPath = Paths.get(baseDir,"listing").toAbsolutePath().toUri().toString();
+    	String listingPath = Paths.get(baseDir,"listings").toAbsolutePath().toUri().toString();
     	
     	String customerAvatarPath = Paths.get(baseDir, "avatar", "customers").toAbsolutePath().toUri().toString();
     	

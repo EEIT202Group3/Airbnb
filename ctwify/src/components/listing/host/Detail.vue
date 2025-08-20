@@ -1,7 +1,6 @@
 <template>
   <div>
     <!-- Navbar -->
-    <Navbar />
 
     <div class="come" v-if="listing">
       <h3>{{ listing.houseName }}</h3>
@@ -153,8 +152,7 @@
 </template>
 
 <script setup>
-import Navbar from '../components/Navbar.vue'
-import axios from '../api/axios'
+import axios from '@/api'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -187,7 +185,7 @@ const cityName = computed(() => {
 })
 
 function editHouse(listId) {
-  router.push(`/edit/${listId}`)
+  router.push(`/host/edlistings/${listId}`)
 }
 
 function openModal() {
@@ -255,7 +253,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-@import "../assets/list1.css";
+@import "@/assets/listing/list1.css";
 
 /* 設備樣式 */
 .amenity-list {

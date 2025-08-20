@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.EEITG3.Airbnb.listing.entity.LisBean;
 import com.EEITG3.Airbnb.listing.repository.ListRepository;
 import com.EEITG3.Airbnb.listing.service.ListingService;
+import com.EEITG3.Airbnb.users.entity.Host;
+import com.EEITG3.Airbnb.users.entity.HostDetails;
+import com.EEITG3.Airbnb.users.service.HostService;
 
 @RestController
 @RequestMapping("/listings")
@@ -29,6 +33,9 @@ public class ListingController {
 	
     @Autowired
     private ListingService listingService;
+    
+    @Autowired
+    private HostService hostservice;
 
 
     //刪除房源
@@ -46,9 +53,11 @@ public class ListingController {
 
 
     //根據host_id查詢(ID、房名、圖片1)
-    @GetMapping("/host/{hostId}")
-    public List<Map<String, Object>> getListingsByHostId(@PathVariable UUID hostId) {
-        List<LisBean> list = listRepository.findByHostId(hostId);
+    @GetMapping("/host")
+    public List<Map<String, Object>> getListingsByHostId(@AuthenticationPrincipal HostDetails hostdetails) {
+    	Host host = hostservice.currentHost(hostdetails);
+    	String hostId = host.getHostId();
+    	List<LisBean> list = listRepository.findByHostId(hostId);
         List<Map<String, Object>> result = new ArrayList<>();
         for (LisBean bean : list) {
             Map<String, Object> map = new HashMap<>();
@@ -105,7 +114,7 @@ public class ListingController {
     // 新增房源（包含設備與照片）
     @PostMapping(path = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createListing(
-            @RequestParam("host_id") UUID hostId,
+    		@AuthenticationPrincipal HostDetails hostdetails,
             @RequestParam("houseName") String houseName,
             @RequestParam("ads") String ads,
             @RequestParam("room") String room,
@@ -117,7 +126,10 @@ public class ListingController {
             @RequestParam("equipments") List<Integer> equipmentIds,
             @RequestParam("photos") List<MultipartFile> photos
     ) {
-        System.out.println("收到檔案數量：" + photos.size());
+    	System.out.println("收到檔案數量：" + photos.size());
+    	Host host = hostservice.currentHost(hostdetails);
+    	String hostId = host.getHostId();
+    	System.out.print(hostId);
         for (MultipartFile photo : photos) {
             System.out.println("檔案名：" + photo.getOriginalFilename());
         }

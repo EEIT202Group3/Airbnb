@@ -104,7 +104,7 @@ public class SecurityConfig{
 	@Bean
 	@Order(2)
 	public SecurityFilterChain hostFilterChain(HttpSecurity http) throws Exception {
-		return http.securityMatcher("/api/hosts/**")
+		return http.securityMatcher("/api/hosts/**","/listings/add/**","/listings/host/**")
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 				.csrf(csrf->csrf.disable())

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Navbar />
     <div class="container">
       <div v-if="loading">資料載入中...</div>
       <div v-else>
@@ -9,9 +8,10 @@
           :key="house.listId"
           class="listing"
         >
-          <a :href="`/listing/detail/${house.listId}`">
+          
+          <router-link to="/host/details/${house.listId}">
             <img :src="`http://localhost:8080/images/listings/${house.photo1}`" alt="房源圖片" />
-          </a>
+          </router-link>
           <div class="listing-info">{{ house.houseName }}</div>
           <div class="listing-actions">
             <button @click="editHouse(house.listId)">編輯</button>
@@ -37,16 +37,19 @@ export default {
     return {
       houseList: [],
       loading: false,
-      hostId: "8D7CC70F-6369-4A41-9A58-05F97ABFB688",
+      hostId: "",
     };
   },
   methods: {
     fetchListings() {
       this.loading = true;
       axios
-        .get(`http://localhost:8080/listings/host/${this.hostId}`)
+        .get(`http://localhost:8080/listings/host`,{
+          withCredentials:true,
+        })
         .then((res) => {
           this.houseList = res.data;
+          console.log(houseList)
         })
         .catch((err) => {
           console.error("查詢會員房源失敗", err);

@@ -6,6 +6,10 @@ import java.io.File;
 
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -21,17 +25,18 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
-import org.springframework.data.domain.PageRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import com.EEITG3.Airbnb.listing.repository.LisBeanSpecifications;
-
-import org.springframework.data.domain.Pageable;
 
 @Service
 public class ListingService {
 
 
     private final ListRepository listRepository;
+    
+    @Value("${app.storage.base-dir}")
+    private String baseDir;
     
 
     @PersistenceContext
@@ -97,58 +102,145 @@ public class ListingService {
 
     // 新增房源（最多 10 張圖片與設備關聯）
     @Transactional
-    public Integer saveListingWithPhotosAndEquipments(LisBean lisBean, List<MultipartFile> photos, List<Integer> equipmentIds) throws IOException {
+    public Integer saveListingWithPhotosAndEquipments(
+            LisBean lisBean,
+            List<MultipartFile> photos,
+            List<Integer> equipmentIds) throws IOException {
 
-        
-        List<String> photoUrls = new ArrayList<>();
-        String storageDir = "/Users/youm/Documents/GitHub/Airbnb/Airbnb/photo/listing";
-//        String storageDir = "C:/upload/photo/";
-//        
-        File dir = new File(storageDir);
-        if(!dir.exists()) {
-        	dir.mkdirs();
-        }  
+        // 1) 建立儲存目錄：{baseDir}/listings
+        Path storageDir = Paths.get(baseDir, "listings").toAbsolutePath().normalize();
+        Files.createDirectories(storageDir);
 
-        for (int i = 0; i < photos.size() && i < 10; i++) {
+        // 2) 寫檔（僅用一種方式：Files.copy），並收集檔名
+        List<String> photoFileNames = new ArrayList<>();
+        int limit = Math.min(photos != null ? photos.size() : 0, 10);
+
+        for (int i = 0; i < limit; i++) {
             MultipartFile photo = photos.get(i);
-            if (!photo.isEmpty()) {
-                String fileName = System.currentTimeMillis() + "_" + photo.getOriginalFilename();
-                File dest = new File(storageDir,fileName);
-                photo.transferTo(dest);
-                photoUrls.add(fileName);
-               
+            if (photo == null || photo.isEmpty()) continue;
+
+            String original = photo.getOriginalFilename();
+            String safeName = sanitizeFileName(original);
+            String fileName = System.currentTimeMillis() + "_" + safeName;
+
+            Path targetPath = storageDir.resolve(fileName).normalize();
+
+            // 保護：避免 ../ 走出 storageDir
+            if (!targetPath.startsWith(storageDir)) {
+                throw new IOException("Invalid file path: " + fileName);
             }
+
+            // 寫入檔案（覆蓋同名）
+            Files.copy(photo.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+            photoFileNames.add(fileName);
         }
 
-        
-        for (int i = 0; i < photoUrls.size(); i++) {
-            String url = photoUrls.get(i);
-            switch (i) {
-                case 0 -> lisBean.setPhoto1(url);
-                case 1 -> lisBean.setPhoto2(url);
-                case 2 -> lisBean.setPhoto3(url);
-                case 3 -> lisBean.setPhoto4(url);
-                case 4 -> lisBean.setPhoto5(url);
-                case 5 -> lisBean.setPhoto6(url);
-                case 6 -> lisBean.setPhoto7(url);
-                case 7 -> lisBean.setPhoto8(url);
-                case 8 -> lisBean.setPhoto9(url);
-                case 9 -> lisBean.setPhoto10(url);
+        // 3) 寫回到 lisBean 的 photo1~photo10 欄位
+        applyPhotoFields(lisBean, photoFileNames);
+
+        // 4) 關聯設備
+        if (equipmentIds != null && !equipmentIds.isEmpty()) {
+            List<EquipmentBean> equipList = new ArrayList<>();
+            for (Integer id : equipmentIds) {
+                EquipmentBean equip = em.find(EquipmentBean.class, id);
+                if (equip != null) equipList.add(equip);
             }
+            lisBean.setEquipments(equipList);
         }
 
-        
-        List<EquipmentBean> equipList = new ArrayList<>();
-        for (Integer id : equipmentIds) {
-            EquipmentBean equip = em.find(EquipmentBean.class, id);
-            if (equip != null) equipList.add(equip);
-        }
-        lisBean.setEquipments(equipList);
-
-        
+        // 5) 儲存
         LisBean saved = listRepository.save(lisBean);
         return saved.getListId();
     }
+
+    /** 只保留英數、點、底線、連字號；其他轉為底線，避免奇怪路徑或 OS 不支援字元 */
+    private String sanitizeFileName(String name) {
+        if (name == null) return "unknown";
+        String base = Paths.get(name).getFileName().toString(); // 去掉路徑成分
+        return base.replaceAll("[^A-Za-z0-9._-]", "_");
+    }
+
+    /** 把前面收到的檔名依序塞入 photo1~photo10 */
+    private void applyPhotoFields(LisBean lisBean, List<String> names) {
+        for (int i = 0; i < names.size(); i++) {
+            String n = names.get(i);
+            switch (i) {
+                case 0 -> lisBean.setPhoto1(n);
+                case 1 -> lisBean.setPhoto2(n);
+                case 2 -> lisBean.setPhoto3(n);
+                case 3 -> lisBean.setPhoto4(n);
+                case 4 -> lisBean.setPhoto5(n);
+                case 5 -> lisBean.setPhoto6(n);
+                case 6 -> lisBean.setPhoto7(n);
+                case 7 -> lisBean.setPhoto8(n);
+                case 8 -> lisBean.setPhoto9(n);
+                case 9 -> lisBean.setPhoto10(n);
+                default -> { /* 超出 10 張就忽略 */ }
+            }
+        }
+    }
+//    @Transactional
+//    public Integer saveListingWithPhotosAndEquipments(LisBean lisBean, List<MultipartFile> photos, List<Integer> equipmentIds) throws IOException {
+//
+//        
+//        List<String> photoUrls = new ArrayList<>();
+//        
+//        
+//        Path storageDir = Paths.get(baseDir,"listings");
+//        
+////        String storageDir = "/Users/youm/Documents/GitHub/Airbnb/Airbnb/photo/listing";
+////        String storageDir = "C:/upload/photo/";
+////        
+////        File dir = new File(storageDir);
+////        if(!dir.exists()) {
+////        	dir.mkdirs();
+////        }  
+//        
+//        Files.createDirectories(storageDir);
+//
+//        for (int i = 0; i < photos.size() && i < 10; i++) {
+//            MultipartFile photo = photos.get(i);
+//            if (!photo.isEmpty()) {
+//                String fileName = System.currentTimeMillis() + "_" + photo.getOriginalFilename();
+////                File dest = new File(storageDir,fileName);
+//                
+//                Files.copy(photo.getInputStream(), storageDir.resolve(fileName),StandardCopyOption.REPLACE_EXISTING);
+//                photo.transferTo(storageDir);
+//                photoUrls.add(fileName);
+//               
+//            }
+//        }
+//
+//        
+//        for (int i = 0; i < photoUrls.size(); i++) {
+//            String url = photoUrls.get(i);
+//            switch (i) {
+//                case 0 -> lisBean.setPhoto1(url);
+//                case 1 -> lisBean.setPhoto2(url);
+//                case 2 -> lisBean.setPhoto3(url);
+//                case 3 -> lisBean.setPhoto4(url);
+//                case 4 -> lisBean.setPhoto5(url);
+//                case 5 -> lisBean.setPhoto6(url);
+//                case 6 -> lisBean.setPhoto7(url);
+//                case 7 -> lisBean.setPhoto8(url);
+//                case 8 -> lisBean.setPhoto9(url);
+//                case 9 -> lisBean.setPhoto10(url);
+//            }
+//        }
+//
+//        
+//        List<EquipmentBean> equipList = new ArrayList<>();
+//        for (Integer id : equipmentIds) {
+//            EquipmentBean equip = em.find(EquipmentBean.class, id);
+//            if (equip != null) equipList.add(equip);
+//        }
+//        lisBean.setEquipments(equipList);
+//
+//        
+//        LisBean saved = listRepository.save(lisBean);
+//        return saved.getListId();
+//    }
     
     //編輯房源
     @Transactional
