@@ -23,7 +23,7 @@ public class GeocodeController {
 
             String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=" + GOOGLE_API_KEY;
 
-            System.out.println("🔍 Geocoding URL: " + url); // Debug 印出 URL
+            System.out.println("Geocoding URL: " + url);
 
             RestTemplate restTemplate = new RestTemplate();
             Map<String, Object> result = restTemplate.getForObject(url, Map.class);

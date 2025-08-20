@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Navbar />
     <div class="container">
       <div class="form-container">
         <div class="form-title">編輯房源</div>
@@ -121,7 +120,6 @@
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
-import Navbar from '../components/Navbar.vue'
 import Swal from "sweetalert2"
 import _ from 'lodash'
 
@@ -238,7 +236,7 @@ onMounted(() => {
 <style scoped>
 @import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css";
 @import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css";
-@import '../assets/list3.css';
+@import '/src/assets/listing/list3.css';
 
 /* 設備分類標題 */
 .equip-category-title {

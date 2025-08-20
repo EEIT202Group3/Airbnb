@@ -31,20 +31,37 @@ const routes = [
         component: () => import('@/components/user/customer/LoginSignup.vue'),
       },
 
+
+      //首頁
       {
         path:'/homepage',
         component: () => import('@/components/listing/customer/ListingCard.vue'),
       },
 
+      //租客房源詳細頁面
       {
         path: '/coustomerlistings/:id',
          component: () =>import('@/components/listing/customer/CustomerDetail.vue'),
       },
 
-    
+     // 新增房源
       {
         path: '/addlistings',
-        component: () => import('@/components/listing/host/AddListing2.vue')
+        component: () => import('@/components/listing/host/AddListing2.vue'),
+
+      },
+
+      {
+         path: '/Edlistings/:id',
+        component: () => import('@/components/listing/host/EditListing.vue'),
+
+
+      },
+
+      {
+         path: '/search',
+        component: () => import('@/components/listing/customer/SearchResults.vue'),
+
 
       },
 

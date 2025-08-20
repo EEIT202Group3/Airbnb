@@ -54,7 +54,7 @@ const showAuthPage = ref(false);
   justify-content: space-between;
   align-items: center;
   padding-left: 0vw;   
-  padding-right: 15.5vw; 
+  padding-right: 13vw; 
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   overflow: visible;
 }
@@ -62,7 +62,7 @@ const showAuthPage = ref(false);
 .logo {
   max-height: 90px;
   width: auto;
-  margin-right: 300px; 
+  margin-right: 400px; 
 }
 
 </style>

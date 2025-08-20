@@ -19,7 +19,7 @@ public class LisBean {
     private UUID host_Id; // 房東會員ID
 
     @Column(name = "review_count", nullable = false)
-    private int reviewCount = 0; // 評價數
+    private Double reviewCount = 0.0; //評分數
 
     @Column(name = "house_name")
     private String house_Name; // 房子名稱
@@ -94,7 +94,7 @@ public class LisBean {
         this.tel = tel;
         this.ppl = ppl;
         this.price = price;
-        this.reviewCount = 0;
+        this.reviewCount = 0.0;
         this.approved = null; // 新增時預設待審核
         this.published = true; // 預設上架
     }
@@ -107,8 +107,8 @@ public class LisBean {
     public UUID getHostId() { return host_Id; }
     public void setHostId(UUID hostId) { this.host_Id = hostId; }
 
-    public int getReviewCount() { return reviewCount; }
-    public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
+    public Double getReviewCount() { return reviewCount; }
+    public void setReviewCount( Double reviewCount) { this.reviewCount = reviewCount; }
 
     public String getHouseName() { return house_Name; }
     public void setHouseName(String houseName) { this.house_Name = houseName; }

@@ -1,4 +1,5 @@
 <template>
+  <Navbar />
   <div class="container">
     <div class="form-container">
       <div class="form-title">新增房源</div>
@@ -32,27 +33,27 @@
 
         <!-- 房型 + 床型 + 床數 -->
         <div class="mb-3 row">
-    <div class="col">
-      <label class="form-label">房型</label>
-      <select v-model="form.room" class="form-select" required>
-        <option disabled value="">請選擇房型</option>
-        <option value="整套房屋">整套房屋</option>
-        <option value="獨立房間">獨立房間</option>
-        <option value="共享房間">共享房間</option>
-        <option value="飯店式房間">飯店式房間</option>
-        <option value="獨立套房">獨立套房</option>
-        <option value="公寓">公寓</option>
-        <option value="別墅">別墅</option>
-        <option value="度假屋">度假屋</option>
-        <option value="農舍">農舍</option>
-        <option value="樓中樓">樓中樓</option>
-        <option value="共管公寓">共管公寓</option>
-        <option value="露營車/帳篷">露營車/帳篷</option>
-        <option value="青年旅館床位">青年旅館床位</option>
-        <option value="小屋">小屋</option>
-        <option value="船屋">船屋</option>
-      </select>
-    </div>
+          <div class="col">
+            <label class="form-label">房型</label>
+            <select v-model="form.room" class="form-select" required>
+              <option disabled value="">請選擇房型</option>
+              <option value="整套房屋">整套房屋</option>
+              <option value="獨立房間">獨立房間</option>
+              <option value="共享房間">共享房間</option>
+              <option value="飯店式房間">飯店式房間</option>
+              <option value="獨立套房">獨立套房</option>
+              <option value="公寓">公寓</option>
+              <option value="別墅">別墅</option>
+              <option value="度假屋">度假屋</option>
+              <option value="農舍">農舍</option>
+              <option value="樓中樓">樓中樓</option>
+              <option value="共管公寓">共管公寓</option>
+              <option value="露營車/帳篷">露營車/帳篷</option>
+              <option value="青年旅館床位">青年旅館床位</option>
+              <option value="小屋">小屋</option>
+              <option value="船屋">船屋</option>
+            </select>
+          </div>
           <div class="col">
             <label class="form-label">床型</label>
             <select v-model="form.bedType" class="form-select" required>
@@ -147,16 +148,18 @@
 </template>
 
 <script>
-import axios from 'axios';
+import Navbar from '../components/Navbar.vue';
+import axios from '../api/axios';
 import Swal from 'sweetalert2';
 
 export default {
+  components: { Navbar },
   data() {
     return {
       selectedCity: '',
       selectedDistrict: '',
       availableDistricts: [],
-      cityData : {
+     cityData : {
   "台北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
   "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "樹林區", "鶯歌區", "三峽區", "淡水區", "汐止區", "瑞芳區", "土城區", "蘆洲區", "五股區", "泰山區", "林口區", "八里區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "金山區", "萬里區", "烏來區"],
   "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
@@ -183,7 +186,7 @@ export default {
 
       equipList: [],
       form: {
-        hostId: "8D7CC70F-6369-4A41-9A58-05F97ABFB688",
+        hostId: "6d4d8eb1-4e79-4c3e-9a1c-820ebcb8a8ee",
         houseName: "",
         detailAddress: "",
         room: "",
@@ -209,51 +212,6 @@ export default {
     }
   },
   methods: {
-      openDialog() {
-      this.showDialog = true;
-      this.$nextTick(() => {
-        this.tempAddress = this.address;
-        this.initMap();
-        this.initAutocomplete();
-      });
-    },
-    closeDialog() {
-      this.showDialog = false;
-    },
-    confirmAddress() {
-      this.address = this.tempAddress;
-      this.closeDialog();
-    },
-    initMap() {
-      this.map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: 25.0330, lng: 121.5654 },
-        zoom: 12
-      });
-    },
-    initAutocomplete() {
-      const input = this.$refs.dialogInput;
-      if (!this.autocomplete) {
-        this.autocomplete = new google.maps.places.Autocomplete(input, { types: ['geocode'] });
-        this.autocomplete.addListener('place_changed', this.onPlaceChanged);
-      }
-    },
-    onPlaceChanged() {
-      const place = this.autocomplete.getPlace();
-      if (place.geometry && place.geometry.location) {
-        this.map.setCenter(place.geometry.location);
-        this.map.setZoom(15);
-
-        if (this.marker) {
-          this.marker.setMap(null);
-        }
-        this.marker = new google.maps.Marker({
-          map: this.map,
-          position: place.geometry.location
-        });
-
-        this.tempAddress = place.formatted_address;
-      }
-    },
     updateDistricts() {
       this.availableDistricts = this.cityData[this.selectedCity] || [];
       this.selectedDistrict = '';
@@ -295,7 +253,6 @@ export default {
       formData.append("host_id", this.form.hostId);
       formData.append("houseName", this.form.houseName);
 
-      
       const fullAddress = `${this.selectedCity}${this.selectedDistrict}${this.form.detailAddress}`;
       formData.append("ads", fullAddress);
 
@@ -306,7 +263,7 @@ export default {
       formData.append("ppl", this.form.ppl);
       formData.append("price", this.form.price);
 
-      this.form.photos.forEach(file => {
+     this.form.photos.forEach(file => {
         formData.append("photos", file);
       });
 
@@ -314,7 +271,7 @@ export default {
         formData.append("equipments", id);
       });
       try {
-        const res = await axios.post("/listings/add", formData); 
+        const res = await axios.post("http://localhost:8080/listings/add", formData);
         if (res.status === 200) {
           Swal.fire("新增成功", "房源新增成功！", "success");
           this.resetForm();
@@ -324,7 +281,7 @@ export default {
         console.error(err);
       }
     },
-  
+
     resetForm() {
       this.form = {
         hostId:"6d4d8eb1-4e79-4c3e-9a1c-820ebcb8a8ee",
@@ -353,7 +310,7 @@ export default {
 </script>
 
 <style scoped>
-@import "/src/assets/listing/list3.css";
+@import "../assets/list3.css";
 /* 設備分類標題 */
 .equip-category-title {
   font-weight: 600;
@@ -396,57 +353,4 @@ export default {
   white-space: normal;
   user-select: none;
 }
-
-/* 遮罩背景 */
-.dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-/* 彈窗本體 */
-.dialog {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 700px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* 文字框 */
-.dialog input {
-  margin-bottom: 10px;
-}
-
-/* 地圖自動填滿彈窗剩餘高度 */
-#map {
-  flex: 1;
-  min-height: 300px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-}
-
-/* 按鈕區塊 */
-.dialog-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
-}
-.pac-container {
-  z-index: 3000 !important;
-}
-
-
 </style>

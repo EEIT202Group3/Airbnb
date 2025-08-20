@@ -2,6 +2,7 @@ package com.EEITG3.Airbnb.config;
 
 import java.nio.file.Paths;
 
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
