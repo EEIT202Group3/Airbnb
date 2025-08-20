@@ -22,7 +22,7 @@ public interface ListRepository extends JpaRepository<LisBean,Integer>,JpaSpecif
 	    LisBean findByLisid(int lisid);
 	 
 	 @Query("SELECT l FROM LisBean l WHERE l.host_Id = :hostId")
-	 List<LisBean> findByHostId(@Param("hostId") UUID hostId);
+	 List<LisBean> findByHostId(@Param("hostId") String hostId);
 	 
 	 List<LisBean> findByApprovedFalse();
 	 

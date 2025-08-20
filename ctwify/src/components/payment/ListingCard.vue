@@ -76,13 +76,13 @@ axios.defaults.withCredentials = true;
 // 假資料格式
 const listing = ref({
   id: 7,
-  title: "日式和風套房｜近地鐵",
-  address: "日本大阪",
+  title: "全木質、暖泥作 自帶庭園",
+  address: "宜蘭縣礁溪鄉快樂村35號",
   type: "獨立套房",
-  bed: "雙人床",
-  capacity: 2,
-  phone: "0988777333",
-  pricePerNight: 1000,
+  bed: "單人床",
+  capacity: 1,
+  phone: "0900000000",
+  pricePerNight: 1542,
   image: "https://picsum.photos/seed/room1/1200/600",
 });
 

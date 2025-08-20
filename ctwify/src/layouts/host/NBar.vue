@@ -29,7 +29,7 @@ onMounted(
 )
 
 async function goHome(){
-  await logout();
+  router.push('/host')
 }
 
 </script>
@@ -44,7 +44,7 @@ async function goHome(){
     <v-spacer />
 
     <v-btn 
-      to="#" 
+      :to="{name:'addlistings'}"
       variant="text" 
       class="text-black" 
       size="large"

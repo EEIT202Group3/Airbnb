@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "listings")
@@ -16,7 +15,7 @@ public class LisBean {
     private Integer listId; // 房源ID
 
     @Column(name = "host_id", nullable = false, columnDefinition = "uniqueidentifier")
-    private UUID host_Id; // 房東會員ID
+    private String host_Id; // 房東會員ID
 
     @Column(name = "review_count", nullable = false)
     private Double reviewCount = 0.0; //評分數
@@ -83,7 +82,7 @@ public class LisBean {
 
     public LisBean() {}
 
-    public LisBean(UUID hostId, String houseName, String ads, String room, String bed,
+    public LisBean(String hostId, String houseName, String ads, String room, String bed,
                    String describe, String tel, int ppl, int price) {
         this.host_Id = hostId;
         this.house_Name = houseName;
@@ -104,8 +103,8 @@ public class LisBean {
     public Integer getListId() { return listId; }
     public void setListId(Integer listId) { this.listId = listId; }
 
-    public UUID getHostId() { return host_Id; }
-    public void setHostId(UUID hostId) { this.host_Id = hostId; }
+    public String getHostId() { return host_Id; }
+    public void setHostId(String hostId) { this.host_Id = hostId; }
 
     public Double getReviewCount() { return reviewCount; }
     public void setReviewCount( Double reviewCount) { this.reviewCount = reviewCount; }
