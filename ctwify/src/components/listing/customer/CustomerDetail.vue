@@ -377,7 +377,9 @@ onMounted(async () => {
     listing.value = res.data
 
     // 測試用分數
-    // listing.value.reviewCount = 4.5
+
+    listing.value.reviewCount = 4.5
+
 
     // 圖片整理
     photos.value = []

@@ -33,7 +33,7 @@ public class ReviewController {
 	@Autowired
 	private ReviewService rService;
 
-	@GetMapping("/reviews")
+	@GetMapping("admins/reviews")
 	public List<Review> getAllReviews(
 			@RequestParam(required = false) String type,
 		    @RequestParam(required = false) String keyword) { 
@@ -58,7 +58,7 @@ public class ReviewController {
 		return rService.findByCustId(id);
 	}
 
-	@DeleteMapping("/reviews/del/{id}")
+	@DeleteMapping("admins/reviews/del/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable Integer id) {
 		System.out.println("此api接收參數:" + id);
 		try {

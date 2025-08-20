@@ -107,7 +107,7 @@ function goToBooking() {
   router.push({
     name: "BookingStart",
     query: {
-      listId: listing.value.id,
+      listid: listing.value.id,
       houseName: listing.value.title,
       address: listing.value.address,
       bed: listing.value.bed,

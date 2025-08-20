@@ -66,10 +66,7 @@ public class HostServiceImpl implements HostService {
 			throw new BadCredentialsException("帳號不存在");
 		}
 		Host host = temp.get();
-		if(!host.isVerified()) {
-			throw new BadCredentialsException("請先完成驗證");
-		}
-		return jwtService.generateToken(request.getEmail(), "ROLE_HOST");
+		return jwtService.generateToken(host.getEmail(), "ROLE_HOST");
 	}
 
 	@Override

@@ -115,10 +115,12 @@ const headers = [
 ];
 
 import axios from "axios";
+import { fetchReviews, getReviews,deleteReview } from "@/service/review/AdminService";
 const reviews = ref([]);
 // 封裝取得數據方法
+/*
 const fetchReviews = async (keyword = "", type = "") => {
-  const res = await axios.get("http://localhost:8080/api/reviews", {
+  const res = await axios.get("http://localhost:8080/api/admins/reviews", {
     params: {
       keyword,
       type,
@@ -127,10 +129,14 @@ const fetchReviews = async (keyword = "", type = "") => {
   });
   reviews.value = res.data;
 };
-
-onMounted(() => {
-  fetchReviews();
-  console.log(reviews);
+*/
+onMounted(async () => {
+  const res = await fetchReviews(keyword.value, searchType.value);
+  if (!res) {
+    router.push({ name: "Homepage" });
+  } else {
+    reviews.value = res;
+  }
 });
 
 const selectedReview = ref(null);
@@ -144,11 +150,7 @@ const viewReview = async (item) => {
 
   loading.value = true;
   try {
-    const resp = await axios.get(
-      `http://localhost:8080/api/reviews/get/${id}`,
-      { withCredentials: true }
-    );
-    selectedReview.value = resp.data;
+    selectedReview.value = await getReviews(id);
     viewDialog.value = true;
   } catch (err) {
     console.error("取得評論失敗:", err);
@@ -159,6 +161,7 @@ const viewReview = async (item) => {
 };
 
 import { ref, computed, onMounted } from "vue";
+import router from "@/router";
 // import ReviewTable from "@/components/reviews/components/ReviewTable.vue";
 
 const searchType = ref("");
@@ -172,8 +175,8 @@ const keyword = ref("");
  */
 
 const searchReviews = async () => {
-  if (!keyword.value) return;
-  fetchReviews(keyword.value.trim(), searchType.value.trim()); // ✅ 只呼叫這個
+  if (!keyword.value) return; // ✅ 只呼叫這個
+  reviews.value = await fetchReviews(keyword.value, searchType.value);
   console.log(keyword.value, searchType.value);
 };
 
@@ -186,10 +189,12 @@ const handleDelete = async (item) => {
 
   if (!confirmed) return;
   try {
-    await axios.delete(`http://localhost:8080/api/reviews/del/${id}`, {
+    await axios.delete(`http://localhost:8080/api/admins/reviews/del/${id}`, {
       withCredentials: true,
     });
-    await fetchReviews(); // 刪除成功後局部刷新 table
+    const res = await fetchReviews(keyword.value, searchType.value);
+    reviews.value = res; // ✅ 更新 reviews
+    // 刪除成功後局部刷新 table
   } catch (err) {
     console.error("刪除失敗:", err);
   }

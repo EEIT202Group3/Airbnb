@@ -12,7 +12,10 @@ import java.util.Map;
 @RequestMapping("/api/geocode")
 public class GeocodeController {
 
-    private final String GOOGLE_API_KEY = "AIzaSyBO1x0gEVOrnpwN1hLYQUbDwMF6wpYgCvg";
+
+
+    private final String GOOGLE_API_KEY = "My Ｇoolge Key"; //整合時再放上 怕次數過量
+
 
     @GetMapping
     public ResponseEntity<?> geocode(@RequestParam String address) {
@@ -23,14 +26,18 @@ public class GeocodeController {
 
             String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=" + GOOGLE_API_KEY;
 
+
             System.out.println("Geocoding URL: " + url);
+
 
             RestTemplate restTemplate = new RestTemplate();
             Map<String, Object> result = restTemplate.getForObject(url, Map.class);
 
             return ResponseEntity.ok(result);
         } catch (Exception e) {
+
             e.printStackTrace(); // 印出錯誤
+
             return ResponseEntity.status(500).body("Geocoding error: " + e.getMessage());
         }
     }

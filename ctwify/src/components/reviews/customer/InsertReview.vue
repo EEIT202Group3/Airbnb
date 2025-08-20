@@ -54,6 +54,8 @@
         rows="1"
         clearable
         no-resize
+        :counter="200"
+        maxlength="200"
       ></v-textarea>
 
       <div class="text-subtitle-1 font-weight-medium mb-1">

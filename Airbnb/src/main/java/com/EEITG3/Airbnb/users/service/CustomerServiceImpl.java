@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -71,11 +70,6 @@ public class CustomerServiceImpl implements CustomerService {
 			throw new BadCredentialsException("帳號不存在");
 		}
 		Customer customer = temp.get();
-		//如果沒有驗證過，拋出Exception，請先完成驗證
-		if(!customer.isVerified()) {
-			throw new DisabledException("請先完成驗證");
-		}
-		//上面的三個驗證都過了，產生JWT並回傳
 		return jwtService.generateToken(customer.getEmail(), "ROLE_CUSTOMER");
 	}
 

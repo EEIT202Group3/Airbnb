@@ -10,9 +10,12 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 
+
+
 // Google Maps
 import VueGoogleMaps from '@fawmi/vue-google-maps'
 import vue3GoogleLogin from 'vue3-google-login'
+
 
 const app = createApp(App)
 
@@ -36,7 +39,8 @@ app.use(vue3GoogleLogin, {
 // Google Maps 設定
 app.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyBO1x0gEVOrnpwN1hLYQUbDwMF6wpYgCvg', // 替換成你的 Google Maps API Key
+    key: 'My Google Key', //Google Maps API Key  github會警告所以先撤掉
+
     libraries: 'places', // 如果要用地點自動補全
   },
 })

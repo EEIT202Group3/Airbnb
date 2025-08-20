@@ -1,5 +1,4 @@
 <template>
-  <Navbar />
   <div class="container">
     <div class="form-container">
       <div class="form-title">新增房源</div>
@@ -148,12 +147,10 @@
 </template>
 
 <script>
-import Navbar from '../components/Navbar.vue';
-import axios from '../api/axios';
+import axios from '@/api2';
 import Swal from 'sweetalert2';
 
 export default {
-  components: { Navbar },
   data() {
     return {
       selectedCity: '',
@@ -310,7 +307,8 @@ export default {
 </script>
 
 <style scoped>
-@import "../assets/list3.css";
+@import "/src/assets/listing/list3.css";
+
 /* 設備分類標題 */
 .equip-category-title {
   font-weight: 600;
