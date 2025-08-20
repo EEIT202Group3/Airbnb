@@ -176,7 +176,7 @@
             </select>
           </div>
 
-          <button class="reserve-btn">預訂</button>
+          <button class="reserve-btn" @click="goToBooking">預訂</button>
         </div>
       </div> <!-- info-flex end -->
 
@@ -369,6 +369,27 @@ async function geocodeAddress(address) {
   }
 }
 
+function goToBooking() {
+  console.log(listing.value)
+  router.push({
+    name: "BookingStart",
+    query: {
+      listid: listing.value.listId,
+      houseName: listing.value.houseName,
+      address: listing.value.ads,
+      bed: listing.value.bed,
+      type: listing.value.room,
+      tel: listing.value.tel,
+      price: listing.value.price,
+      checkInDate: checkIn.value,
+      checkOutDate: checkOut.value,
+      guests: guests.value,
+    },
+  });
+}
+
+
+
 // 取得房源資料
 onMounted(async () => {
   const id = route.params.id
@@ -378,7 +399,7 @@ onMounted(async () => {
 
     // 測試用分數
 
-    listing.value.reviewCount = 4.5
+    // listing.value.reviewCount = 4.5
 
 
     // 圖片整理

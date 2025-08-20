@@ -84,7 +84,7 @@ async function logout(){
         <v-list-item to="/reviews">
           <v-list-item-title>我的評論</v-list-item-title>
         </v-list-item>
-        <v-list-item to="/main/getList">
+        <v-list-item to="/order/list">
           <v-list-item-title>訂房紀錄</v-list-item-title>
         </v-list-item>
         <v-list-item to="/main/list">

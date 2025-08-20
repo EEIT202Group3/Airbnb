@@ -8,7 +8,7 @@ import HostSideBar from './HostSideBar.vue';
         <v-col cols="3" style="margin-top: 40px;">
             <HostSideBar></HostSideBar>
         </v-col>
-        <v-col cols="7" style="margin-top: 15px;">
+        <v-col cols="8" style="margin-top: 15px;">
             <router-view></router-view>
         </v-col>
     </v-row>
