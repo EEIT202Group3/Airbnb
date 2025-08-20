@@ -32,7 +32,7 @@
           >
             <v-img
               :src="listing.photo1
-                ? `http://localhost:8080/images/${listing.photo1}`
+                ? `http://localhost:8080/images/listings/${listing.photo1}`
                 : 'https://via.placeholder.com/150x100?text=No+Image'"
               alt="房源圖片"
               class="listing-img"
@@ -358,7 +358,7 @@ export default {
             const photoKey = `photo${i}`;
             if (this.detailListing[photoKey]) {
               this.photos.push(
-                `http://localhost:8080/images/${this.detailListing[photoKey]}`
+                `http://localhost:8080/images/listings/${this.detailListing[photoKey]}`
               );
             }
           }

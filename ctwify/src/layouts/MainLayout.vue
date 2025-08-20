@@ -8,8 +8,6 @@
 <script setup>
 
 import Nav from "@/layouts/Navbar.vue";
-//import Nav from "@/layouts/Nbar.vue";
-
 import Footer from "@/layouts/Footer.vue";
 </script>
 <style scoped>

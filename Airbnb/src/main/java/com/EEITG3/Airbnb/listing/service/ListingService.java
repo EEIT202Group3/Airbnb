@@ -4,7 +4,9 @@ package com.EEITG3.Airbnb.listing.service;
 import java.io.File;
 
 
+
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 import org.springframework.stereotype.Service;
@@ -19,11 +21,18 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import com.EEITG3.Airbnb.listing.repository.LisBeanSpecifications;
+
+import org.springframework.data.domain.Pageable;
+
 @Service
 public class ListingService {
 
 
     private final ListRepository listRepository;
+    
 
     @PersistenceContext
     private EntityManager em;
@@ -92,7 +101,7 @@ public class ListingService {
 
         
         List<String> photoUrls = new ArrayList<>();
-        String storageDir = "/Users/youm/pohto";
+        String storageDir = "/Users/youm/Documents/GitHub/Airbnb/Airbnb/photo/listing";
 //        String storageDir = "C:/upload/photo/";
 //        
         File dir = new File(storageDir);
@@ -152,7 +161,7 @@ public class ListingService {
         if (photos != null && !photos.isEmpty()) {
             List<String> photoUrls = new ArrayList<>();
 //            String storageDir = "C:/upload/photo/";
-            String storageDir = "/Users/youm/pohto";
+            String storageDir = "/Users/youm/Documents/GitHub/Airbnb/Airbnb/photo/listing";
 //            
             File dir = new File(storageDir);
             if(!dir.exists()) {
@@ -215,5 +224,40 @@ public class ListingService {
         return listRepository.findByApprovedTrueAndPublishedTrue();
     }
     
+//    //主頁 查詢地點 人數
+//    public List<LisBean> searchListings(String location, Integer guestCount) {
+//        Specification<LisBean> spec = Specification
+//                .where(LisBeanSpecifications.isApprovedAndPublished())
+//                .and(LisBeanSpecifications.locationLike(location))
+//                .and(LisBeanSpecifications.guestCountAtLeast(guestCount));
+//
+//        return listRepository.findAll(spec);
+//    }
+    
+ // 主頁查詢欄查詢 （三個選一都可查詢）
+    public List<LisBean> searchListings(String location, Integer guestCount, LocalDate checkIn, LocalDate checkOut) {
+        Specification<LisBean> spec = Specification
+                .where(LisBeanSpecifications.isApprovedAndPublished())
+                .and(LisBeanSpecifications.locationLike(location))
+                .and(LisBeanSpecifications.guestCountAtLeast(guestCount))
+                .and(LisBeanSpecifications.availableBetween(
+                        checkIn != null ? checkIn.atStartOfDay() : null,
+                        checkOut != null ? checkOut.atStartOfDay() : null
+                ));
+
+        return listRepository.findAll(spec);
+    }
+    
+ // 根據城市取得所有符合條件的房源
+    public List<LisBean> getListingsByCity(String city) {
+        return listRepository.findByCity(city);
+    }
+
+    // 取得該城市評分最高前10筆
+    public List<LisBean> getTopRatedListingsByCity(String city) {
+        int offset = 0;
+        int limit = 10;
+        return listRepository.findTopRatedByCity(city, offset, limit);
+    }
 
 }

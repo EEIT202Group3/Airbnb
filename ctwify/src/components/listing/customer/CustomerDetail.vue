@@ -377,7 +377,9 @@ onMounted(async () => {
     listing.value = res.data
 
     // 測試用分數
+
     listing.value.reviewCount = 4.5
+
 
     // 圖片整理
     photos.value = []
@@ -562,7 +564,7 @@ onMounted(() => {
 
 /* 地圖樣式 */
 .map-wrapper {
-  width: 960px;
+  width: 1020px;
   height: 500px;       
   border-radius: 16px;  
   overflow: hidden;      

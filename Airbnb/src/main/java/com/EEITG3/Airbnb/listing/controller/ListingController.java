@@ -1,10 +1,13 @@
 package com.EEITG3.Airbnb.listing.controller;
 
+import java.time.LocalDate;
 import java.util.*;
 
 
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -272,7 +275,29 @@ public class ListingController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("找不到該房源");
         }
     }
+    
+    //主頁查詢房源
+    @GetMapping("/search")
+    public List<LisBean> searchListings(
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Integer guest,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut
+    ) {
+        return listingService.searchListings(location, guest, checkIn, checkOut);
+    }
+    
+    // 根據城市取得房源
+    @GetMapping("/city/{city}")
+    public List<LisBean> getListingsByCity(@PathVariable String city) {
+        return listingService.getListingsByCity(city);
+    }
 
+    // 根據城市取得評分最高前10筆
+    @GetMapping("/city/{city}/top-rated")
+    public List<LisBean> getTopRatedListingsByCity(@PathVariable String city) {
+        return listingService.getTopRatedListingsByCity(city);
+    }
     
 
 }

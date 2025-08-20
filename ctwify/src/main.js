@@ -11,9 +11,9 @@ import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 
 
+
 // Google Maps
 import VueGoogleMaps from '@fawmi/vue-google-maps'
-
 import vue3GoogleLogin from 'vue3-google-login'
 
 
@@ -40,6 +40,7 @@ app.use(vue3GoogleLogin, {
 app.use(VueGoogleMaps, {
   load: {
     key: 'My Google Key', //Google Maps API Key  github會警告所以先撤掉
+
     libraries: 'places', // 如果要用地點自動補全
   },
 })

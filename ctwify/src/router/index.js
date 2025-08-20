@@ -120,6 +120,140 @@ const routes = [
                 name: "HostLogin",
             },
         ],
+      },
+      {
+        path: '/login',
+        component: () => import('@/components/user/customer/LoginSignup.vue'),
+      },
+
+
+      //首頁
+      {
+        path:'/homepage',
+        component: () => import('@/components/listing/customer/ListingCard.vue'),
+      },
+
+      //租客房源詳細頁面
+      {
+        path: '/coustomerlistings/:id',
+         component: () =>import('@/components/listing/customer/CustomerDetail.vue'),
+      },
+
+     // 新增房源
+      {
+        path: '/addlistings',
+        component: () => import('@/components/listing/host/AddListing2.vue'),
+
+      },
+
+      {
+         path: '/Edlistings/:id',
+        component: () => import('@/components/listing/host/EditListing.vue'),
+
+
+      },
+
+      {
+         path: '/search',
+        component: () => import('@/components/listing/customer/SearchResults.vue'),
+
+
+      },
+
+
+      {
+        path:'/customerdatil/:id',
+        component: () => import('@/components/user/customer/LoginSignup.vue')
+      },
+      {
+        path: "customerprofile",
+        component: () =>
+          import("@/components/user/customer/CustomerProfile.vue"),
+        name: "CustomerProfile",
+      },
+      {
+        path: "login",
+        component: () => import("@/components/user/customer/LoginSignup.vue"),
+      },
+
+      {
+        path: "/listing/card",
+        name: "ListingCard",
+        component: () => import("@/components/payment/ListingCard.vue"),
+      },
+      {
+        path: "/booking/start",
+        name: "BookingStart",
+        component: () => import("@/components/payment/BookingStart.vue"),
+      },
+      {
+        // 測試從房源抓資料用
+        path: "/booking/start1",
+        name: "BookingStart1",
+        component: () => import("@/components/payment/BookingStart1.vue"),
+      },
+      {
+        path: "/booking/preview",
+        name: "PreviewConfirm",
+        component: () => import("@/components/payment/PreviewConfirm.vue"),
+      },
+      {
+        path: "/booking/pay",
+        name: "PayRedirect",
+        component: () => import("@/components/payment/PayRedirect.vue"),
+      },
+      {
+        path: "/booking/done/:bookingId",
+        name: "PaymentDone",
+        component: () => import("@/components/payment/PaymentDone.vue"),
+        props: true,
+      },
+      {
+        // 測試從房源抓資料用
+        path: "/orders1",
+        name: "OrderList1",
+        component: () => import("@/components/payment/OrderList1.vue"),
+      },
+      {
+        path: "/carrent",
+        name: "CarRentFrontHomepage",
+        component: () =>
+          import(
+            "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue"
+          ),
+      },
+      {
+        // 測試從房源抓資料用
+          path: '/test/listing-preview', component: () => import('@/components/payment/TestListingPreview.vue')
+      },
+      {
+        path: "/reviews",
+        component: () => import("@/components/reviews/ReviewView.vue"),
+        name: "Reviews",
+      },
+      {
+        path: "reviews/insert",
+        component: () =>
+          import("@/components/reviews/customer/InsertReview.vue"),
+      },
+      {
+        path: "password",
+        component: () =>
+          import("@/components/user/customer/ChangePassword.vue"),
+        name: "ChangePassword",
+      },
+    ],
+  },
+  {
+    path: "/host",
+    component: () => import("@/layouts/host/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("@/components/user/host/HostPage.vue"),
+        name: "HostHomepage",
+        redirect: { name: "HostInfo" },
+
     },
 
 

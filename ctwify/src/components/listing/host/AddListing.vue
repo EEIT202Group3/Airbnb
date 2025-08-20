@@ -308,6 +308,7 @@ export default {
 
 <style scoped>
 @import "/src/assets/listing/list3.css";
+
 /* 設備分類標題 */
 .equip-category-title {
   font-weight: 600;
