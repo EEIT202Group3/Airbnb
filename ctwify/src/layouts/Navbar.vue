@@ -41,12 +41,7 @@ async function logout(){
       <v-img :src="logo" alt="Ctwify" height="200" width="200" eager class="me-2" />
     </div>
 
-
-      <nav> 
-        <router-link to="#">刊登旅宿</router-link>
-
     <v-spacer />
-
 
     
     <router-link
@@ -110,28 +105,4 @@ async function logout(){
 </template>
 
 <style scoped>
-
-@import '/src/assets/listing/list1.css';
-
-.naver {
-  height: 70px;
-  position: sticky;
-  top: 0;
-  z-index: 5000;
-  background-color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 0vw;   
-  padding-right: 13vw; 
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  overflow: visible;
-}
-
-.logo {
-  max-height: 90px;
-  width: auto;
-  margin-right: 400px; 
-}
 </style>
-
