@@ -57,7 +57,7 @@ async function onLogin() {
   try {
     await hostStore.login(login.value)
     alert('登入成功')
-    router.push('/host')
+    router.push({name:'HostHomepage'})
   } catch (error) {
     let msg = ''
     const status = error.response.status

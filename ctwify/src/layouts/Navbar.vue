@@ -9,7 +9,6 @@ import logo from '@/icon/logo.png'
 
 const router = useRouter()
 const showAuthPage = ref(false)
-
 const customerStore = useCustomerStore()
 const { customer } = storeToRefs(customerStore)
 

@@ -1,6 +1,6 @@
 <template>
   <NBar></NBar>
-  <v-main>
+  <v-main style="margin-top: 45px;">
     <router-view></router-view>
   </v-main>
   <Footer></Footer>

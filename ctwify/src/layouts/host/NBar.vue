@@ -1,8 +1,10 @@
 <script setup>
-import { onMounted } from "vue";
+import { ref,computed,onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useHostStore } from "@/stores/host";
 import { useRouter } from "vue-router";
+
+import logo from '@/icon/logo.png';
 
 const router = useRouter();
 const hostStore = useHostStore();
@@ -11,7 +13,7 @@ const {host} = storeToRefs(hostStore);
 async function logout(){
   try {
     await hostStore.logout()
-    alert('登出成功')
+    router.push('/')
   } catch (error) {
     console.log(error.response)
     alert('登出失敗')
@@ -26,25 +28,33 @@ onMounted(
   }
 )
 
+async function goHome(){
+  await logout();
+}
+
 </script>
 
 <template>
-  <v-app-bar app color="white" flat class="elevation-1">
-    <!-- Logo -->
-    <v-toolbar-title class="text-h6 font-weight-bold">
-      <RouterLink :to="{name:'Homepage'}" @click.prevent="logout" style="text-decoration: none;">
-        <span class="text-orange-darken-2">My</span>
-        <span style="color: black;">Booking</span>
-      </RouterLink>
-    </v-toolbar-title>
+  <v-app-bar density="comfortable" elevation="1" class="d-flex justify-center" style="height: 9%;">
+    <!-- 左：Logo（不重整導回首頁） -->
+    <div role="button" tabindex="0" @click="goHome" style="margin-left:10%;">
+      <v-img :src="logo" alt="Ctwify" height="200" width="200" eager class="me-2" />
+    </div>
 
-    <!-- Spacer -->
-    <v-spacer></v-spacer>
+    <v-spacer />
 
-    <!-- 漢堡選單（Vuetify Menu） -->
-    <v-menu offset-y>
+    <v-btn 
+      to="#" 
+      variant="text" 
+      class="text-black" 
+      size="large"
+      style="font-size: large;"  
+    >刊登旅宿</v-btn>
+
+    <!-- 右：漢堡選單 -->
+    <v-menu location="bottom end" offset="8" transition="fade-transition" close-on-content-click>
       <template #activator="{ props }">
-        <v-btn icon v-bind="props">
+        <v-btn v-bind="props" icon variant="text" aria-label="開啟選單" class="ms-1">
           <v-icon>mdi-menu</v-icon>
         </v-btn>
       </template>
@@ -58,8 +68,4 @@ onMounted(
 </template>
 
 <style scoped>
-.v-btn:hover {
-  background-color: #fef3e2 !important;
-  color: #d35400 !important;
-}
 </style>

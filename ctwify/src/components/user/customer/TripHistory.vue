@@ -1,16 +1,32 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-const history = [
-    {location:'Taipei',date:'2025/01/01',price:'2500',id:'1'},
-    {location:'Taipei',date:'2025/01/01',price:'2500',id:'2'},
-    {location:'Taipei',date:'2025/01/01',price:'2500',id:'3'},
-    {location:'Taipei',date:'2025/01/01',price:'2500',id:'4'},
-]
+import axios from 'axios';
+import { ref,onMounted } from 'vue';
+
+const orders = ref([]);
 
 const hovered = ref(null)
 function getHistory(data:any){
     alert(data.id)
 }
+
+async function fetchOrders(){
+    try{
+        const response = await axios.get('http://localhost:8080/api/orderconfirm/byCustome',{
+            withCredentials:true,
+        })
+        console.log(response.data)
+        return response.data;
+    }catch(error){
+        console.log(error.response)
+        return null;
+    }
+}
+
+onMounted(
+    async()=>{
+        orders.value = await fetchOrders();
+    }
+)
 
 </script>
 <template>
@@ -19,9 +35,9 @@ function getHistory(data:any){
         <v-divider class="my-6" />
         <v-item-group mandatory>
             <v-container>
-                <v-row>
+                <v-row v-if="orders">
                     <v-col
-                    v-for="h in history"
+                    v-for="h in orders"
                     cols="12"
                     md="4"
                     >
@@ -42,6 +58,9 @@ function getHistory(data:any){
                         </v-card>
                     </v-item>
                     </v-col>
+                </v-row>
+                <v-row v-else>
+                    <div>找不到資料!!!</div>
                 </v-row>
             </v-container>
         </v-item-group>
