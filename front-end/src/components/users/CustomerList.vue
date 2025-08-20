@@ -35,13 +35,13 @@ async function updatePermission(active,email){
     const result = await permission(status,email);
     if(result.message==='success'){
         alert('更新成功')
-        customers.value = await getAllCustomers();
+        await search();
     }else{
         alert('更新失敗')
     }
 }
 async function search(){
-    if(keyword.value==='reset'){
+    if(keyword.value==='reset'||keyword.value===null){
         customers.value = await getAllCustomers();
         return;
     }
