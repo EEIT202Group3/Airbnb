@@ -51,6 +51,7 @@ public class HostOrderService {
 	        dto.setGrandtotal(order.getGrandTotal());
 	        dto.setCheckinDate(order.getCheckinDate());
 	        dto.setCheckoutDate(order.getCheckoutDate());
+	        dto.setHostNetAmount(order.getHostNetAmount());
 	        return dto;
 	    }
 	  
