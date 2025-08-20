@@ -3,6 +3,8 @@ package com.EEITG3.Airbnb.payMent.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.checkerframework.checker.units.qual.cd;
+
 import com.EEITG3.Airbnb.listing.entity.LisBean;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -43,7 +45,7 @@ public class Order implements java.io.Serializable {
 	    private Integer reservationId;     // 租車ID (外來鍵)
 
 	    @Column(name = "username")
-	    private String username;          // 房源名稱
+	    private String username;          // 客人名稱
 
 	    @Column(name = "house_name")
 	    private String houseName;          // 房源名稱
@@ -99,6 +101,32 @@ public class Order implements java.io.Serializable {
 
 	    @Column(name = "ment_status")
 	    private String mentStatus;         // 付款狀態
+	    
+	    //===新增的訂單內容===//
+	    @Column(name = "platform_fee_rate")
+	    private BigDecimal platformFeeRate;  //抽成比
+	    
+	    @Column(name = "platform_fee_amount")
+	    private BigDecimal platformFeeAmount; //抽成金額
+	    
+	    @Column(name = "host_net_amount")
+	    private BigDecimal hostNetAmount;		//房東淨收入
+	    
+	    @Column(name = "settlement_month")
+	    private String settlementMonth;			//結算月份
+	    
+	    @Column(name = "payout_status")
+	    private String payoutStatus;			//房東撥款狀態
+	    
+	    @Column(name = "payout_id")
+	    private String payoutId;				//對應payout匯款單
+	    
+	    @Column(name = "revenue_status")
+	    private String revenueStatus;			//收入狀態
+	    
+	    @Column(name = "refund_amount")
+	    private BigDecimal refundAmount;		//退款總額
+	    
 
 	    @PrePersist
 	    protected void onCreate() {
@@ -190,6 +218,34 @@ public class Order implements java.io.Serializable {
 		public static final String STATUS_CANCELLED = "CANCELLED";
 
 
+		public Integer getReservationId() {return reservationId;}
+		public void setReservationId(Integer reservationId) {this.reservationId = reservationId;}
+		
+		public Integer getLocationId() {return locationId;}
+		public void setLocationId(Integer locationId) {this.locationId = locationId;}
+		
+		public BigDecimal getPlatformFeeRate() {return platformFeeRate;}
+		public void setPlatformFeeRate(BigDecimal platformFeeRate) {this.platformFeeRate = platformFeeRate;}
+		
+		public BigDecimal getPlatformFeeAmount() {return platformFeeAmount;}
+		public void setPlatformFeeAmount(BigDecimal platformFeeAmount) {this.platformFeeAmount = platformFeeAmount;}
+		
+		public BigDecimal getHostNetAmount() {return hostNetAmount;}
+		public void setHostNetAmount(BigDecimal hostNetAmount) {this.hostNetAmount = hostNetAmount;}
+		
+		public String getSettlementMonth() {return settlementMonth;}
+		public void setSettlementMonth(String settlementMonth) {this.settlementMonth = settlementMonth;}
+		
+		public String getPayoutStatus() {return payoutStatus;}
+		public void setPayoutStatus(String payoutStatus) {this.payoutStatus = payoutStatus;}
+		
+		public String getPayoutId() {return payoutId;}
+		public void setPayoutId(String payoutId) {this.payoutId = payoutId;}
 
+		public String getRevenueStatus() {return revenueStatus;}
+		public void setRevenueStatus(String revenueStatus) {this.revenueStatus = revenueStatus;}
+
+		public BigDecimal getRefundAmount() {return refundAmount;}
+		public void setRefundAmount(BigDecimal refundAmount) {this.refundAmount = refundAmount;}
 
 }

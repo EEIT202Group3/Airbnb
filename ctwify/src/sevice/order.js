@@ -32,4 +32,16 @@ export async function getOrderDetail(bookingId) {
         throw error;
     }
 }
+// 房東查詢訂單明細 - 修正參數名稱
+export async function byHostId(hostId) {
+    console.log('呼叫 byHostId API，hostId:', hostId);
+    try {
+        const { data } = await axios.get(`/api/orderconfirm/byHostId?hostId=${hostId}`);
+        console.log('byHostId 回應:', data);
+        return data;
+    } catch (error) {
+        console.error('byHostId 錯誤:', error);
+        throw error;
+    }
+}
 

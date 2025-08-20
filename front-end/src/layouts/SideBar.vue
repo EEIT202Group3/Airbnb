@@ -16,13 +16,18 @@ const isActive = (to?: string) => to && route.path === to;
 const items = [
   { title: "客戶清單", icon: "mdi-account", to: "/customers" },
   { title: "房東清單", icon: "mdi-home-account", to: "/hosts" },
-  { title: "房源管理", icon: "mdi-home-city-outline", to:"/approveListing"},
-  { title: "設備管理", icon: "mdi-tools", to:"/addEquipment"},
+  { title: "房源管理", icon: "mdi-home-city-outline", to: "/approveListing" },
+  { title: "設備管理", icon: "mdi-tools", to: "/addEquipment" },
   { title: "評論清單", icon: "mdi-comment", to: "/reviews/list" },
   {
-    title: "訂單查詢",
+    title: "訂單管理",
     icon: "mdi-invoice-text-multiple-outline",
     to: "/AdminOrder",
+  },
+  {
+    title: "每月帳務",
+    icon: "mdi-cash-register",
+    to: "/AdminPayout",
   },
   { title: "租車服務", icon: "mdi-car", to: "/car-rent/back-homepage" },
   { title: "客服聊天室", icon: "mdi-chat", to: "/chat" },
@@ -107,24 +112,24 @@ async function login() {
       class="d-flex align-center mb-6"
       style="margin-bottom: 0px; padding-bottom: 0px"
     >
-    <div
-  style="
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    background-color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  "
->
-  <v-img
-    src="../src/icon/logo.png"
-    contain
-    style="width: 100%; height: auto;"
-  ></v-img>
-</div>
+      <div
+        style="
+          width: 110px;
+          height: 110px;
+          border-radius: 50%;
+          background-color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        "
+      >
+        <v-img
+          src="../src/icon/logo.png"
+          contain
+          style="width: 100%; height: auto"
+        ></v-img>
+      </div>
       <div class="ml-3">
         <div class="sidebar-title">Ctwify</div>
         <div class="sidebar-subtitle">DASHBOARD</div>

@@ -1,105 +1,133 @@
 package com.EEITG3.Airbnb.payMent.service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.EEITG3.Airbnb.payMent.dto.PayoutPreview;
+import com.EEITG3.Airbnb.payMent.dto.PayoutRow;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.EEITG3.Airbnb.payMent.dto.HostOrderAggDto;
-import com.EEITG3.Airbnb.payMent.entity.HostPayout;
-import com.EEITG3.Airbnb.payMent.entity.PayoutOrder;
-import com.EEITG3.Airbnb.payMent.repository.HostPayoutRepository;
-import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
-import com.EEITG3.Airbnb.payMent.repository.PayoutOrderRepository;
-
-import jakarta.transaction.Transactional;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.Map;   
+import java.util.UUID;
 
 @Service
 public class PayoutService {
 
-    private final OrderRepository orderRepository;
-    private final HostPayoutRepository hostPayoutRepository;
-    private final PayoutOrderRepository payoutOrderRepository;
+    private final JdbcTemplate jdbc;
+    private final NamedParameterJdbcTemplate namedJdbc;
 
-    public PayoutService(OrderRepository orderRepository,
-                         HostPayoutRepository hostPayoutRepository,
-                         PayoutOrderRepository payoutOrderRepository) {
-        this.orderRepository = orderRepository;
-        this.hostPayoutRepository = hostPayoutRepository;
-        this.payoutOrderRepository = payoutOrderRepository;
+    public PayoutService(JdbcTemplate jdbc, NamedParameterJdbcTemplate namedJdbc) {
+        this.jdbc = jdbc;
+        this.namedJdbc = namedJdbc;
     }
 
-    // 每月5號要結算「上個月」付款完成的訂單
+    @Transactional(readOnly = true)
+    public PayoutPreview preview(YearMonth month) {
+        String ym = month.toString(); // "YYYY-MM"
+        String sql = """
+            SELECT host_id,
+                   :ym AS payout_month,
+                   SUM(total_amount)        AS total_earnings,
+                   SUM(platform_fee_amount) AS total_platform_fee,
+                   SUM(host_net_amount)     AS total_net_payout,
+                   COUNT(*)                 AS orders
+            FROM orderlist
+            WHERE FORMAT(checkout_date,'yyyy-MM') = :ym
+              AND booking_status = N'已完成'
+              AND ment_status    = N'已付款'
+              AND revenue_status = N'confirmed'
+              AND payout_status  = N'pending'
+            GROUP BY host_id
+            ORDER BY host_id
+        """;
+
+        var rows = namedJdbc.query(sql, Map.of("ym", ym), (rs, i) -> new PayoutRow(
+            rs.getString("host_id"),
+            rs.getString("payout_month"),
+            rs.getBigDecimal("total_earnings"),
+            rs.getBigDecimal("total_platform_fee"),
+            rs.getBigDecimal("total_net_payout"),
+            rs.getInt("orders")
+        ));
+        return new PayoutPreview(ym, rows);
+    }
+
     @Transactional
-    public void generateMonthlyPayouts(String month) {
-        ZoneId tz = ZoneId.of("Asia/Taipei");
-        LocalDate first = LocalDate.parse(month + "-01");
-        LocalDateTime start = first.atStartOfDay();
-        LocalDateTime end   = first.plusMonths(1).atStartOfDay();
-        String payoutMonth  = month;
+    public void generateAndLockPayouts(YearMonth month, String adminUser) {
+        String ym = month.toString();
 
-        // 1) 撈上月所有已付款訂單 (DTO)
-        List<HostOrderAggDto> rows = orderRepository.findPaidOrdersForPayout(start, end);
-
-        // 2) 依房東分組
-        Map<String, List<HostOrderAggDto>> byHost = rows.stream()
-                .collect(Collectors.groupingBy(HostOrderAggDto::getHostId));
-
-        // 3) 逐一房東建立 HostPayout + PayoutOrder
-        byHost.forEach((hostId, items) -> {
-            // 同一房東同一月份只建一次
-            if (hostPayoutRepository.existsByHostIdAndPayoutMonth(hostId, payoutMonth)) return;
-
-            BigDecimal totalGross = BigDecimal.ZERO;
-            BigDecimal totalFee   = BigDecimal.ZERO;
-            BigDecimal totalNet   = BigDecimal.ZERO;
-
-            HostPayout hp = new HostPayout();
-            hp.setPayoutId(UUID.randomUUID().toString());
-            hp.setHostId(hostId);
-            hp.setPayoutMonth(payoutMonth);
-            hp.setStatus("pending");
-            hp.setCreatedAt(LocalDateTime.now(tz));
-            hp = hostPayoutRepository.save(hp);
-
-            for (HostOrderAggDto i : items) {
-                BigDecimal gross = i.getTotalAmount();
-                BigDecimal fee   = calcPlatformFee(gross);
-                BigDecimal net   = gross.subtract(fee);
-
-                PayoutOrder po = new PayoutOrder();
-                po.setPayoutOrderId(UUID.randomUUID().toString());
-                po.setHostPayout(hp);
-                po.setBookingId(i.getBookingId());
-                po.setListId(String.valueOf(i.getListId()));
-                po.setGrossAmount(gross);
-                po.setPlatformFee(fee);
-                po.setNetAmount(net);
-                po.setCreatedAt(LocalDateTime.now(tz));
-                payoutOrderRepository.save(po);
-
-                totalGross = totalGross.add(gross);
-                totalFee   = totalFee.add(fee);
-                totalNet   = totalNet.add(net);
+        var preview = preview(month);
+        for (PayoutRow row : preview.getRows()) {   
+            UUID payoutId;
+            try {
+                payoutId = jdbc.queryForObject("""
+                    INSERT INTO host_payouts (payout_id, host_id, payout_month,
+                                              total_earnings, total_platform_fee, total_net_payout,
+                                              status, created_at, updated_at)
+                    OUTPUT inserted.payout_id
+                    VALUES (NEWID(), ?, ?, ?, ?, ?, 'generated', SYSUTCDATETIME(), SYSUTCDATETIME())
+                """,
+                    (rs, i) -> rs.getObject(1, java.util.UUID.class),
+                    row.getHostId(), ym, row.getTotalEarnings(),
+                    row.getTotalPlatformFee(), row.getTotalNetPayout()
+                );
+            } catch (DataIntegrityViolationException dup) {
+                payoutId = jdbc.queryForObject("""
+                    SELECT TOP 1 payout_id FROM host_payouts
+                    WHERE host_id = ? AND payout_month = ?
+                """,
+                    (rs, i) -> rs.getObject(1, java.util.UUID.class),
+                    row.getHostId(), ym
+                );
             }
 
-            hp.setTotalEarnings(totalGross);
-            hp.setTotalPlatformFee(totalFee);
-            hp.setTotalNetPayout(totalNet);
-            hp.setUpdatedAt(LocalDateTime.now(tz));
-            hostPayoutRepository.save(hp);
-        });
+            jdbc.update("""
+                INSERT INTO payout_orders (payout_order_id, payout_id, booking_id, list_id,
+                                           gross_amount, platform_fee, net_amount, created_at)
+                SELECT NEWID(), ?, o.booking_id, o.list_id,
+                       o.total_amount, o.platform_fee_amount, o.host_net_amount,
+                       SYSUTCDATETIME()
+                FROM orderlist o
+                WHERE FORMAT(o.checkout_date,'yyyy-MM') = ?
+                  AND o.host_id = ?
+                  AND o.booking_status = N'完成'
+                  AND o.ment_status    = N'已付款'
+                  AND o.revenue_status = N'confirmed'
+                  AND o.payout_status  = N'pending'
+            """, payoutId, ym, row.getHostId());
+
+            jdbc.update("""
+                UPDATE o SET
+                    o.payout_status = 'scheduled',
+                    o.payout_id = ?
+                FROM orderlist o
+                WHERE FORMAT(o.checkout_date,'yyyy-MM') = ?
+                  AND o.host_id = ?
+                  AND o.booking_status = N'完成'
+                  AND o.ment_status    = N'已付款'
+                  AND o.revenue_status = N'confirmed'
+                  AND o.payout_status  = N'pending'
+            """, payoutId, ym, row.getHostId());
+        }
     }
 
-    private BigDecimal calcPlatformFee(BigDecimal gross) {
-        // 例：15% 抽成，保留2位小數
-        return gross.multiply(new BigDecimal("0.15")).setScale(2, RoundingMode.HALF_UP);
+    @Transactional
+    public void markPayoutPaid(UUID payoutId, LocalDateTime paidAt) {
+        jdbc.update("""
+            UPDATE host_payouts
+            SET status='paid', payout_date=?, updated_at=SYSUTCDATETIME()
+            WHERE payout_id=?
+        """, Timestamp.valueOf(paidAt), payoutId);
+
+        jdbc.update("""
+            UPDATE o SET o.payout_status='paid'
+            FROM orderlist o
+            JOIN payout_orders po ON po.booking_id = o.booking_id
+            WHERE po.payout_id = ?
+        """, payoutId);
     }
 }

@@ -39,6 +39,8 @@ public class OrderService {
 	    private ListRepository listRepository;
 	    @Autowired
 	    private CustomerRepository customerRepository;
+	    @Autowired
+	    private RevenueSplitService revenueSplitService;
 	    private int resolveCapacity(String bedText) {
 	        if (bedText == null || bedText.isBlank()) return 1;
 	        String s = bedText;
@@ -110,7 +112,6 @@ public class OrderService {
 	        result.put("checkindate", dto.getCheckindate());
 	        result.put("checkoutdate", dto.getCheckoutdate());
 	        result.put("people", people);
-	        // 額外（可選）
 	        result.put("rooms", roomsNeeded);
 	        result.put("roomTotal", roomTotal);
 	        result.put("carTotal", carTotal);
@@ -170,7 +171,26 @@ public class OrderService {
 	        order.setPeople(people);
 	        order.setCheckinDate(dto.getCheckindate().atStartOfDay());
 	        order.setCheckoutDate(dto.getCheckoutdate().atStartOfDay());
+	        
+	        order.setGrandTotal(order.getGrandTotal() != null ? order.getGrandTotal() : BigDecimal.ZERO);
+	        order.setPlatformFeeRate(BigDecimal.ZERO);
+	        order.setPlatformFeeAmount(BigDecimal.ZERO);
+	        order.setHostNetAmount(BigDecimal.ZERO);
+	        // 結算月份：先用退房月 + 1（或你想要的規則）
+	        java.time.YearMonth settleMonth =
+	                java.time.YearMonth.from(order.getCheckoutDate()).plusMonths(1);
+	        order.setSettlementMonth(settleMonth.toString()); // "YYYY-MM"
 
+	        // 狀態欄位（要符合你資料庫的 CHECK/ENUM）
+	        order.setPayoutStatus("pending");
+
+	        // 你目前的 CHECK 只有 confirmed/refunded/partial_refund/chargeback，沒有 pending
+	        // → 先設成 confirmed；等真正付款後，會由 markOrderPaidAndSplit(...) 覆蓋正確金額與狀態
+	        order.setRevenueStatus("confirmed");
+
+	        // 若欄位 NOT NULL
+	        order.setRefundAmount(BigDecimal.ZERO);
+	        
 	        //將「房租總額」存進 roomPrice（若你想存每晚單價，改為 unitPricePerNight）
 	        int roomTotalInt = roomTotal.setScale(0, RoundingMode.HALF_UP).intValue();
 	        order.setRoomPrice(roomTotalInt);
@@ -194,6 +214,28 @@ public class OrderService {
 	        }
 
 	        return orderRepository.save(order);
+	    }
+	    //拆帳
+	    public void markOrderPaidAndSplit(String bookingId, String paymentId, LocalDateTime paidTime) {
+	        Order order = orderRepository.findByBookingId(bookingId)
+	                .orElseThrow(() -> new IllegalArgumentException("查無此訂單：" + bookingId));
+
+	        // 冪等：避免重複處理（重整/重複打 API）
+	        if ("已付款".equals(order.getMentStatus())) {
+	            return;
+	        }
+
+	        // 1) 標記付款資訊
+	        order.setMentStatus("已付款");
+	        order.setPaymentId(paymentId);
+	        order.setPaidTime(paidTime != null ? paidTime : LocalDateTime.now());
+	        order.setBookingMethod("PAYPAL"); // 只有 PayPal
+
+	        // 2) 拆帳：把平台抽成/房東淨收等欄位一次寫回訂單
+	        revenueSplitService.applySplitAndPersist(order);
+
+	        // 3) 存回
+	        orderRepository.save(order);
 	    }
 
 	    @PersistenceContext
