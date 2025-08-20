@@ -105,7 +105,7 @@ public class OrderConfirm {
 
 	    String email = jwtService.extractEmail(token);
 	    String role  = jwtService.extractRole(token);
-	    if (!"HOST".equalsIgnoreCase(role)) {
+	    if (!"ROLE_HOST".equalsIgnoreCase(role)) {
 	        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "身分不是房東");
 	    }
 

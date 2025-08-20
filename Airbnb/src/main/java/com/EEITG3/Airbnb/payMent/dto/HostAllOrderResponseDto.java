@@ -23,6 +23,13 @@ public class HostAllOrderResponseDto {
 	private String bookingStatus;   
 	private String bookingMethod;    
 	private String mentStatus;
+	private BigDecimal hostNetAmount;
+	public BigDecimal getHostNetAmount() {
+		return hostNetAmount;
+	}
+	public void setHostNetAmount(BigDecimal hostNetAmount) {
+		this.hostNetAmount = hostNetAmount;
+	}
 	public String getBookingId() {
 		return bookingId;
 	}
