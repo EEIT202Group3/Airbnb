@@ -29,6 +29,11 @@ const routes = [
 
             },
 
+             {
+                path: '/search',
+                component: () => import('@/components/listing/customer/SearchResults.vue'),
+            },
+
             //修維的API串上之後可砍
             {
                 path: "/listing/card",
