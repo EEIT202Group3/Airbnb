@@ -212,7 +212,7 @@ const routes = [
         component: () => import('@/components/carRent/frontpageComponent/CarDetail.vue'),
         props: true
     },
-    { path: '/carPaymentResult',
+    { path: '/car-payment-result',
         name: 'CarPaymentResult',
         component: () => import('@/components/carRent/frontpageComponent/CarPaymentResult.vue')
     }
