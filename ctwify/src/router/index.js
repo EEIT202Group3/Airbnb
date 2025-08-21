@@ -1,7 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import CarRentFrontHomepage from "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue";
-import CarSelect from "@/components/carRent/frontpageComponent/CarSelect.vue";
-import CarDetail from "@/components/carRent/frontpageComponent/CarDetail.vue";
 
 
 const routes = [
@@ -200,20 +197,24 @@ const routes = [
     {
         path: '/car-front-homepage',
         name: 'carFrontHomepage',
-        component: CarRentFrontHomepage
+        component: () => import('@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue')
     },
 
     {
         path: '/car-select',
         name: 'carSelect',
-        component: CarSelect
+        component: () => import('@/components/carRent/frontpageComponent/CarSelect.vue')
     },
 
     {
         path: '/car-detail/:id',
         name: 'carDetail',
-        component: CarDetail,
+        component: () => import('@/components/carRent/frontpageComponent/CarDetail.vue'),
         props: true
+    },
+    { path: '/carPaymentResult',
+        name: 'CarPaymentResult',
+        component: () => import('@/components/carRent/frontpageComponent/CarPaymentResult.vue')
     }
 ]
 

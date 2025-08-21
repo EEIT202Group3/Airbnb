@@ -24,7 +24,12 @@ export const useBookingStore = defineStore('booking', {
             locationAddr: '',
             businessHours: '',
             totalAmount: 0,
-            reservationId: null, // 租車訂單ID
+            reservationId: null,
+            vehicleBrand: '',
+            vehicleModel: '',
+            vehicleColor: '',
+            driverName: '',
+            driverPhone: ''
         },
     }),
 
@@ -69,7 +74,18 @@ export const useBookingStore = defineStore('booking', {
         setVehicleId(id) {
             this.vehicleDraft.vehicleId = id ?? null
         },
+        //品牌/車種/顏色
+        setVehicleInfo({ brand = '', model = '', color = '' } = {}) {
+            this.vehicleDraft.vehicleBrand = brand
+            this.vehicleDraft.vehicleModel = model
+            this.vehicleDraft.vehicleColor = color
+        },
 
+        //駕駛資料
+        setDriver({ name = '', phone = '' } = {}) {
+            this.vehicleDraft.driverName = name
+            this.vehicleDraft.driverPhone = phone
+        },
         // 車輛日期
         setDates({ pickupDateTime, returnDateTime }) {
             if (pickupDateTime !== undefined) this.vehicleDraft.pickupDateTime = pickupDateTime
@@ -106,6 +122,11 @@ export const useBookingStore = defineStore('booking', {
                 businessHours: '',
                 totalAmount: 0,
                 reservationId: null,
+                vehicleBrand: '',
+                vehicleModel: '',
+                vehicleColor: '',
+                driverName: '',
+                driverPhone: ''
             }
         },
 

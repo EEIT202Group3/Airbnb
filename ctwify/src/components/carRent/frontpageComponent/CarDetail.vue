@@ -125,13 +125,22 @@ async function submitReservation() {
       locationAddr: locationAddr.value,
       businessHours: businessHours.value,
     })
+    booking.setVehicleInfo({
+      brand: vehicle.value?.brand ?? '',
+      model: vehicle.value?.model ?? '',
+      color: vehicle.value?.color ?? '',
+    })
+    booking.setDriver({
+      name: (lastName.value || '') + (firstName.value || ''),
+      phone: phone.value || '',
+    })
     booking.setTotalAmount(totalAmount.value)
     booking.setReservationId(rid)
 
     await router.push("/preview-confirm");
   } catch (err) {
-    console.error("新增失敗", err);
-    alert("預約失敗，請稍後再試");
+    console.error("資料儲存失敗", err);
+    alert("資料儲存失敗，請稍後再試");
   }
 }
 
