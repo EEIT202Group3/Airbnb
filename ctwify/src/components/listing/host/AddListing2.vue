@@ -8,33 +8,46 @@
           <input v-model="form.houseName" type="text" class="form-control" required />
         </div>
 
-        <!-- 地址：城市與區域 -->
-        <label class="form-label">地址</label>
-        <div class="col">
-          <input
-            type="text"
-            class="form-control"
-            :value="address"
-            readonly
-            placeholder="點擊選擇地址"
-            @click="openDialog"
-          />
+        <!-- 地址輸入 + Google Maps -->
+<label class="form-label">地址</label>
+<div class="col">
+  <input
+    type="text"
+    class="form-control"
+    :value="address"
+    readonly
+    placeholder="點擊選擇地址"
+    @click="showDialog = true"
+  />
 
-          <!-- 彈窗 -->
-          <div v-if="showDialog" class="dialog-overlay">
-            <div class="dialog">
-              <h3>選擇地址</h3>
-              <input type="text" v-model="tempAddress" ref="dialogInput" placeholder="輸入地址" />
+  <!-- 彈窗 -->
+  <div v-if="showDialog" class="dialog-overlay">
+    <div class="dialog">
+      <h3>選擇地址</h3>
 
-              <div id="map"></div>
+      <!-- Google Maps Autocomplete -->
+      <GMapAutocomplete
+        placeholder="輸入地址"
+        @place_changed="setPlace"
+        class="form-control"
+      />
 
-              <div class="dialog-buttons">
-                <button @click="confirmAddress">確認地址</button>
-                <button @click="closeDialog">取消</button>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Google Map -->
+      <GMapMap
+        :center="mapCenter"
+        :zoom="15"
+        style="width: 100%; height: 400px;"
+      >
+        <GMapMarker :position="mapCenter" />
+      </GMapMap>
+
+      <div class="dialog-buttons">
+        <button @click="confirmAddress">確認地址</button>
+        <button @click="closeDialog">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
 
         <!-- 房型 + 床型 + 床數 -->
         <div class="mb-3 row">
@@ -158,12 +171,10 @@ import Swal from 'sweetalert2';
 export default {
   data() {
     return {
-      address: '',         
-      tempAddress: '',     
-      showDialog: false,   
-      autocomplete: null,
-      map: null,
-      marker: null,
+      address: "",
+      showDialog: false,
+      mapCenter: { lat: 25.0330, lng: 121.5654 }, // 台北101 預設
+      selectedPlace: null,
       equipList: [],
       form: {
         hostId: "",
@@ -191,21 +202,27 @@ export default {
       }, {});
     }
   },
-  methods: {
-    openDialog() {
-      this.showDialog = true;
-      this.$nextTick(() => {
-        this.tempAddress = this.address;
-        this.initMap();
-        this.initAutocomplete();
-      });
+ methods: {
+    setPlace(place) {
+      if (place && place.geometry) {
+        this.mapCenter = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng()
+        };
+        this.selectedPlace = place;
+      }
     },
     closeDialog() {
       this.showDialog = false;
     },
-    confirmAddress() {
-      this.address = this.tempAddress;
-      this.closeDialog();
+   confirmAddress() {
+      if (this.selectedPlace) {
+        this.address = this.selectedPlace.formatted_address;
+      }
+      this.showDialog = false;
+    },
+    closeDialog() {
+      this.showDialog = false;
     },
     initMap() {
       this.map = new google.maps.Map(document.getElementById('map'), {

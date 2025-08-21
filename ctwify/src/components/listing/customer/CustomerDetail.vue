@@ -380,7 +380,7 @@ function goToBooking() {
       bed: listing.value.bed,
       type: listing.value.room,
       tel: listing.value.tel,
-      price: listing.value.price,
+      totalPrice: totalPrice.value,
       checkInDate: checkIn.value,
       checkOutDate: checkOut.value,
       guests: guests.value,
@@ -455,8 +455,8 @@ watch(mapBounds, async (newBounds) => {
 // 監聽日期範圍
 watch(dateRange, (newVal) => {
   if (newVal && newVal.length === 2) {
-    checkIn.value = newVal[0]?.toISOString().split('T')[0] || ''
-    checkOut.value = newVal[1]?.toISOString().split('T')[0] || ''
+    checkIn.value = newVal[0].toLocaleDateString('sv-CH')  
+    checkOut.value = newVal[1].toLocaleDateString('sv-CH')
   }
 })
 

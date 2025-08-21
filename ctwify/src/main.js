@@ -39,7 +39,7 @@ app.use(vue3GoogleLogin, {
 // Google Maps 設定
 app.use(VueGoogleMaps, {
   load: {
-    key: 'My Google Key', //Google Maps API Key  github會警告所以先撤掉
+    key: '', //Google Maps API Key  github會警告所以先撤掉
 
     libraries: 'places', // 如果要用地點自動補全
   },
