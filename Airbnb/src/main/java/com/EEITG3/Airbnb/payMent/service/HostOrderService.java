@@ -41,7 +41,7 @@ public class HostOrderService {
 	    private HostAllOrderResponseDto toAllDto(Order order) {
 	    	HostAllOrderResponseDto dto = new HostAllOrderResponseDto();
 	        dto.setBookingId(order.getBookingId());
-	        dto.setHouseName(order.getHouseName());   // 你的 orderlist 已有 house_name/address/tel/bed
+	        dto.setHouseName(order.getHouseName());  
 	        dto.setBed(order.getBed());
 	        dto.setAddress(order.getAddress());
 	        dto.setTel(order.getTel());

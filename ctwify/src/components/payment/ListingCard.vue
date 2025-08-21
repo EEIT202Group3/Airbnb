@@ -82,7 +82,7 @@ const listing = ref({
   bed: "單人床",
   capacity: 1,
   phone: "0900000000",
-  pricePerNight: 1542,
+  pricePerNight: 1000,
   image: "https://picsum.photos/seed/room1/1200/600",
 });
 

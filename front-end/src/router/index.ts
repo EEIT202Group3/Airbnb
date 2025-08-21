@@ -67,10 +67,16 @@ const routes = [
         props: true,
       },
       {
-        path: "/AdminPayout",
+        path: "/Adminpayout",
         name: "AdminPayout",
         component: () =>
           import("@/components/payMent/backpageComponent/AdminPayout.vue"),
+      },
+      {
+        path: "/Adminselect",
+        name: "AdminSelect",
+        component: () =>
+          import("@/components/payMent/backpageComponent/AdminSelect.vue"),
       },
     ],
   },

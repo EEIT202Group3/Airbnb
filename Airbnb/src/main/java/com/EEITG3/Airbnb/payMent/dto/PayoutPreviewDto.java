@@ -2,11 +2,11 @@ package com.EEITG3.Airbnb.payMent.dto;
 
 import java.util.List;
 
-public class PayoutPreview {
+public class PayoutPreviewDto {
 	private String payoutMonth;
-	private List<PayoutRow> rows;
+	private List<PayoutRowDto> rows;
 
-	public PayoutPreview(String payoutMonth, List<PayoutRow> rows) {
+	public PayoutPreviewDto(String payoutMonth, List<PayoutRowDto> rows) {
 		this.payoutMonth = payoutMonth;
 		this.rows = rows;
 	}
@@ -19,11 +19,11 @@ public class PayoutPreview {
 		this.payoutMonth = payoutMonth;
 	}
 
-	public List<PayoutRow> getRows() {
+	public List<PayoutRowDto> getRows() {
 		return rows;
 	}
 
-	public void setRows(List<PayoutRow> rows) {
+	public void setRows(List<PayoutRowDto> rows) {
 		this.rows = rows;
 	}
 }

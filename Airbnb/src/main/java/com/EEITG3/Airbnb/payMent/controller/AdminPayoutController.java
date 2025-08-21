@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.EEITG3.Airbnb.payMent.dto.HostPayoutDto;
 import com.EEITG3.Airbnb.payMent.dto.OrderPreviewDto;
-import com.EEITG3.Airbnb.payMent.dto.PayoutPreview;
+import com.EEITG3.Airbnb.payMent.dto.PayoutOrderDto;
+import com.EEITG3.Airbnb.payMent.dto.PayoutPreviewDto;
 import com.EEITG3.Airbnb.payMent.entity.Order;
 import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
 import com.EEITG3.Airbnb.payMent.service.PayoutService;
@@ -44,7 +46,6 @@ public class AdminPayoutController {
 	    // 先套用拆帳邏輯
 	    revenueSplitService.applySplitAndPersist(order);
 
-	    // 組 DTO
 	    OrderPreviewDto dto = new OrderPreviewDto();
 	    dto.setHouseName(order.getListing().getHouseName());
 	    dto.setAddress(order.getListing().getAds());
@@ -73,7 +74,19 @@ public class AdminPayoutController {
         return ResponseEntity.ok().build();
     }
     @GetMapping("/monthly-preview")
-    public ResponseEntity<PayoutPreview> monthlyPreview(@RequestParam String month) {
+    public ResponseEntity<PayoutPreviewDto> monthlyPreview(@RequestParam String month) {
         return ResponseEntity.ok(payoutService.preview(YearMonth.parse(month)));
+    }
+    @GetMapping("/host")
+    public ResponseEntity<java.util.List<HostPayoutDto>> findHostPayouts(
+            @RequestParam(required = false) String hostId,
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String status) {
+        return ResponseEntity.ok(payoutService.findHostPayouts(hostId, month, status));
+    }
+    @GetMapping("/{payoutId}/orders")
+    public ResponseEntity<java.util.List<PayoutOrderDto>> findPayoutOrders(
+            @PathVariable("payoutId") java.util.UUID payoutId) {
+        return ResponseEntity.ok(payoutService.findPayoutOrdersByPayoutId(payoutId));
     }
 }

@@ -5,86 +5,6 @@
       <h2 class="m-0">後台｜房東月結支付</h2>
     </div>
 
-    <!-- 區塊一：單筆訂單拆帳預覽 -->
-    <v-card class="mb-6" rounded="xl">
-      <v-card-title class="d-flex align-center">
-        <v-icon class="mr-2">mdi-receipt-text</v-icon>
-        單筆訂單拆帳預覽
-      </v-card-title>
-      <v-card-text>
-        <v-row>
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="bookingId"
-              label="Booking ID"
-              density="comfortable"
-              prepend-inner-icon="mdi-identifier"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" md="6" class="d-flex align-center">
-            <v-btn
-              color="lightgray"
-              :loading="loadingOrder"
-              @click="fetchOrderPreview"
-            >
-              取得拆帳
-            </v-btn>
-          </v-col>
-        </v-row>
-
-        <v-alert v-if="orderError" type="error" variant="tonal" class="mb-4">
-          {{ orderError }}
-        </v-alert>
-
-        <v-table v-if="order">
-          <tbody>
-            <tr>
-              <th class="text-no-wrap">房源</th>
-              <td>{{ order.houseName }}</td>
-            </tr>
-            <tr>
-              <th>地址</th>
-              <td>{{ order.address }}</td>
-            </tr>
-            <tr>
-              <th>床型</th>
-              <td>{{ order.bed }}</td>
-            </tr>
-            <tr>
-              <th>房屋定價</th>
-              <td>NT$ {{ fmt(order.price) }}</td>
-            </tr>
-            <tr>
-              <th>租車金額</th>
-              <td>NT$ {{ fmt(order.cartotal) }}</td>
-            </tr>
-            <tr>
-              <th>總金額</th>
-              <td>NT$ {{ fmt(order.grandTotal) }}</td>
-            </tr>
-            <tr>
-              <th>平台抽成(比)</th>
-              <td>20%</td>
-            </tr>
-            <tr>
-              <th>平台抽成(額)</th>
-              <td>NT$ {{ fmt(order.platformFeeAmount) }}</td>
-            </tr>
-            <tr>
-              <th>房東實拿</th>
-              <td class="font-weight-bold">
-                NT$ {{ fmt(order.hostNetAmount) }}
-              </td>
-            </tr>
-            <tr>
-              <th>結算月份</th>
-              <td>{{ order.settlementMonth }}</td>
-            </tr>
-          </tbody>
-        </v-table>
-      </v-card-text>
-    </v-card>
-
     <!-- 區塊二：月結預覽/產生/標記支付 -->
     <v-card rounded="xl">
       <v-card-title class="d-flex align-center">
@@ -186,11 +106,6 @@ import { ref } from "vue";
 import axios from "axios";
 import api from "@/api";
 
-const bookingId = ref("");
-const order = ref(null);
-const loadingOrder = ref(false);
-const orderError = ref("");
-
 const month = ref("");
 const rows = ref([]);
 const loadingMonthly = ref(false);
@@ -202,29 +117,7 @@ const marking = ref(false);
 const markMsg = ref("");
 const markOk = ref(false);
 
-// 單筆訂單拆帳預覽
-async function fetchOrderPreview() {
-  order.value = null;
-  orderError.value = "";
-  if (!bookingId.value) {
-    orderError.value = "請輸入 bookingId";
-    return;
-  }
-  loadingOrder.value = true;
-  try {
-    const { data } = await api.get("/payouts/preview", {
-      params: { bookingId: bookingId.value },
-      withCredentials: true,
-    });
-    order.value = data;
-  } catch (e) {
-    orderError.value = e?.response?.data || e?.message || "取得失敗";
-  } finally {
-    loadingOrder.value = false;
-  }
-}
-
-// 月結預覽（需要後端補上 /monthly-preview）
+// 月結預覽
 async function fetchMonthlyPreview() {
   rows.value = [];
   monthlyError.value = "";
@@ -251,20 +144,14 @@ async function fetchMonthlyPreview() {
   }
 }
 
-/** 把後端回來的資料標準化成你的表格要的 PayoutRow 陣列 */
 function normalizeMonthly(data, month) {
-  // 後端若已回 { rows: [...] }，直接用
   if (data && Array.isArray(data.rows)) {
     return data.rows;
   }
-  // 後端若回的是「每筆訂單」的陣列，這裡把它 group by host 後匯總成 PayoutRow
   if (Array.isArray(data)) {
     const byHost = new Map();
     for (const o of data) {
-      // 後端不同欄位名時做容錯（請依你的實際欄位調整）
       const hostKey = o.hostId || o.host_id || o.username || "UNKNOWN";
-
-      // 金額欄位容錯（依你後端實際欄位名調整）
       const gross = Number(
         o.total_amount ?? o.gross_amount ?? o.grandTotal ?? 0
       );
@@ -305,7 +192,7 @@ async function generateLock() {
       params: { month: month.value },
       withCredentials: true,
     });
-    await fetchMonthlyPreview(); // 產生後再抓一次預覽
+    await fetchMonthlyPreview();
   } catch (e) {
     monthlyError.value = e?.response?.data || e?.message || "產生失敗";
   } finally {
@@ -313,7 +200,7 @@ async function generateLock() {
   }
 }
 
-// 標記已支付（Body: { payoutId }）
+// 標記已支付
 async function markPaid() {
   markMsg.value = "";
   if (!payoutId.value) {

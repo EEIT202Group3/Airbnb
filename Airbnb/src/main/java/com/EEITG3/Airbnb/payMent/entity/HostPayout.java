@@ -24,10 +24,10 @@ public class HostPayout {
 	    private String payoutId;
 
 	    @Column(name = "host_id", nullable = false)
-	    private String hostId;  // 這裡是房東ID，不做entity關聯，假設host另有entity
+	    private String hostId;  
 
 	    @Column(name = "payout_month", nullable = false, length = 7)
-	    private String payoutMonth;  // 格式 YYYY-MM
+	    private String payoutMonth; 
 
 	    @Column(name = "total_earnings", nullable = false, precision = 10, scale = 0)
 	    private BigDecimal totalEarnings;
