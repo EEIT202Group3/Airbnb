@@ -3,6 +3,9 @@ package com.EEITG3.Airbnb.reviews.entity;
 import org.springframework.stereotype.Component;
 
 import com.EEITG3.Airbnb.listing.entity.LisBean;
+import com.EEITG3.Airbnb.payMent.entity.Order;
+import com.EEITG3.Airbnb.users.entity.Customer;
+import com.EEITG3.Airbnb.users.entity.Host;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,21 +36,25 @@ public class Review {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int reviewId;
 	
-	@Column(name="booking_id")
-	@NonNull
-	private String bookingId;
+	// 訂單（FK: orderlist.booking_id, uniqueidentifier）
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "booking_id", nullable = false, referencedColumnName = "booking_id")
+    private Order booking;
 	
-	@Column(name="host_id")
-	@NonNull
-	private String hostId;
+    // 房東（FK: hosts.host_id, uniqueidentifier）
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "host_id", nullable = false, referencedColumnName = "host_id")
+    private Host host;
+
 	
-	@Column(name="customer_id")
-	@NonNull
-	private String custId;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id", nullable = false, referencedColumnName = "customer_id")
+    private Customer customer;
 	
-	@Column(name="list_id")
-	@NonNull
-	private int listId;
+	// 房源（FK: listings.list_id, int）
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "list_id", nullable = false, referencedColumnName = "list_id")
+    private LisBean listing;
 	
 	@Column(name="clean_score")
 	@NonNull
@@ -88,36 +95,36 @@ public class Review {
 		this.reviewId = reviewId;
 	}
 
-	public String getBookingId() {
-		return bookingId;
+	public Order getBooking() {
+		return booking;
 	}
 
-	public void setBookingId(String bookingId) {
-		this.bookingId = bookingId;
+	public void setBooking(Order booking) {
+		this.booking = booking;
 	}
 
-	public String getHostId() {
-		return hostId;
+	public Host getHost() {
+		return host;
 	}
 
-	public void setHostId(String hostId) {
-		this.hostId = hostId;
+	public void setHost(Host host) {
+		this.host = host;
 	}
 
-	public String getCustId() {
-		return custId;
+	public Customer getCustomer() {
+		return customer;
 	}
 
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
 	}
 
-	public int getListId() {
-		return listId;
+	public LisBean getListing() {
+		return listing;
 	}
 
-	public void setListId(int listId) {
-		this.listId = listId;
+	public void setListing(LisBean listing) {
+		this.listing = listing;
 	}
 
 	public int getCleanScore() {
@@ -191,5 +198,6 @@ public class Review {
 	public void setImage3(String image3) {
 		this.image3 = image3;
 	}
+
 	
 }
