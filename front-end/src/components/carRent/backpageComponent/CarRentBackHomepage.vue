@@ -201,7 +201,7 @@ function formatDateTime(dt?: string) {
 </script>
 
 <template>
-  <v-container fluid class="py-4 main-content">
+  <v-container fluid class="py-1 main-content">
     <v-btn variant="outlined" class="ma-2" prepend-icon="mdi-menu" @click="showSidebar = true">功能選單</v-btn>
     <Sidebar :visible="showSidebar" :close="() => (showSidebar = false)"/>
 
@@ -234,15 +234,46 @@ function formatDateTime(dt?: string) {
               </v-col>
 
               <template v-if="mode === 'period'">
-                <v-col cols="12" md="4">
-                  <v-text-field type="date" v-model="fromDate" label="開始日期"
-                                density="comfortable" variant="outlined" hide-details/>
+                <!-- 開始日期 -->
+                <v-col
+                    cols="12"
+                    md="4"
+                    class="px-md-1 pb-2 pb-md-0"
+                    @click="$refs.fromDateInput.$el.querySelector('input').showPicker()"
+                >
+                  <v-text-field
+                      ref="fromDateInput"
+                      v-model="fromDate"
+                      label="開始日期"
+                      type="date"
+                      variant="outlined"
+                      density="comfortable"
+                      color="grey-darken-2"
+                      class="search-field"
+                  />
                 </v-col>
-                <v-col cols="12" md="4">
-                  <v-text-field type="date" v-model="toDate" label="結束日期"
-                                density="comfortable" variant="outlined" hide-details/>
+
+                <!-- 結束日期 -->
+                <v-col
+                    cols="12"
+                    md="4"
+                    class="px-md-1 pb-2 pb-md-0"
+                    @click="$refs.toDateInput.$el.querySelector('input').showPicker()"
+                >
+                  <v-text-field
+                      ref="toDateInput"
+                      v-model="toDate"
+                      label="結束日期"
+                      type="date"
+                      variant="outlined"
+                      density="comfortable"
+                      color="grey-darken-2"
+                      class="search-field"
+                  />
                 </v-col>
               </template>
+
+
 
               <v-col :cols="mode === 'period' ? 12 : 6" md="6">
                 <v-text-field v-model="kw" density="comfortable" variant="outlined"
@@ -250,7 +281,7 @@ function formatDateTime(dt?: string) {
                               @keyup.enter="onSearchReservations"/>
               </v-col>
 
-              <v-col cols="12" md="2" class="d-flex">
+              <v-col cols="12" class="d-flex" style="max-width: 150px;">
                 <v-btn block color="success" class="text-white" :loading="resLoading" @click="onSearchReservations">
                   查詢
                 </v-btn>
@@ -260,19 +291,19 @@ function formatDateTime(dt?: string) {
         </v-card>
       </v-col>
 
-      <!-- 車輛查詢（新增：搜尋模式 下拉＋動態標籤） -->
+      <!-- 車輛查詢 -->
       <v-col cols="12" md="6">
         <v-card>
           <v-card-text>
             <div class="d-flex justify-space-between align-center mb-2">
-              <div class="text-subtitle-2">查詢車輛（車牌 / 車輛ID）</div>
+              <div class="text-subtitle-2">查詢車輛（車牌 / 車輛編號）</div>
             </div>
 
             <v-row dense class="mb-2">
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="7">
                 <v-select
                     v-model="vehMode"
-                    :items="[{ title: '車牌', value: 'plateNo' }, { title: '車輛ID', value: 'vehicleId' }]"
+                    :items="[{ title: '車牌', value: 'plateNo' }, { title: '車輛編號', value: 'vehicleId' }]"
                     density="comfortable"
                     variant="outlined"
                     hide-details
@@ -283,7 +314,7 @@ function formatDateTime(dt?: string) {
               <v-col cols="12" md="5">
                 <v-text-field
                     v-model="plateKw"
-                    :label="vehMode === 'plateNo' ? '車牌' : '車輛ID'"
+                    :label="vehMode === 'plateNo' ? '車牌' : '車輛編號'"
                     density="comfortable"
                     variant="outlined"
                     hide-details
@@ -291,7 +322,7 @@ function formatDateTime(dt?: string) {
                 />
               </v-col>
 
-              <v-col cols="12" md="3" class="d-flex">
+              <v-col cols="12" class="d-flex" style="max-width: 150px;">
                 <v-btn block color="primary" :loading="vehLoading" @click="onSearchVehicles">查詢</v-btn>
               </v-col>
             </v-row>
@@ -430,7 +461,7 @@ function formatDateTime(dt?: string) {
     <!-- 車輛結果彈窗 -->
     <v-dialog v-model="showVehDialog" max-width="900" scrollable>
       <v-card>
-        <v-card-title class="text-subtitle-1">車牌 / 車輛ID 查詢結果</v-card-title>
+        <v-card-title class="text-subtitle-1">車牌 / 車輛編號 查詢結果</v-card-title>
         <v-card-text>
           <v-alert v-if="vehError" type="error" variant="tonal" density="comfortable" class="mb-2">{{
               vehError
@@ -442,7 +473,7 @@ function formatDateTime(dt?: string) {
                    class="text-no-wrap">
             <thead>
             <tr>
-              <th>車輛ID</th>
+              <th>車輛編號</th>
               <th>車牌</th>
               <th>車型</th>
               <th>狀態</th>
@@ -492,11 +523,12 @@ function formatDateTime(dt?: string) {
 <style scoped>
 .main-content {
   margin: auto;
-  width: calc(100% - 200px);
+  width: calc(100%);
 }
 
 canvas {
   width: 100% !important;
   height: auto !important;
 }
+
 </style>
