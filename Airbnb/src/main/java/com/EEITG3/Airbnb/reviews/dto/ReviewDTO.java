@@ -2,8 +2,8 @@ package com.EEITG3.Airbnb.reviews.dto;
 
 public class ReviewDTO {
 	private int reviewId;
-	private String customerId;
-	private String hostId;
+	private String customerEmail;
+	private String hostEmail;
 	private String bookingId;
 	private int listId;
 	private int cleanScore;
@@ -15,30 +15,35 @@ public class ReviewDTO {
 	private String image1;
 	private String image2;
 	private String image3;
-	
 	public int getReviewId() {
 		return reviewId;
 	}
 	public void setReviewId(int reviewId) {
 		this.reviewId = reviewId;
 	}
-	public String getCustomerId() {
-		return customerId;
+	public String getCustomerEmail() {
+		return customerEmail;
 	}
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
+	public void setCustomerEmail(String customerEmail) {
+		this.customerEmail = customerEmail;
 	}
-	public String getHostId() {
-		return hostId;
+	public String getHostEmail() {
+		return hostEmail;
 	}
-	public void setHostId(String hostId) {
-		this.hostId = hostId;
+	public void setHostEmail(String hostEmail) {
+		this.hostEmail = hostEmail;
 	}
 	public String getBookingId() {
 		return bookingId;
 	}
 	public void setBookingId(String bookingId) {
 		this.bookingId = bookingId;
+	}
+	public int getListId() {
+		return listId;
+	}
+	public void setListId(int listId) {
+		this.listId = listId;
 	}
 	public int getCleanScore() {
 		return cleanScore;
@@ -94,12 +99,7 @@ public class ReviewDTO {
 	public void setImage3(String image3) {
 		this.image3 = image3;
 	}
-	public int getListId() {
-		return listId;
-	}
-	public void setListId(int listId) {
-		this.listId = listId;
-	}
+
 	
 
 }
