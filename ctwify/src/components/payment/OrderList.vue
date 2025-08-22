@@ -130,6 +130,26 @@
             </v-list>
           </v-col>
         </v-row>
+        <!-- 只有訂單完成才能評價 -->
+
+        <router-link
+          :to="{
+            name: 'InsertReview',
+            query: {
+              bookingId: order.bookingId,
+            },
+          }"
+          custom
+          v-slot="{ navigate }"
+        >
+          <v-btn
+            :disabled="order.bookingstatus !== '已完成'"
+            @click="navigate"
+            icon
+          >
+            <v-icon>mdi-car</v-icon>
+          </v-btn>
+        </router-link>
       </v-card-text>
     </v-card>
 
@@ -387,6 +407,7 @@
 
 <script>
 import axios from "axios";
+import List from "../listing/host/List.vue";
 
 export default {
   name: "OrderList",
