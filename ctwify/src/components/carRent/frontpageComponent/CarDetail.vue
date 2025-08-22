@@ -111,7 +111,7 @@ async function submitReservation() {
       title: "預約成功！",
       text: "您的預約已完成，將跳轉到訂單頁面。",
       showConfirmButton: false,
-      timer: 2500
+      timer: 2000
     });
 
     // 取成新的ID
@@ -172,6 +172,15 @@ const payload = {
   locationId: booking.vehicleDraft.locationId ?? null,
 }
 
+// 測試資料
+const fillTestDriver = () => {
+  lastName.value = "王";
+  firstName.value = "小明";
+  email.value = "testWang@email.com";
+  phone.value = "0912345678";
+  license.value = "F123456789";
+  driverAge.value = "25-60";
+};
 </script>
 
 <template>
@@ -281,6 +290,9 @@ const payload = {
             <v-card elevation="2" class="mb-4">
               <v-card-title class="card-title-flat">
                 駕駛人資料
+                <v-btn class="ml-5" size="small" color="primary" variant="outlined" @click="fillTestDriver">
+                  測試填入
+                </v-btn>
               </v-card-title>
               <v-card-text>
                 <v-form ref="formRef" @submit.prevent>
@@ -413,11 +425,9 @@ const payload = {
   filter: brightness(1.03);
 }
 
-@media (max-width: 1024px) {
   .page-wrap {
-    width: 100%;
+    width: 95%;
   }
-}
 
 .font-weight-bold {
   font-weight: 700;

@@ -487,6 +487,26 @@ onBeforeUnmount(() => {
   geocoder = null;
   autocomplete = null;
 });
+
+// 測試資料
+const fillTestDriver = () => {
+  vehicle.value = {
+    ...vehicle.value,
+    plateNo: "ABC-1234",
+    brand: "TOYOTA",
+    model: "Corolla Altis",
+    color: "白",
+    fuelType: "汽油",
+    transmission: "自排",
+    status: "可租用",
+    seatCapacity: 5,
+    fuelCapacity: 50,
+    vehicleTax: 8640,
+    dailyRent: 4500,
+    mileage: 3500,
+    location: "台北市信義區信義路五段7號",
+  };
+};
 </script>
 
 
@@ -509,6 +529,7 @@ onBeforeUnmount(() => {
         <!-- 標題 + 操作區 -->
         <div class="d-flex align-center justify-space-between mb-3">
           <div class="text-h5 font-weight-bold">車輛資訊</div>
+
           <div class="d-flex flex-wrap" style="gap:.5rem;">
             <v-btn
                 v-if="isEditing && !insertVehicleMode"
@@ -581,7 +602,13 @@ onBeforeUnmount(() => {
               <!-- 基本資料 -->
               <v-col cols="12" md="6" class="d-flex">
                 <v-card class="bg-white flex-grow-1" elevation="1">
-                  <v-card-title class="text-subtitle-1">基本資料</v-card-title>
+                  <v-card-title class="text-subtitle-1">
+                    基本資料
+                    <v-btn class="ml-5" size="small" color="primary" variant="outlined" @click="fillTestDriver">
+                      測試填入
+                    </v-btn>
+                  </v-card-title>
+
                   <v-card-text>
                     <v-table density="compact" class="text-no-wrap">
                       <colgroup>

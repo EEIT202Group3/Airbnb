@@ -281,6 +281,14 @@ function formatDateTime(dt?: string | null) {
                       </colgroup>
                       <tbody>
                       <tr>
+                        <td class="label-cell">預約編號</td>
+                        <td>
+                          <div class="fe-wrapper disabled">
+                            <div class="fe-display">{{ reservation.reservationId ?? '—' }}</div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
                         <td class="label-cell">駕照號碼</td>
                         <td>
                           <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
@@ -354,20 +362,6 @@ function formatDateTime(dt?: string | null) {
                         </td>
                       </tr>
 
-                      <tr>
-                        <td class="label-cell">租屋訂單編號</td>
-                        <td>
-                          <div class="fe-wrapper" :class="{'is-editable': isInlineEditable}">
-                            <div class="fe-display" v-show="!(isInlineEditable && activeField === 'bookingId')"
-                                 @click="isInlineEditable && (activeField = 'bookingId')">
-                              {{ reservation.bookingId || '—' }}
-                            </div>
-                            <v-text-field v-show="isInlineEditable && activeField === 'bookingId'"
-                                          v-model="reservation.bookingId" density="comfortable" variant="outlined"
-                                          hide-details class="fe-input" @blur="activeField = null"/>
-                          </div>
-                        </td>
-                      </tr>
                       </tbody>
                     </v-table>
                   </v-card-text>
@@ -385,14 +379,6 @@ function formatDateTime(dt?: string | null) {
                         <col/>
                       </colgroup>
                       <tbody>
-                      <tr>
-                        <td class="label-cell">預約編號</td>
-                        <td>
-                          <div class="fe-wrapper disabled">
-                            <div class="fe-display">{{ reservation.reservationId ?? '—' }}</div>
-                          </div>
-                        </td>
-                      </tr>
                       <tr>
                         <td class="label-cell">預約建立時間</td>
                         <td>

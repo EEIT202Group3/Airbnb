@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const formRef = ref<any>(null);
+const menuPickup = ref(false);
 
 const locations = ref<{ locationId: number; name: string; address: string }[]>([]);
 
@@ -99,8 +100,14 @@ const timeOptions = computed(() => {
           </v-col>
 
           <!-- 取車日期 -->
-          <v-col cols="12" md="2" class="px-md-1 pb-2 pb-md-0">
+          <v-col
+              cols="12"
+              md="2"
+              class="px-md-1 pb-2 pb-md-0"
+              @click="$refs.pickupDateInput.$el.querySelector('input').showPicker()"
+          >
             <v-text-field
+                ref="pickupDateInput"
                 v-model="formData.pickupDate"
                 label="取車日期"
                 type="date"
@@ -129,12 +136,18 @@ const timeOptions = computed(() => {
           </v-col>
 
           <!-- 還車日期 -->
-          <v-col cols="12" md="2" class="px-md-1 pb-2 pb-md-0">
+          <v-col
+              cols="12"
+              md="2"
+              class="px-md-1 pb-2 pb-md-0"
+              @click="$refs.returnDateInput.$el.querySelector('input').showPicker()"
+          >
             <v-text-field
+                ref="returnDateInput"
                 v-model="formData.returnDate"
                 label="還車日期"
                 type="date"
-                :min="formData.pickupDate || todayStr"
+                :min="todayStr"
                 :rules="[required]"
                 variant="outlined"
                 density="comfortable"
