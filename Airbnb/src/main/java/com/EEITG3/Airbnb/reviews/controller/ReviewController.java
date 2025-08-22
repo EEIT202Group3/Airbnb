@@ -67,6 +67,11 @@ public class ReviewController {
 
 		}
 	}
+	@GetMapping("/reviews/getByCust/{id}")
+	public List<ReviewDTO> findReviewBycustId(@PathVariable String id){
+		return rService.findByCustId(id);
+	}
+	
 
 	/*
 	 * 呼叫service.insert 傳入參數，儲存review對象進行 repo.save(reviews) 用util 處理上傳圖片

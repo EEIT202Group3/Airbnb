@@ -78,16 +78,7 @@ public class ReviewService {
 	            .collect(Collectors.toList());
 	}
 	
-	public List<Review> findByTypeAndKeyword(String type, String keyword) {
-	    if (type == null || keyword == null || keyword.trim().isEmpty()) {
-	        return rRepository.findAll();
-	    }
 
-	public ReviewDTO findByReviewID(Integer id) {
-		  return rRepository.findByReviewId(id)
-                  .map(ReviewMapper::toDTO)
-                  .orElse(null); // 或丟出例外
-	}
 	
 	public List<ReviewDTO> findByCustId(String id){
 		return rRepository.findByCustomer_CustomerIdContainingIgnoreCase(id).stream()

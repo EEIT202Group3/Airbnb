@@ -110,3 +110,4 @@ cypress/screenshots/
 *.swo
 *.swp
 /Airbnb/photo
+/front-end/public/carPicture
