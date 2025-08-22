@@ -1,13 +1,22 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useCustomerStore } from "@/stores/customer";
+import api from "@/api";
 import defaultAvatar from "@/images/default.png";
 import SimpleReview from "@/components/reviews/SimpleReview.vue";
 const customerStore = useCustomerStore();
 const { customer } = storeToRefs(customerStore);
+const reviews = ref([]);
+console.log(customer.value.customerId);
 
 onMounted(async () => {
+  const reviewRes = await api.get(
+    `/api/reviews/getByCust/${customer.value.customerId}`,
+    { withCredentials: true }
+  );
+  reviews.value = reviewRes.data;
+  console.log(reviews.value);
   if (!customer.value) {
     customerStore.fetchUser();
   }
@@ -61,10 +70,8 @@ onMounted(async () => {
       <v-icon class="mr-2">mdi-chat-processing-outline</v-icon>
       <span class="text-subtitle-1 font-weight-medium">我曾撰寫的評價</span>
     </div>
-    <v-sheet
-      class="pa-8 text-medium-emphasis rounded-lg bg-grey-lighten-5 text-center"
-    >
-      <simple-review></simple-review>
+    <v-sheet>
+      <simple-review :reviews="reviews"></simple-review>
     </v-sheet>
   </v-card>
 </template>

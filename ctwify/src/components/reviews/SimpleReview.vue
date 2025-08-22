@@ -25,7 +25,10 @@
               <div class="d-flex">
                 <div class="d-flex flex-column">
                   <v-card-title class="pa-0" style="font-size: 20px"
-                    >{{ maskEmail(item.email) }} :</v-card-title
+                    >{{
+                      maskEmail(item.email) || maskEmail(item.customerEmail)
+                    }}
+                    :</v-card-title
                   >
                   <v-card-subtitle class="pa-0" style="font-size: 20px">
                     評論日期：{{

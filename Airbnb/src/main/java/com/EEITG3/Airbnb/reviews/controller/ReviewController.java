@@ -39,25 +39,13 @@ public class ReviewController {
 	public List<ReviewDTO> AdminGetAllReviews(
 			@RequestParam(required = false) String type,
 		    @RequestParam(required = false) String keyword) { 
-//		if (type == null || keyword == null || keyword.isBlank()) {
-//		        return rService.findAll();
-//		    }
-		System.out.println(type + keyword);
-//		 return rService.findByTypeAndKeyword(type, keyword);
-		System.out.println(rService.getAllReviews());
-		return rService.getAllReviews();
-	}
-//	@GetMapping("/reviews")
-//	public List<Review> getAllReviewsBy(
-//			@RequestParam(required = false) String type,
-//		    @RequestParam(required = false) String keyword) { 
-//		if (type == null || keyword == null || keyword.isBlank()) {
-//		        return rService.findAll();
-//		    }
-//		System.out.println(type + keyword);
-//		 return rService.findByTypeAndKeyword(type, keyword);
-//	}
+		if (type == null || keyword == null || keyword.isBlank()) {
+		        return rService.getAllReviews();
+		    }
 
+		System.out.println(type + keyword);
+    return rService.findByTypeAndKeyword(type, keyword);
+	}
 	@GetMapping("/reviews/listing/{id}")
 	public List<ReviewWithCustomerDto> getAllReviewsByList(@PathVariable Integer id) {
 		return rService.listingReview(id);
@@ -67,11 +55,6 @@ public class ReviewController {
 	public ReviewDTO getReviewById(@PathVariable Integer id) {
 		return rService.findByReviewID(id); // 找不到可回 null 或拋異常
 	}
-	/*
-	@GetMapping("/reviews/getByCust/{id}")
-	public List<Review> getAllReviewsByCustId(@PathVariable String id){
-		return rService.findByCustId(id);
-	}*/
 	
 	@DeleteMapping("admins/reviews/del/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable Integer id) {

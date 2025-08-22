@@ -49,29 +49,48 @@ public class ReviewService {
 		this.storage = storage;
 	}
 	
-	public List<Review> findByTypeAndKeyword(String type, String keyword) {
-	    if (type == null || keyword == null || keyword.trim().isEmpty()) {
-	        return rRepository.findAll();
-	    }
+	public List<ReviewDTO> findByTypeAndKeyword(String type, String keyword) {
 
 	    switch (type) {
 	        case "hostId":
-	            return rRepository.findByHost_HostIdContainingIgnoreCase(keyword);
+	            return rRepository.findByHost_HostIdContainingIgnoreCase(keyword).stream()
+	    	            .map(ReviewMapper::toDTO)
+	    	            .collect(Collectors.toList());
 	        case "custId":
-	            return rRepository.findByCustomer_CustomerIdContainingIgnoreCase(keyword);
+	            return rRepository.findByCustomer_CustomerIdContainingIgnoreCase(keyword).stream()
+	    	            .map(ReviewMapper::toDTO)
+	    	            .collect(Collectors.toList());
 	        case "listId":
-	            try {
-	                return rRepository.findByListing_ListId(Integer.parseInt(keyword.trim()));
-	            } catch (NumberFormatException e) {
-	                return Collections.emptyList(); // 或丟 IllegalArgumentException
-	            }
+
+	                return rRepository.findByListing_ListId(Integer.parseInt(keyword.trim())).stream()
+	        	            .map(ReviewMapper::toDTO)
+	        	            .collect(Collectors.toList());
 	        default:
-	            return rRepository.findAll();
+	            return rRepository.findAll().stream()
+	    	            .map(ReviewMapper::toDTO)
+	    	            .collect(Collectors.toList());
 	    }
 	}
 	
 	public List<ReviewDTO> getAllReviews() {
 	    return rRepository.findAll().stream()
+	            .map(ReviewMapper::toDTO)
+	            .collect(Collectors.toList());
+	}
+	
+	public List<Review> findByTypeAndKeyword(String type, String keyword) {
+	    if (type == null || keyword == null || keyword.trim().isEmpty()) {
+	        return rRepository.findAll();
+	    }
+
+	public ReviewDTO findByReviewID(Integer id) {
+		  return rRepository.findByReviewId(id)
+                  .map(ReviewMapper::toDTO)
+                  .orElse(null); // 或丟出例外
+	}
+	
+	public List<ReviewDTO> findByCustId(String id){
+		return rRepository.findByCustomer_CustomerIdContainingIgnoreCase(id).stream()
 	            .map(ReviewMapper::toDTO)
 	            .collect(Collectors.toList());
 	}

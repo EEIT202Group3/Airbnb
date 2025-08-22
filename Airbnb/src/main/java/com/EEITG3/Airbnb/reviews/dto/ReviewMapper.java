@@ -6,8 +6,8 @@ public class ReviewMapper {
 	public static ReviewDTO toDTO(Review review) {
         ReviewDTO dto = new ReviewDTO();
         dto.setReviewId(review.getReviewId());
-        dto.setCustomerId(review.getCustomer().getCustomerId());
-        dto.setHostId(review.getHost().getHostId());
+        dto.setCustomerEmail(review.getCustomer().getEmail());
+        dto.setHostEmail(review.getHost().getEmail());
         dto.setBookingId(review.getBooking().getBookingId());
         dto.setCleanScore(review.getCleanScore());
         dto.setCommScore(review.getCommScore());
@@ -20,6 +20,5 @@ public class ReviewMapper {
         dto.setImage3(review.getImage3());
         dto.setListId(review.getListing().getListId());
         return dto;
-    }
-
+  }
 }
