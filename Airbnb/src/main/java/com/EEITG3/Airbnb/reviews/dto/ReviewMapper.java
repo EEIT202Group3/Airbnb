@@ -20,8 +20,5 @@ public class ReviewMapper {
         dto.setImage3(review.getImage3());
         dto.setListId(review.getListing().getListId());
         return dto;
-    }
-	
-	
-
+  }
 }

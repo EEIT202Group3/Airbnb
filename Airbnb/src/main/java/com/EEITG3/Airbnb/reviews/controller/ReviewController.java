@@ -42,8 +42,9 @@ public class ReviewController {
 		if (type == null || keyword == null || keyword.isBlank()) {
 		        return rService.getAllReviews();
 		    }
+
 		System.out.println(type + keyword);
-		 return rService.findByTypeAndKeyword(type, keyword);
+    return rService.findByTypeAndKeyword(type, keyword);
 	}
 	@GetMapping("/reviews/listing/{id}")
 	public List<ReviewWithCustomerDto> getAllReviewsByList(@PathVariable Integer id) {
@@ -53,11 +54,6 @@ public class ReviewController {
 	@GetMapping("/admins/reviews/get/{id}")
 	public ReviewDTO getReviewById(@PathVariable Integer id) {
 		return rService.findByReviewID(id); // 找不到可回 null 或拋異常
-	}
-	
-	@GetMapping("/reviews/getByCust/{id}")
-	public List<ReviewDTO> getAllReviewsByCustId(@PathVariable String id){
-		return rService.findByCustId(id);
 	}
 	
 	@DeleteMapping("admins/reviews/del/{id}")

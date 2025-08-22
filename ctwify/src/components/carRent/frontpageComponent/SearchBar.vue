@@ -77,7 +77,7 @@ const timeOptions = computed(() => {
 
 <template>
   <v-container class="py-6">
-    <v-sheet class="search-bar pa-4 rounded-lg" elevation="1">
+    <v-sheet class="search-bar1 pa-4 rounded-lg" elevation="1">
       <v-form ref="formRef" @submit.prevent="onSubmit">
         <v-row align="end" no-gutters>
           <!-- 取車地點 -->
@@ -170,7 +170,7 @@ const timeOptions = computed(() => {
 </template>
 
 <style scoped>
-.search-bar {
+.search-bar1 {
   background: #ffffff;
   border: 1px solid #e0e0e0;
 }

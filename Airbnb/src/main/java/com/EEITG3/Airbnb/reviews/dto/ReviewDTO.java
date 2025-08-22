@@ -99,7 +99,6 @@ public class ReviewDTO {
 	public void setImage3(String image3) {
 		this.image3 = image3;
 	}
-
 	
 
 }
