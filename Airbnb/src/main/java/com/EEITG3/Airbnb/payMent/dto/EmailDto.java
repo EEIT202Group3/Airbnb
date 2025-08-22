@@ -3,7 +3,7 @@ package com.EEITG3.Airbnb.payMent.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class HostAllOrderResponseDto {
+public class EmailDto {
 	private String bookingId;
 	private Integer reservationId;     
 	private String username;          
@@ -25,18 +25,6 @@ public class HostAllOrderResponseDto {
 	private String mentStatus;
 	private BigDecimal hostNetAmount;
 	private BigDecimal platformFeeAmount;
-	public BigDecimal getPlatformFeeAmount() {
-		return platformFeeAmount;
-	}
-	public void setPlatformFeeAmount(BigDecimal platformFeeAmount) {
-		this.platformFeeAmount = platformFeeAmount;
-	}
-	public BigDecimal getHostNetAmount() {
-		return hostNetAmount;
-	}
-	public void setHostNetAmount(BigDecimal hostNetAmount) {
-		this.hostNetAmount = hostNetAmount;
-	}
 	public String getBookingId() {
 		return bookingId;
 	}
@@ -151,4 +139,17 @@ public class HostAllOrderResponseDto {
 	public void setMentStatus(String mentStatus) {
 		this.mentStatus = mentStatus;
 	}
+	public BigDecimal getHostNetAmount() {
+		return hostNetAmount;
+	}
+	public void setHostNetAmount(BigDecimal hostNetAmount) {
+		this.hostNetAmount = hostNetAmount;
+	}
+	public BigDecimal getPlatformFeeAmount() {
+		return platformFeeAmount;
+	}
+	public void setPlatformFeeAmount(BigDecimal platformFeeAmount) {
+		this.platformFeeAmount = platformFeeAmount;
+	}
+	
 }

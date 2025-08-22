@@ -182,7 +182,7 @@
               >
             </v-list-item>
 
-            <v-list-item v-if="selectedOrder.locationId">
+            <v-list-item v-if="selectedOrder.reservationId">
               <template #prepend
                 ><v-icon color="deep-orange">mdi-car-info</v-icon></template
               >
@@ -295,7 +295,7 @@
               >
             </v-list-item>
 
-            <v-list-item v-if="selectedOrder.locationId">
+            <v-list-item v-if="selectedOrder.reservationId">
               <template #prepend
                 ><v-icon color="deep-orange">mdi-cash-100</v-icon></template
               >

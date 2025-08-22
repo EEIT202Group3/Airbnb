@@ -161,6 +161,8 @@ public class OrderService {
 
 	        Order order = new Order();
 	        order.setListing(listing);
+	        order.setReservationId(dto.getReservationId());
+	        order.setLocationId(dto.getLocationId());
 	        order.setHostId(listing.getHostId() != null ? listing.getHostId().toString() : null);
 	        order.setCustomerId(customer.getCustomerId() != null ? customer.getCustomerId().toString() : null);
 	        order.setUsername(customer.getUsername());
@@ -286,6 +288,7 @@ public class OrderService {
 
 	    	    OrderDetailResponseDto dto = new OrderDetailResponseDto();
 	       	    dto.setBookingId(order.getBookingId());
+	       	    dto.setReservationId(order.getReservationId());
 	    	    dto.setUsername(order.getUsername());
 	    	    dto.setHouseName(order.getHouseName());
 	    	    dto.setAddress(order.getAddress());
@@ -297,6 +300,7 @@ public class OrderService {
 	    	    dto.setLocationId(order.getLocationid());
 	    	    dto.setPaymentId(order.getPaymentId());
 	    	    dto.setRoomprice(order.getRoomPrice());
+	    	    dto.setCartotal(order.getCarTotal());
 	    	    dto.setBookingStatus(order.getBookingStatus());
 	    	    dto.setMentStatus(order.getMentStatus());
 	    	    dto.setCartotal(order.getCarTotal());
