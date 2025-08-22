@@ -1,79 +1,94 @@
 <template>
-  <v-container>
-    <v-form v-model="valid">
-      <div>
-        <v-text-field v-model="listId" label="ListID"></v-text-field>
-      </div>
-      <div>
-        <v-text-field v-model="bookingId" label="BookingID"></v-text-field>
-      </div>
-      <div>
-        <v-text-field v-model="custId" label="CustID"></v-text-field>
-      </div>
-      <div>
-        <v-text-field v-model="hostId" label="HostID"></v-text-field>
-      </div>
-      <div class="mb-4">
-        <div class="text-subtitle-1 font-weight-medium mb-1">乾淨度</div>
-        <v-rating
-          v-model="cleanScore"
-          hover
-          :length="5"
-          :size="36"
-          active-color="light-green-darken-4"
-          label="乾淨度"
-        />
-      </div>
-      <div class="mb-4">
-        <div class="text-subtitle-1 font-weight-medium mb-1">溝通</div>
-        <v-rating
-          v-model="commScore"
-          hover
-          :length="5"
-          :size="36"
-          active-color="light-green-darken-4"
-          label="溝通"
-        />
-      </div>
-      <div class="mb-4">
-        <div class="text-subtitle-1 font-weight-medium mb-1">性價比</div>
-        <v-rating
-          v-model="valueScore"
-          hover
-          :length="5"
-          :size="36"
-          active-color="light-green-darken-4"
-          label="性價比"
-        />
-      </div>
-      <v-textarea
-        v-model="custComm"
-        label="文字評論"
-        variant="outlined"
-        row-height="15"
-        rows="1"
-        clearable
-        no-resize
-        :counter="200"
-        maxlength="200"
-      ></v-textarea>
+  <v-container class="py-6">
+    <v-card class="mx-auto px-6 py-4" max-width="600" elevation="2">
+      <v-card-title class="text-h6 text-center mb-4"> 評論表單 </v-card-title>
 
-      <div class="text-subtitle-1 font-weight-medium mb-1">
-        上傳評論圖片 (最多三張)
-      </div>
-      <v-file-input
-        v-model="files"
-        multiple
-        show-size
-        accept="image/*"
-        label="上傳評論圖片 (最多三張)"
-        counter
-        :counter-size="3"
-        prepend-icon="mdi-camera"
-      ></v-file-input>
+      <v-form v-model="valid">
+        <v-row dense>
+          <v-col cols="12" sm="6">
+            <v-text-field v-model="listId" label="ListID" dense></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="bookingId"
+              label="BookingID"
+              dense
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field v-model="custId" label="CustID" dense></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field v-model="hostId" label="HostID" dense></v-text-field>
+          </v-col>
+        </v-row>
 
-      <v-btn @click="submit">送出</v-btn>
-    </v-form>
+        <v-divider class="my-4"></v-divider>
+
+        <v-row dense>
+          <v-col cols="12" sm="4">
+            <div class="text-subtitle-2 font-weight-medium mb-1">乾淨度</div>
+            <v-rating
+              v-model="cleanScore"
+              hover
+              :length="5"
+              :size="28"
+              active-color="yellow-darken-1"
+            />
+          </v-col>
+          <v-col cols="12" sm="4">
+            <div class="text-subtitle-2 font-weight-medium mb-1">溝通</div>
+            <v-rating
+              v-model="commScore"
+              hover
+              :length="5"
+              :size="28"
+              active-color="yellow-darken-1"
+            />
+          </v-col>
+          <v-col cols="12" sm="4">
+            <div class="text-subtitle-2 font-weight-medium mb-1">性價比</div>
+            <v-rating
+              v-model="valueScore"
+              hover
+              :length="5"
+              :size="28"
+              active-color="yellow-darken-1"
+            />
+          </v-col>
+        </v-row>
+
+        <v-textarea
+          v-model="custComm"
+          label="文字評論"
+          variant="outlined"
+          rows="3"
+          auto-grow
+          clearable
+          :counter="200"
+          maxlength="200"
+          class="my-4"
+        ></v-textarea>
+
+        <v-file-input
+          v-model="files"
+          multiple
+          show-size
+          accept="image/*"
+          label="上傳評論圖片 (最多三張)"
+          counter
+          :counter-size="3"
+          prepend-icon="mdi-camera"
+          class="mb-4"
+        ></v-file-input>
+
+        <div class="text-center">
+          <v-btn color="#e7630b" @click="submit" class="text-white">
+            送出
+          </v-btn>
+        </div>
+      </v-form>
+    </v-card>
   </v-container>
 </template>
 
@@ -131,5 +146,8 @@ const submit = async () => {
   }
 };
 </script>
-
-<style></style>
+<style scoped>
+.v-rating {
+  justify-content: center;
+}
+</style>

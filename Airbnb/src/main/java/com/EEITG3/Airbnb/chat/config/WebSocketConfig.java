@@ -53,6 +53,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .addInterceptors(new HttpHandshakeInterceptor())
                 .setHandshakeHandler(handshakeHandler());// 允許跨域
 //                .withSockJS(); // 支援 SockJS fallback
+        registry.addEndpoint("/api/admins/ws-chat")
+        .setAllowedOriginPatterns("*")
+        .addInterceptors(new HttpHandshakeInterceptor())
+        .setHandshakeHandler(handshakeHandler());// 允許跨域
+//                .withSockJS(); // 支援 SockJS fallback
         System.out.println("測試連接~");	
     }	
 	
