@@ -619,4 +619,15 @@ onMounted(() => {
   overflow: hidden;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
+
+
+.swal2-container {
+  z-index: 100000 !important; 
+}
+
+.info-right {
+  position: relative;
+  z-index: 1000; 
+}
+
 </style>

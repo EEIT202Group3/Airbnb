@@ -177,7 +177,7 @@ const routes = [
 
             },
             {
-                path: 'list',
+                path: '/list',
                 component: () => import('@/components/listing/host/List.vue')
             },
             {

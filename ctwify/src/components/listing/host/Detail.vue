@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Navbar -->
 
     <div class="come" v-if="listing">
       <h3>{{ listing.houseName }}</h3>
@@ -80,6 +79,7 @@
                 <span>{{ equip.equip_name }}</span>
               </div>
             </div>
+            <br>
             <button
               v-if="listing.equipments.length > limitCount"
               class="show-more-btn"
@@ -94,10 +94,12 @@
         <div class="info-right">
           <div class="price1">NT$ {{ listing.price }}</div>
           <div>每晚價格</div>
-          <div style="margin: 12px 0">人數：{{ listing.ppl }} 人</div>
-          <button class="book-btn" @click="editHouse(listing.listId)">
-            編輯
-          </button>
+          <div style="margin: 12px 0;">人數：{{ listing.ppl }} 人</div>
+          <button class="book-btn" @click="editHouse(listing.listId)">編輯</button>
+          <button class="remove-btn" @click="unpublishHouse(listing)">
+          <v-icon>mdi-delete-outline</v-icon>
+            移除房源</button>
+
         </div>
       </div>
     </div>
@@ -196,6 +198,7 @@ function editHouse(listId) {
   router.push(`/host/edlistings/${listId}`);
 }
 
+
 function openModal() {
   isModalOpen.value = true;
 }
@@ -210,6 +213,21 @@ function openAmenitiesModal() {
 
 function closeAmenitiesModal() {
   isAmenitiesModalOpen.value = false;
+}
+
+function unpublishHouse(house) {
+  if (confirm(`確定要移除房源「${house.houseName}」嗎？`)) {
+    axios
+      .put(`/listings/${house.listId}/unpublish`)
+      .then(() => {
+        alert("房源已移除")
+        router.push("/host/listing") // 移除後導回房源列表
+      })
+      .catch((err) => {
+        console.error(err)
+        alert("移除失敗")
+      })
+  }
 }
 
 const truncatedText = computed(() => {
@@ -297,4 +315,21 @@ hr {
   max-height: 90vh;
   overflow-y: auto;
 }
+
+.remove-btn {
+  background: none; 
+  color: rgb(8, 8, 8);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 8px;
+  width: 100%;
+  transition: background 0.3s;
+}
+
+.remove-btn:hover {
+  background-color: #cbcbcb;
+}
+
 </style>

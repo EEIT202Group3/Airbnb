@@ -219,19 +219,19 @@ async showMarkersOnMap() {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   background-color: white;
   margin-bottom: 16px;
-  padding: 12px; /* 卡片內邊距，讓圖片不貼邊 */
-  gap: 16px; /* 文字與圖片之間留空 */
-  text-decoration: none;  /* 移除底線 */
-  color: inherit;         /* 保持原本的文字顏色 */
+  padding: 12px; 
+  gap: 16px; 
+  text-decoration: none;  
+  color: inherit;        
 }
 
 .listing-img {
-  width: 140px;    /* 固定寬度 */
-  height: 140px;   /* 留下上下空隙 */
+  width: 140px;    
+  height: 140px;   
   object-fit: cover;
   border-radius: 12px;
   flex-shrink: 0;
-  margin-top: 10px;   /* 上下空隙 */
+  margin-top: 10px;  
   margin-bottom: 10px;
 }
 
@@ -240,15 +240,15 @@ async showMarkersOnMap() {
 }
 
 .search-results-container {
-   gap:1px; /* 左右之間留空隙 */
-  padding-right: 50px; /* 右邊再多留一些空隙 */
+   gap:1px; 
+  padding-right: 50px; 
   display: flex;
   height: 100vh;
 }
 .results-list {
-  flex: 1;             /* 左側列表撐大一點 */
+  flex: 1;           
   overflow-y: auto;
-  padding: 50px;       /* 左右內邊距，卡片不貼邊 */
+  padding: 50px;   
 }
 .results-map {
   flex: 0.8;
