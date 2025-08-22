@@ -89,4 +89,12 @@ public class AdminPayoutController {
             @PathVariable("payoutId") java.util.UUID payoutId) {
         return ResponseEntity.ok(payoutService.findPayoutOrdersByPayoutId(payoutId));
     }
+    
+    @PostMapping("/cancel")
+    public ResponseEntity<Void> cancel(@RequestBody Map<String, String> body) {
+        UUID payoutId = UUID.fromString(body.get("payoutId"));
+        String reason = body.getOrDefault("reason", "");
+        payoutService.cancelPayout(payoutId, "admin", reason);
+        return ResponseEntity.ok().build();
+    }
 }

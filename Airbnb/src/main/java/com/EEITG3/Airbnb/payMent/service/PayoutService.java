@@ -133,6 +133,22 @@ public class PayoutService {
             WHERE po.payout_id = ?
         """, payoutId);
     }
+//    @Transactional
+//    public void markPayoutCancel(UUID payoutId, LocalDateTime paidAt) {
+//        jdbc.update("""
+//            UPDATE host_payouts
+//            SET status='paid', payout_date=?, updated_at=SYSUTCDATETIME()
+//            WHERE payout_id=?
+//        """, Timestamp.valueOf(paidAt), payoutId);
+//
+//        jdbc.update("""
+//            UPDATE o SET o.payout_status='paid'
+//            FROM orderlist o
+//            JOIN payout_orders po ON po.booking_id = o.booking_id
+//            WHERE po.payout_id = ?
+//        """, payoutId);
+//    }
+
     @Transactional(readOnly = true)
     public java.util.List<HostPayoutDto> findHostPayouts(String hostId, String month, String status) {
         StringBuilder sb = new StringBuilder("""
@@ -210,5 +226,45 @@ public class PayoutService {
             rs.getBigDecimal("net_amount"),
             rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null
         ), payoutId);
+    }
+    
+    @Transactional
+    public void cancelPayout(UUID payoutId, String adminUser, String reason) {
+        // 1) 取目前狀態並做防呆
+        String status = jdbc.queryForObject(
+            "SELECT status FROM host_payouts WHERE payout_id = ?",
+            String.class, payoutId
+        );
+        if (status == null) {
+            throw new IllegalArgumentException("找不到撥款單：" + payoutId);
+        }
+        if ("paid".equalsIgnoreCase(status)) {
+            throw new IllegalStateException("已付款的撥款單不可取消");
+        }
+        if ("cancelled".equalsIgnoreCase(status)) {
+            // 已經取消就直接返回（或丟錯都可）
+            return;
+        }
+
+        // 2) 先把訂單恢復可再結算
+        jdbc.update("""
+            UPDATE o SET
+                o.payout_status = 'pending',
+                o.payout_id = NULL
+            FROM orderlist o
+            JOIN payout_orders po ON po.booking_id = o.booking_id
+            WHERE po.payout_id = ?
+        """, payoutId);
+
+        // 3) 刪掉這張撥款單對應的 payout_orders（保留 host_payouts 做為稽核痕跡）
+        jdbc.update("DELETE FROM payout_orders WHERE payout_id = ?", payoutId);
+
+        // 4) 標記 host_payouts 為 cancelled（可視需要記 updated_by / 取消原因）
+        jdbc.update("""
+            UPDATE host_payouts
+            SET status = 'cancelled',
+                updated_at = SYSUTCDATETIME()
+            WHERE payout_id = ?
+        """, payoutId);
     }
 }

@@ -1,17 +1,14 @@
 package com.EEITG3.Airbnb.payMent.controller;
 
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.EEITG3.Airbnb.jwt.EmailService;
 import com.EEITG3.Airbnb.jwt.JwtService;
-import com.EEITG3.Airbnb.listing.entity.LisBean;
-import com.EEITG3.Airbnb.listing.repository.ListRepository;
 import com.EEITG3.Airbnb.payMent.dto.HostAllOrderResponseDto;
 import com.EEITG3.Airbnb.payMent.dto.OrderAllResponseDto;
 import com.EEITG3.Airbnb.payMent.dto.OrderDetailResponseDto;
@@ -30,11 +26,9 @@ import com.EEITG3.Airbnb.payMent.entity.Order;
 import com.EEITG3.Airbnb.payMent.service.HostOrderService;
 import com.EEITG3.Airbnb.payMent.service.OrderService;
 import com.EEITG3.Airbnb.users.entity.Customer;
-import com.EEITG3.Airbnb.users.entity.Host;
 import com.EEITG3.Airbnb.users.repository.CustomerRepository;
 import com.EEITG3.Airbnb.users.repository.HostRepository;
 
-import jakarta.transaction.Transactional;
 
 //接收 /ordersconfirm 的 POST 請求
 @RestController
@@ -53,6 +47,8 @@ public class OrderConfirm {
 	
 	@Autowired
 	private HostRepository hostRepository;
+	
+
 
 	@PostMapping("/preview")
 	public ResponseEntity<?> previewOrder(@RequestBody OrderRequestDto dto,
@@ -78,13 +74,14 @@ public class OrderConfirm {
 			return ResponseEntity.ok("訂單成功！訂單編號：" + order.getBookingId());
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("建立訂單失敗：" + e.getMessage());
+		    }
 		}
-	}
 
 	// 單筆訂單明細
 	@GetMapping("/detail")
 	public OrderDetailResponseDto orderDetailResponseDto(@RequestParam("bookingId") String bookingId) {
 		return orderService.getOrderByBookingId(bookingId);
+		
 	}
 
 	// 客戶查詢全部訂單
@@ -110,10 +107,10 @@ public class OrderConfirm {
 	    }
 
 	    // hostRepository.findByEmail(...) 取到的若是「字串型」hostId，就轉成 UUID
-	    UUID hostId = hostRepository.findHostByEmail(email)
+	    String hostId = hostRepository.findHostByEmail(email)
 	            .map(h -> {
 	                try {
-	                    return UUID.fromString(h.getHostId()); // ← 這裡把 String 轉 UUID
+	                    return h.getHostId(); // ← 這裡把 String 轉 UUID
 	                } catch (IllegalArgumentException e) {
 	                    throw new ResponseStatusException(
 	                        HttpStatus.BAD_REQUEST, "hostId 不是合法的 UUID 格式");

@@ -139,10 +139,7 @@
           </div>
 
           <br />
-          <!-- 評論列表 -->
-          <div class="info-flex">
-            <SimpleReview :reviews="reviews"></SimpleReview>
-          </div>
+
           <!-- 設備列表 -->
           <div class="amenities" v-if="listing.equipments?.length">
             <h4>有提供的設備與服務</h4>
@@ -267,6 +264,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import { ref, onMounted, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SimpleReview from "@/components/reviews/SimpleReview.vue";
+
 
 const route = useRoute();
 const router = useRouter();
@@ -416,6 +414,7 @@ function goToBooking() {
       bed: listing.value.bed,
       type: listing.value.room,
       tel: listing.value.tel,
+      price: listing.value.price,
       totalPrice: totalPrice.value,
       checkInDate: checkIn.value,
       checkOutDate: checkOut.value,
@@ -424,18 +423,12 @@ function goToBooking() {
   });
 }
 
-const reviews = ref([]);
-
 // 取得房源資料
 onMounted(async () => {
   const id = route.params.id;
   try {
     const res = await axios.get(`/listings/${id}`);
     listing.value = res.data;
-    console.log(id);
-    const reviewRes = await axios.get(`/api/reviews/listing/${id}`);
-    reviews.value = reviewRes.data;
-    console.log(reviews.value);
 
     // 測試用分數
 

@@ -159,7 +159,6 @@ async function fetchOrderDetail(bookingId: string) {
   }
 }
 //查詢全部
-//2
 const headers = [
   { title: "用戶名稱", key: "username" },
   { title: "房源名稱", key: "housename" },

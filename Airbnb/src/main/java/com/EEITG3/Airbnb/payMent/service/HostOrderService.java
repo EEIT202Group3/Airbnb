@@ -32,7 +32,7 @@ public class HostOrderService {
 	    private OrderRepository orderRepository;
 	   
 	    //房東查詢全部訂單
-	    public List<HostAllOrderResponseDto> getOrdersByHostId(UUID hostId) {
+	    public List<HostAllOrderResponseDto> getOrdersByHostId(String hostId) {
 	        List<Order> orders = orderRepository.findAllByHostId(hostId);
 	        return orders.stream().map(this::toAllDto).toList();
 	    }
@@ -52,6 +52,8 @@ public class HostOrderService {
 	        dto.setCheckinDate(order.getCheckinDate());
 	        dto.setCheckoutDate(order.getCheckoutDate());
 	        dto.setHostNetAmount(order.getHostNetAmount());
+	        dto.setCartotal(order.getCarTotal());
+	        dto.setPlatformFeeAmount(order.getPlatformFeeAmount());
 	        return dto;
 	    }
 	  
