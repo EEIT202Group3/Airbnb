@@ -1,35 +1,59 @@
 <template>
   <div>
-    <div class="container">
-      <div v-if="loading">資料載入中...</div>
-      <div v-else>
-        <div
-          v-for="house in houseList"
-          :key="house.listId"
-          class="listing"
-        >
-          <router-link :to="`/host/details/${house.listId}`">
-                <img :src="`http://localhost:8080/images/listings/${house.photo1}`" alt="房源圖片" />
-            </router-link>
-          <div class="listing-info">{{ house.houseName }}</div>
-          <div class="listing-actions">
-            <button @click="editHouse(house.listId)">編輯</button>
-            <button @click="confirmDelete(house)">刪除</button>
-          </div>
-        </div>
-        <div v-if="houseList.length === 0">目前沒有房源</div>
+    <div v-if="loading" class="text-center py-4">資料載入中...</div>
+    <div v-else class="listings-grid">
+      <router-link
+        v-for="house in houseList"
+        :key="house.listId"
+        :to="`details/${house.listId}`"
+        class="listing"
+      >
+        <img
+          :src="`http://localhost:8080/images/listings/${house.photo1}`"
+          alt="房源圖片"
+          class="listing-img"
+        />
+        <br>
+     <div class="listing-info">
+  <h5 class="listing-title">{{ house.houseName }}</h5>
+  <p class="listing-ads">
+    <v-icon small class="me-1">mdi-map-marker</v-icon>
+    {{ house.ads }}
+  </p>
+</div>
+
+           <!-- 審核狀態燈標籤 -->
+    <div class="status-badge">
+      <span
+        v-if="house.approved === null"
+        class="status-light yellow"
+      ></span>
+      <span
+        v-else-if="house.approved === true"
+        class="status-light green"
+      ></span>
+      <span
+        v-else
+        class="status-light red"
+      ></span>
+      <span class="status-text">
+        {{ house.approved === null ? "審核中" : (house.approved ? "已通過" : "未通過") }}
+      </span>
+  </div>
+      </router-link>
+
+      <div v-if="houseList.length === 0" class="mt-4 text-muted text-center">
+        目前沒有房源
       </div>
     </div>
   </div>
 </template>
-
 <script>
-import Navbar from '@/layouts/Navbar.vue';
-import axios from "axios";  
+import axios from "@/api2";
+
 
 export default {
-     components: {
-    Navbar   
+  components: {
   },
   name: "list",
   data() {
@@ -43,11 +67,12 @@ export default {
     fetchListings() {
       this.loading = true;
       axios
-        .get(`http://localhost:8080/listings/host`,{
-          withCredentials:true,
-        })
+        .get(`http://localhost:8080/listings/host`)
         .then((res) => {
-          this.houseList = res.data;
+          // 過濾掉已下架或已刪除的房源
+          this.houseList = res.data.filter(
+            house => house.published !== false && house.deleted !== true
+          );
         })
         .catch((err) => {
           console.error("查詢會員房源失敗", err);
@@ -58,19 +83,19 @@ export default {
         });
     },
     editHouse(listId) {
-      this.$router.push(`/host/edlistings/${listId}`);
+      this.$router.push(`/edit/${listId}`);
     },
-    confirmDelete(house) {
-      if (confirm(`確定要刪除房源「${house.houseName}」嗎？`)) {
+    unpublishHouse(house) {
+      if (confirm(`確定要移除房源「${house.houseName}」嗎？`)) {
         axios
-          .delete(`http://localhost:8080/listings/${house.listId}`)
+          .put(`http://localhost:8080/listings/${house.listId}/unpublish`)
           .then(() => {
-            alert("刪除成功");
-            this.fetchListings(); 
+            alert("房源已移除");
+            this.fetchListings(); // 重新載入列表
           })
           .catch((err) => {
             console.error(err);
-            alert("刪除失敗");
+            alert("移除失敗");
           });
       }
     },
@@ -82,8 +107,79 @@ export default {
 </script>
 
 <style scoped>
-/* @import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"; */
-/* @import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"; */
+@import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css";
+@import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css";
 @import "/src/assets/listing/list3.css";
+
+.listing {
+  position: relative; /* 讓內部絕對定位以 listing 為基準 */
+  padding: 16px;
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 每行三個卡片 */
+  gap: 20px; /* 卡片之間的間距 */
+}
+.listing-img-wrapper {
+  position: relative;
+}
+
+.status-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #fff;
+  padding: 4px 10px;
+  border-radius: 20px; /* 圓角標籤 */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.status-light {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* 狀態顏色 */
+.status-light.green {
+  background-color: #28a745;
+}
+.status-light.yellow {
+  background-color: #ffc107;
+}
+.status-light.red {
+  background-color: #dc3545;
+}
+.listing-ads {
+   font-size: 15px;
+  color: #828282;
+}
+
+.listing-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.listing-title {
+  flex-grow: 1; 
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
 
 </style>

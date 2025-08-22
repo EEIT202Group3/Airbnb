@@ -192,9 +192,28 @@ const updateListing = async () => {
   const changed = !_.isEqual(_.omit(listing.value, ['equipments']), _.omit(originalListing.value, ['equipments']))
   const equipmentsChanged = !_.isEqual([...selectedEquipments.value].sort(), [...originalEquipments.value].sort())
 
-  if (!changed && !equipmentsChanged && photos.value.length === 0) {
-    Swal.fire("提醒", "請修改內容後再提交", "info")
-    return
+  // if (!changed && !equipmentsChanged && photos.value.length === 0) {
+  //   Swal.fire("提醒", "請修改內容後再提交", "info")
+  //   return
+  // }
+
+
+    // 檢查是否修改了地址 & 原本狀態是已審核
+  const addressChanged = listing.value.ads !== originalListing.value.ads
+  const isApproved = originalListing.value.approved === true
+
+  if (addressChanged && isApproved) {
+    const result = await Swal.fire({
+      title: "提醒",
+      text: "更改地址需要重新審核房源，確定要送出嗎？",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "確定送出",
+      cancelButtonText: "取消"
+    })
+    if (!result.isConfirmed) {
+      return // 使用者取消送出
+    }
   }
 
   const formData = new FormData()
@@ -221,7 +240,7 @@ const updateListing = async () => {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     Swal.fire("成功", "編輯成功", "success")
-    router.push('/host')
+    router.push('/host/listing')
   } catch (err) {
     Swal.fire("錯誤", "編輯失敗，請檢查輸入", "error")
   }

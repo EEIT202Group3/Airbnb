@@ -592,5 +592,12 @@ onMounted(() => {
   box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
 }
 
+.swal2-container {
+  z-index: 100000 !important; /* 比你的 header 還大就行 */
+}
 
+.info-right {
+  position: relative;
+  z-index: 1000; 
+}
 </style>

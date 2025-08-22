@@ -34,15 +34,15 @@ async function logout(){
 </script>
 
 <template>
-  <v-app-bar density="comfortable" elevation="1" class="d-flex justify-center" style="height: 9%;">
+  <v-app-bar density="comfortable" elevation="2.5" class="d-flex justify-center" style="height: 9%;">
     <!-- 左：Logo（不重整導回首頁） -->
-    <div role="button" tabindex="0" @click="goHome" style="margin-left:10%;">
-      <v-img :src="logo" alt="Ctwify" height="200" width="200" eager class="me-2" />
+    <div role="button" tabindex="0" @click="goHome" style="margin-left:13%;">
+      <v-img :src="logo" alt="Ctwify" height="150" width="150" eager class="me-2" />
     </div>
 
     <v-spacer />
 
-    
+     <div class="right-section d-flex align-center">
     <router-link
       v-if="customer"
       to="/customer"
@@ -95,6 +95,7 @@ async function logout(){
         </v-list-item>
       </v-list>
     </v-menu>
+    </div>
   </v-app-bar>
 
   <!-- 登入 / 註冊 Dialog -->
@@ -104,4 +105,9 @@ async function logout(){
 </template>
 
 <style scoped>
+
+.right-section {
+  margin-right: 14%;
+}
+
 </style>

@@ -26,6 +26,7 @@ body {
   box-sizing: content-box;
   width: 100%;
 }
+
 .highlight {
   color: #f07b2d;
 }
@@ -104,29 +105,37 @@ body {
 
 /* ===== 房源清單樣式 ===== */
 .listing {
+  position: relative;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  overflow: hidden;
+  width: 300px;
+  height: 370px; 
   display: flex;
-  align-items: center;
-  width: 945px;
-  background-color: #fff;
-  padding: 12px 12px;
-  margin-top: 15px;
-  margin-left: 0px;
-  border-radius: 10px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  text-decoration: none; 
+  color: #060606;
+   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.listing:hover {
+  transform: translateY(-2px); 
 }
 
 .listing img {
-  width: 100px;
-  height: 70px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-right: 20px;
+  width: 100%;
+  height: 200px; /* 照片高度 */
+   border-radius: 8px;
+  object-fit: cover; /* 保持比例裁切 */
 }
 
 .listing-info {
   flex: 1;
   font-size: 18px;
   font-weight: 500;
+  
 }
 
 .listing-actions form {

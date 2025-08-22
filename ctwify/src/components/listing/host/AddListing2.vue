@@ -341,9 +341,11 @@ export default {
         const res = await axios.post("/listings/add", formData,{
           withCredentials:true,
         }); 
-        if (res.status === 200) {
-          Swal.fire("新增成功", "房源新增成功！", "success");
-          this.resetForm();
+      if (res.status === 200) {
+        Swal.fire("新增成功", "房源新增成功！", "success").then(() => {
+        this.$router.push("/host/listings") 
+        })
+        this.resetForm();
         }
       } catch (err) {
         Swal.fire("錯誤", "新增失敗，請稍後再試。", "error");

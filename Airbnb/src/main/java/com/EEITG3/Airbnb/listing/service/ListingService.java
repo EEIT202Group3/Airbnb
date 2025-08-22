@@ -1,8 +1,6 @@
 package com.EEITG3.Airbnb.listing.service;
 
 
-import java.io.File;
-
 
 
 import java.io.IOException;
@@ -250,49 +248,49 @@ public class ListingService {
             List<Integer> equipmentIds
     ) throws IOException {
 
+        //建立儲存目錄（我後來改的跟新增房源一樣）
+        Path storageDir = Paths.get(baseDir, "listings").toAbsolutePath().normalize();
+        Files.createDirectories(storageDir);
+
+        // 上傳圖片並收集檔名
         if (photos != null && !photos.isEmpty()) {
-            List<String> photoUrls = new ArrayList<>();
-//            String storageDir = "C:/upload/photo/";
-            String storageDir = "/Users/youm/Documents/GitHub/Airbnb/Airbnb/photo/listing";
-//            
-            File dir = new File(storageDir);
-            if(!dir.exists()) {
-            	dir.mkdirs();
-            }
+            List<String> photoFileNames = new ArrayList<>();
+            int limit = Math.min(photos.size(), 10);
 
-            for (int i = 0; i < photos.size() && i < 10; i++) {
+            for (int i = 0; i < limit; i++) {
                 MultipartFile photo = photos.get(i);
-                if (!photo.isEmpty()) {
-                    String fileName = System.currentTimeMillis() + "_" + photo.getOriginalFilename();
-                    File dest = new File(storageDir, fileName);
-                    photo.transferTo(dest);
-                    photoUrls.add(fileName);
+                if (photo == null || photo.isEmpty()) continue;
+
+                String safeName = sanitizeFileName(photo.getOriginalFilename());
+                String fileName = System.currentTimeMillis() + "_" + safeName;
+                Path targetPath = storageDir.resolve(fileName).normalize();
+
+                if (!targetPath.startsWith(storageDir)) {
+                    throw new IOException("Invalid file path: " + fileName);
                 }
+
+                Files.copy(photo.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                photoFileNames.add(fileName);
             }
 
-            lisBean.setPhoto1(photoUrls.size() > 0 ? photoUrls.get(0) : null);
-            lisBean.setPhoto2(photoUrls.size() > 1 ? photoUrls.get(1) : null);
-            lisBean.setPhoto3(photoUrls.size() > 2 ? photoUrls.get(2) : null);
-            lisBean.setPhoto4(photoUrls.size() > 3 ? photoUrls.get(3) : null);
-            lisBean.setPhoto5(photoUrls.size() > 4 ? photoUrls.get(4) : null);
-            lisBean.setPhoto6(photoUrls.size() > 5 ? photoUrls.get(5) : null);
-            lisBean.setPhoto7(photoUrls.size() > 6 ? photoUrls.get(6) : null);
-            lisBean.setPhoto8(photoUrls.size() > 7 ? photoUrls.get(7) : null);
-            lisBean.setPhoto9(photoUrls.size() > 8 ? photoUrls.get(8) : null);
-            lisBean.setPhoto10(photoUrls.size() > 9 ? photoUrls.get(9) : null);
+     
+            applyPhotoFields(lisBean, photoFileNames);
         }
 
-
-        List<EquipmentBean> equipmentList = new ArrayList<>();
-        for (Integer eid : equipmentIds) {
-            EquipmentBean equip = em.find(EquipmentBean.class, eid);
-            if (equip != null) equipmentList.add(equip);
+        // 關聯設備
+        if (equipmentIds != null && !equipmentIds.isEmpty()) {
+            List<EquipmentBean> equipList = new ArrayList<>();
+            for (Integer id : equipmentIds) {
+                EquipmentBean equip = em.find(EquipmentBean.class, id);
+                if (equip != null) equipList.add(equip);
+            }
+            lisBean.setEquipments(equipList);
         }
-        lisBean.setEquipments(equipmentList);
 
-        
+        //儲存
         listRepository.save(lisBean);
     }
+
     //下架房源
     public LisBean updatePublishedStatus(Integer id, boolean status) {
         LisBean listing = listRepository.findById(id)
@@ -352,4 +350,5 @@ public class ListingService {
         return listRepository.findTopRatedByCity(city, offset, limit);
     }
 
+    
 }

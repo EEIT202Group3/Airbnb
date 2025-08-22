@@ -63,6 +63,7 @@ public class ListingController {
             Map<String, Object> map = new HashMap<>();
             map.put("listId", bean.getListId());
             map.put("houseName", bean.getHouseName());
+            map.put("ads", bean.getAds());
             map.put("photo1", bean.getPhoto1());
             map.put("approved", bean.getApproved());  
             map.put("published", bean.getPublished());
