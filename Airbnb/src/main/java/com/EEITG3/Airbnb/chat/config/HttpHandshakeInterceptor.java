@@ -31,52 +31,45 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor{
 	    System.out.println(">> beforeHandshake() 被呼叫");
 
 	    if (request instanceof ServletServerHttpRequest servletReq) {
+	    	
 	        HttpServletRequest req = servletReq.getServletRequest();
-	        HttpSession session = req.getSession(false);
 	        
-	        // 先處理已認證用戶
+	        String path = req.getRequestURI();
+	        if (path != null && path.startsWith("/api/admins")) {
+	        HttpSession session = req.getSession(false);
+	        SecurityContext ctx = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
+	        if (ctx == null || !(ctx.getAuthentication() != null && ctx.getAuthentication().isAuthenticated())) {
+	            System.out.println("Admin endpoint: not authenticated -> refuse");
+	            return false;
+	        }
+	        String role = determineUserType(ctx.getAuthentication());
+	        if (!"ADMIN".equals(role)) {
+	            System.out.println("Admin endpoint: not ADMIN -> refuse");
+	            return false;
+	        }
+	        attributes.put("username", ctx.getAuthentication().getName());
+	        attributes.put("userType", "ADMIN");
+	        attributes.put("sessionId", session.getId());
+	        return true;
+	    }
+	        // 2) 非 admin path: 優先採用已驗證 session
+	        HttpSession session = req.getSession(false);
 	        if (session != null) {
-	            SecurityContext context = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
-	            if (context != null) {
-	                Authentication auth = context.getAuthentication();
+	            SecurityContext ctx = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
+	            if (ctx != null) {
+	                Authentication auth = ctx.getAuthentication();
 	                if (auth != null && auth.isAuthenticated()) {
-	                    String username = auth.getName();
-	                    String userType = determineUserType(auth);
-	                    
-	                    // 只處理明確的用戶角色
-	                    if ("HOST".equals(userType) || "CUSTOMER".equals(userType) || "ADMIN".equals(userType)) {
-	                        attributes.put("username", username);
-	                        attributes.put("userType", userType);
-	                        attributes.put("sessionId", session.getId());
-	                        
-	                        switch (userType) {
-	                            case "HOST":
-	                                attributes.put("hostId", username);
-	                                System.out.println("WebSocket主機用戶登入:" + username);
-	                                break;
-	                            case "CUSTOMER":
-	                                attributes.put("customerId", username);
-	                                System.out.println("WebSocket客戶登入:" + username);
-	                                break;
-	                            case "ADMIN":
-	                                attributes.put("adminId", username);
-	                                System.out.println("WebSocket管理員登入:" + username);
-	                                break;
-	                        }
-	                        
-	                        System.out.println("WebSocket 連接驗證成功: " + userType + " - " + username);
-	                        return true;
-	                    }
-	                    // 如果 determineUserType 返回 "UNKNOWN" 或其他值，則繼續下面的訪客處理
+	                    attributes.put("username", auth.getName());
+	                    attributes.put("userType", determineUserType(auth));
+	                    attributes.put("sessionId", session.getId());
+	                    return true;
 	                }
 	            }
 	        }
-	        
-	        // 統一的訪客處理邏輯
+
+	        // 3) 無認證 session -> 處理訪客（不相信前端提供的 username 做為身份）
 	        return handleGuestConnection(req, attributes);
 	    }
-	    
-	    System.out.println("WebSocket 握手驗證失敗 - 無有效認證或訪客標識");
 	    return false;
 	}
 	
@@ -108,33 +101,7 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor{
 
 	@Override
 	public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
-			Exception exception) {
-		
-	}
-	/**
-	 * 獲取客戶端 IP
-	 */
-	private String getClientIpAddress(HttpServletRequest request) {
-	    String xForwardedFor = request.getHeader("X-Forwarded-For");
-	    if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
-	        return xForwardedFor.split(",")[0].trim();
-	    }
-	    
-	    String xRealIp = request.getHeader("X-Real-IP");
-	    if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
-	        return xRealIp;
-	    }
-	    
-	    return request.getRemoteAddr();
-	}
-
-	/**
-	 * 生成訪客 ID
-	 */
-	private String generateGuestId(String seed) {
-	    return Math.abs(seed.hashCode()) + "_" + (System.currentTimeMillis() % 100000);
-	}
-	
+			Exception exception) {}
 	/**
      * 根據 Authentication 物件判斷用戶類型
      */
@@ -177,6 +144,7 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor{
         */
         
     }
+    
     
     
 

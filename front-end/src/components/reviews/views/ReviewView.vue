@@ -59,7 +59,7 @@
         <div><strong>評論編號：</strong>{{ selectedReview.reviewId }}</div>
         <div><strong>房源編號：</strong>{{ selectedReview.listId }}</div>
         <div><strong>訂單編號：</strong>{{ selectedReview.bookingId }}</div>
-        <div><strong>房客編號：</strong>{{ selectedReview.custId }}</div>
+        <div><strong>房客編號：</strong>{{ selectedReview.customerId }}</div>
         <div><strong>房東編號：</strong>{{ selectedReview.hostId }}</div>
         <div><strong>評論日期：</strong>{{ selectedReview.reviewDate }}</div>
         <div><strong>乾淨評分：</strong>{{ selectedReview.cleanScore }}</div>
@@ -110,12 +110,16 @@ const headers = [
   { title: "房源編號", align: "start", key: "listId" },
   { title: "訂單編號", align: "start", key: "bookingId" },
   { title: "房東編號", align: "start", key: "hostId" },
-  { title: "房客編號", align: "start", key: "custId" },
+  { title: "房客編號", align: "start", key: "customerId" },
   { title: "操作", align: "start", key: "actions", sortable: false },
 ];
 
 import axios from "axios";
-import { fetchReviews, getReviews,deleteReview } from "@/service/review/AdminService";
+import {
+  fetchReviews,
+  getReviews,
+  deleteReview,
+} from "@/service/review/AdminService";
 const reviews = ref([]);
 // 封裝取得數據方法
 /*
@@ -131,12 +135,8 @@ const fetchReviews = async (keyword = "", type = "") => {
 };
 */
 onMounted(async () => {
-  const res = await fetchReviews(keyword.value, searchType.value);
-  if (!res) {
-    router.push({ name: "Homepage" });
-  } else {
-    reviews.value = res;
-  }
+  reviews.value = await fetchReviews(keyword.value, searchType.value);
+  console.log(reviews.value, "reviews fetched on mounted");
 });
 
 const selectedReview = ref(null);
@@ -175,6 +175,10 @@ const keyword = ref("");
  */
 
 const searchReviews = async () => {
+  if (searchType.value === "listId" && isNaN(parseInt(keyword.value))) {
+    alert("請輸入有效的房源ID（整數）");
+    return;
+  }
   if (!keyword.value) return; // ✅ 只呼叫這個
   reviews.value = await fetchReviews(keyword.value, searchType.value);
   console.log(keyword.value, searchType.value);

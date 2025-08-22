@@ -213,9 +213,9 @@ const listing = {
 };
 
 const form = ref({
-  checkin: "",
-  checkout: "",
-  people: 1,
+  checkin: route.query.checkInDate,
+  checkout:route.query.checkOutDate,
+  people:route.query.guests ,
 });
 
 const today = computed(() => new Date().toISOString().slice(0, 10));

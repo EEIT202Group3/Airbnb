@@ -114,6 +114,7 @@
 
           <br />
           <!-- Google 地圖區塊 -->
+
           <div class="map-section" v-if="listing">
             <h4>住宿地點</h4>
             <br />
@@ -138,6 +139,7 @@
           </div>
 
           <br />
+
           <!-- 設備列表 -->
           <div class="amenities" v-if="listing.equipments?.length">
             <h4>有提供的設備與服務</h4>
@@ -255,13 +257,14 @@
   </div>
 </template>
 
-
 <script setup>
 import axios from "@/api";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { ref, onMounted, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import SimpleReview from "@/components/reviews/SimpleReview.vue";
+
 
 const route = useRoute();
 const router = useRouter();
@@ -497,7 +500,6 @@ onMounted(() => {
   checkOut.value = tomorrow.toISOString().split("T")[0];
 });
 </script>
-
 
 <style>
 @import "@/assets/listing/list1.css";
