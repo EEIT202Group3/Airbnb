@@ -50,126 +50,128 @@ const faqs = [
 <template>
   <!-- 搜尋列（置頂） -->
   <div class="page-wrap mt-4">
-    <SearchBar />
+    <SearchBar/>
   </div>
 
   <!-- 地點推薦 -->
-  <div class="page-wrap mt-6">
-    <div class="d-flex align-center mb-4">
-      <v-icon class="mr-2" color="warning">mdi-map-marker</v-icon>
-      <h4 class="mb-0 font-weight-bold">地點推薦</h4>
+  <div class="my-container">
+    <div class="page-wrap mt-6">
+      <div class="d-flex align-center mb-4">
+        <v-icon class="mr-2" color="warning">mdi-map-marker</v-icon>
+        <h4 class="mb-0 font-weight-bold">地點推薦</h4>
+      </div>
+
+      <v-row align="stretch" dense>
+        <v-col
+            v-for="loc in locationList"
+            :key="loc.name"
+            cols="12"
+            md="4"
+            class="mb-4"
+        >
+          <v-card elevation="2" class="h-100">
+            <v-img :src="loc.img" :alt="loc.name" height="200" cover/>
+            <v-card-title class="text-orange-darken-2 font-weight-bold">
+              {{ loc.name }}
+            </v-card-title>
+            <v-card-text class="text-body-2">
+              {{ loc.desc }}
+            </v-card-text>
+            <v-card-actions class="pt-0">
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
     </div>
 
-    <v-row align="stretch" dense>
-      <v-col
-          v-for="loc in locationList"
-          :key="loc.name"
-          cols="12"
-          md="4"
-          class="mb-4"
-      >
-        <v-card elevation="2" class="h-100">
-          <v-img :src="loc.img" :alt="loc.name" height="200" cover />
-          <v-card-title class="text-orange-darken-2 font-weight-bold">
-            {{ loc.name }}
+    <!-- 租車說明 -->
+    <div class="page-wrap mt-6">
+      <v-card elevation="2">
+        <v-card-item class="px-0">
+          <v-card-title class="title-strip">
+            如何找到最超值的租車服務
           </v-card-title>
-          <v-card-text class="text-body-2">
-            {{ loc.desc }}
-          </v-card-text>
-          <v-card-actions class="pt-0">
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
-  </div>
+        </v-card-item>
 
-  <!-- 租車說明 -->
-  <div class="page-wrap mt-6">
-    <v-card elevation="2">
-      <v-card-item class="px-0">
-        <v-card-title class="title-strip">
-          如何找到最超值的租車服務
-        </v-card-title>
-      </v-card-item>
+        <v-divider/>
 
-      <v-divider />
+        <v-card-text>
+          <div class="mb-4">
+            <h6 class="font-weight-bold">💡 快速比價，一站完成預訂</h6>
+            <p class="mb-0">
+              本平台整合多家租車供應商，提供<strong>即時價格</strong>與<strong>線上預訂</strong>，協助您快速完成挑選與下單。
+            </p>
+          </div>
 
-      <v-card-text>
-        <div class="mb-4">
-          <h6 class="font-weight-bold">💡 快速比價，一站完成預訂</h6>
-          <p class="mb-0">
-            本平台整合多家租車供應商，提供<strong>即時價格</strong>與<strong>線上預訂</strong>，協助您快速完成挑選與下單。
-          </p>
-        </div>
+          <div class="mb-4">
+            <h6 class="font-weight-bold">📅 彈性預訂與取消政策</h6>
+            <p class="mb-0">
+              多數據點提供《<strong>彈性預訂</strong>》與《<strong>免費取消</strong>》方案，旅程調整更安心。
+            </p>
+          </div>
 
-        <div class="mb-4">
-          <h6 class="font-weight-bold">📅 彈性預訂與取消政策</h6>
-          <p class="mb-0">
-            多數據點提供《<strong>彈性預訂</strong>》與《<strong>免費取消</strong>》方案，旅程調整更安心。
-          </p>
-        </div>
+          <div class="mb-4">
+            <h6 class="font-weight-bold">📈 長租方案更優惠</h6>
+            <p class="mb-0">
+              若租期較長（如 7 天以上），建議比較《<strong>長租/月租</strong>》方案，通常單日費用更具優勢。
+            </p>
+          </div>
 
-        <div class="mb-4">
-          <h6 class="font-weight-bold">📈 長租方案更優惠</h6>
-          <p class="mb-0">
-            若租期較長（如 7 天以上），建議比較《<strong>長租/月租</strong>》方案，通常單日費用更具優勢。
-          </p>
-        </div>
+          <div class="mb-4">
+            <h6 class="font-weight-bold">⛽ 留意燃油與里程政策</h6>
+            <p class="mb-0">
+              建議選擇《<strong>滿油取還</strong>》並確認里程限制，避免產生額外費用。
+            </p>
+          </div>
 
-        <div class="mb-4">
-          <h6 class="font-weight-bold">⛽ 留意燃油與里程政策</h6>
-          <p class="mb-0">
-            建議選擇《<strong>滿油取還</strong>》並確認里程限制，避免產生額外費用。
-          </p>
-        </div>
+          <div class="mb-4">
+            <h6 class="font-weight-bold">🔑 自助取車更省時</h6>
+            <p class="mb-0">
+              若支援《<strong>自助取車</strong>》或《<strong>免鑰匙</strong>》服務，可縮短現場等待時間。
+            </p>
+          </div>
 
-        <div class="mb-4">
-          <h6 class="font-weight-bold">🔑 自助取車更省時</h6>
-          <p class="mb-0">
-            若支援《<strong>自助取車</strong>》或《<strong>免鑰匙</strong>》服務，可縮短現場等待時間。
-          </p>
-        </div>
+          <div>
+            <h6 class="font-weight-bold">🌱 電動車選項</h6>
+            <p class="mb-0">
+              支援電動車預約，可節省燃油成本並降低碳排，適合都會短程或定點往返。
+            </p>
+          </div>
 
-        <div>
-          <h6 class="font-weight-bold">🌱 電動車選項</h6>
-          <p class="mb-0">
-            支援電動車預約，可節省燃油成本並降低碳排，適合都會短程或定點往返。
-          </p>
-        </div>
+          <v-divider class="my-4"/>
 
-        <v-divider class="my-4" />
-
-        <div>
-          <h6 class="font-weight-bold">📍 取車地點選擇</h6>
-          <p class="mb-0">
-            若預算有限，可評估市中心外圍據點，通常《<strong>租金較優惠</strong>》，搭乘大眾運輸即可抵達。
-          </p>
-        </div>
-      </v-card-text>
-    </v-card>
-  </div>
-
-  <!-- 常見問題 -->
-  <div class="page-wrap mt-6 mb-10">
-    <div class="d-flex align-center mb-4">
-      <v-icon class="mr-2" color="orange-darken-2">mdi-help-circle</v-icon>
-      <h4 class="mb-0 font-weight-bold">常見問題</h4>
+          <div>
+            <h6 class="font-weight-bold">📍 取車地點選擇</h6>
+            <p class="mb-0">
+              若預算有限，可評估市中心外圍據點，通常《<strong>租金較優惠</strong>》，搭乘大眾運輸即可抵達。
+            </p>
+          </div>
+        </v-card-text>
+      </v-card>
     </div>
 
-    <v-expansion-panels variant="accordion">
-      <v-expansion-panel v-for="(faq, idx) in faqs" :key="idx">
-        <v-expansion-panel-title class="font-weight-bold">
-          <v-icon class="mr-2" color="orange">mdi-help-circle-outline</v-icon>
-          {{ faq.q }}
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          {{ faq.a }}
-        </v-expansion-panel-text>
-      </v-expansion-panel>
-    </v-expansion-panels>
+    <!-- 常見問題 -->
+    <div class="page-wrap mt-6 mb-10">
+      <div class="d-flex align-center mb-4">
+        <v-icon class="mr-2" color="orange-darken-2">mdi-help-circle</v-icon>
+        <h4 class="mb-0 font-weight-bold">常見問題</h4>
+      </div>
+
+      <v-expansion-panels variant="accordion">
+        <v-expansion-panel v-for="(faq, idx) in faqs" :key="idx">
+          <v-expansion-panel-title class="font-weight-bold">
+            <v-icon class="mr-2" color="orange">mdi-help-circle-outline</v-icon>
+            {{ faq.q }}
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
+            {{ faq.a }}
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </div>
   </div>
 
-  <router-view />
+  <router-view/>
 </template>
 
 <style scoped>
@@ -196,5 +198,11 @@ const faqs = [
   }
 }
 
-.font-weight-bold { font-weight: 700; }
+.font-weight-bold {
+  font-weight: 700;
+}
+
+.my-container{
+  margin: 0 1%;
+}
 </style>

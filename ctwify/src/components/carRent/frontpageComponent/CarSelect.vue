@@ -268,9 +268,9 @@ function clearFilters() {
                   <v-img
                       :src="`http://localhost:8080/carPicture/${car?.image}`"
                       :alt="car.brand + ' ' + car.model"
-                      width="180"
-                      height="120"
-                      cover
+                      width="300"
+                      height="240"
+                      contain
                       class="rounded-lg"
                   />
 
