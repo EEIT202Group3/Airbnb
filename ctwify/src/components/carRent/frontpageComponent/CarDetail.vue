@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import NavigationBar from "@/components/carRent/frontpageComponent/NavigationBar.vue";
+import Swal from "sweetalert2";
 import {useBookingStore} from '@/stores/booking'
 import {ref, onMounted, computed} from "vue";
 import {useRoute} from "vue-router";
@@ -104,7 +105,14 @@ async function submitReservation() {
   try {
     const res = await api.post("/reservations1/insert", payload);
     console.log("新增成功", res.data);
-    alert("預約成功！");
+
+    await Swal.fire({
+      icon: "success",
+      title: "預約成功！",
+      text: "您的預約已完成，將跳轉到訂單頁面。",
+      showConfirmButton: false,
+      timer: 2500
+    });
 
     // 取成新的ID
     const rid =
@@ -125,13 +133,26 @@ async function submitReservation() {
       locationAddr: locationAddr.value,
       businessHours: businessHours.value,
     })
+    booking.setVehicleInfo({
+      brand: vehicle.value?.brand ?? '',
+      model: vehicle.value?.model ?? '',
+      color: vehicle.value?.color ?? '',
+    })
+    booking.setDriver({
+      name: (lastName.value || '') + (firstName.value || ''),
+      phone: phone.value || '',
+    })
     booking.setTotalAmount(totalAmount.value)
     booking.setReservationId(rid)
 
     await router.push("/preview-confirm");
   } catch (err) {
-    console.error("新增失敗", err);
-    alert("預約失敗，請稍後再試");
+    Swal.fire({
+      icon: "error",
+      title: "資料儲存失敗",
+      text: "請稍後再試。",
+      confirmButtonColor: "#d33",
+    });
   }
 }
 

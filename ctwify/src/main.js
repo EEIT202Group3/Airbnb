@@ -33,13 +33,13 @@ app.use(createPinia())
 app.use(router)
 app.use(vuetify)
 app.use(vue3GoogleLogin, {
-    clientId: '784447494371-8fmribkj12vq9mpsotjopnkk8g8ob29s.apps.googleusercontent.com'
+  clientId: '784447494371-8fmribkj12vq9mpsotjopnkk8g8ob29s.apps.googleusercontent.com'
 })
 
 // Google Maps 設定
 app.use(VueGoogleMaps, {
   load: {
-    key: '', //Google Maps API Key  github會警告所以先撤掉
+    key: 'AIzaSyBO1x0gEVOrnpwN1hLYQUbDwMF6wpYgCvg', //Google Maps API Key  github會警告所以先撤掉
 
     libraries: 'places', // 如果要用地點自動補全
   },

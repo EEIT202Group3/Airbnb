@@ -1,15 +1,21 @@
 package com.EEITG3.Airbnb.payMent.controller;
 
+import com.EEITG3.Airbnb.jwt.EmailService;
 import com.EEITG3.Airbnb.payMent.entity.Order;
 import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
 import com.EEITG3.Airbnb.payMent.service.OrderService;
 import com.EEITG3.Airbnb.payMent.service.PayPalService;
+import com.EEITG3.Airbnb.users.entity.Customer;
+import com.EEITG3.Airbnb.users.repository.CustomerRepository;
 import com.paypal.orders.Capture;
 import com.paypal.orders.PaymentCollection;
 import com.paypal.orders.PurchaseUnit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -22,6 +28,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/paypal")
 public class PayPalController {
+	
+	@Value("${app.front-base-url:http://localhost:5173}")
+	private String frontBaseUrl;
+
+	@Value("${app.support.email:eeit202@gmail.com}")
+	private String supportEmailAddress;
 
     @Autowired
     private PayPalService paypalService;
@@ -31,6 +43,12 @@ public class PayPalController {
     
     @Autowired
     private OrderService orderService;
+    
+	@Autowired
+	private EmailService emailService;
+	
+	@Autowired
+	private CustomerRepository repo;
 
     //建立 PayPal 訂單
     @PostMapping("/create-order")
@@ -104,7 +122,7 @@ public class PayPalController {
                 // 2) 交給 Service：標記已付款 + 回寫 paymentId/paidTime + 拆帳（單一交易）
                 orderService.markOrderPaidAndSplit(bookingId, txId, LocalDateTime.now());
 
-                // 3) 付款後才更新顯示用 bookingStatus（可保留在 Controller）
+                // 3) 付款後才更新顯示用 bookingStatus
                 Order fresh = orderRepository.findByBookingId(bookingId)
                         .orElseThrow(() -> new RuntimeException("找不到訂單"));
 
@@ -123,7 +141,41 @@ public class PayPalController {
                     fresh.setBookingStatus("待入住");
                 }
                 orderRepository.save(fresh);
+                final Order snapshot = fresh; // for lambda
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        try {
+                            String to = repo.findById(snapshot.getCustomerId())
+                                    .map(Customer::getEmail)
+                                    .orElseThrow(() -> new RuntimeException("找不到顧客 Email（customerId=" + snapshot.getCustomerId() + "）"));
 
+                            //寄信欄位
+                            String username      = snapshot.getUsername();
+                            String orderId       = String.valueOf(snapshot.getBookingId());
+                            String houseName     = snapshot.getHouseName();  
+                            String address       = snapshot.getAddress();    
+                            String checkinDate   = String.valueOf(snapshot.getCheckinDate());
+                            String checkoutDate  = String.valueOf(snapshot.getCheckoutDate());
+                            String people        = String.valueOf(snapshot.getPeople());
+                            String mentStatus    = "已付款";
+                            String grandTotal    = snapshot.getGrandTotal() == null ? "0"
+                                    : snapshot.getGrandTotal().toPlainString();
+                            String createdTime   = String.valueOf(
+                                    snapshot.getPaidTime() != null ? snapshot.getPaidTime() : LocalDateTime.now());
+                            String orderDetailUrl= frontBaseUrl + "/orders/" + orderId;
+                            String supportEmail  = supportEmailAddress;
+                            
+                            emailService.sendOrderCreateEmail(
+                                    to, username, orderId, houseName, address,
+                                    checkinDate, checkoutDate, people, mentStatus,
+                                    grandTotal, createdTime, orderDetailUrl, supportEmail
+                            );
+                        } catch (Exception ex) {
+                            ex.printStackTrace(); 
+                        }
+                    }
+                });
             } else {
                 order.setMentStatus("付款失敗");
                 order.setBookingStatus("已取消");

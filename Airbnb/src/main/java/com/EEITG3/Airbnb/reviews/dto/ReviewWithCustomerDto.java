@@ -1,0 +1,81 @@
+	package com.EEITG3.Airbnb.reviews.dto;
+
+
+public class ReviewWithCustomerDto {
+	
+	private Integer cleanScore;
+    private	Integer commScore;
+    private Integer valueScore;
+    private String reviewDate;
+    private String cusComm;
+    private String hostComm;
+    
+    private String email;
+    private String avatarURL;
+    
+	public Integer getCleanScore() {
+		return cleanScore;
+	}
+	public void setCleanScore(Integer cleanScore) {
+		this.cleanScore = cleanScore;
+	}
+	public Integer getCommScore() {
+		return commScore;
+	}
+	public void setCommScore(Integer commScore) {
+		this.commScore = commScore;
+	}
+	public Integer getValueScore() {
+		return valueScore;
+	}
+	public void setValueScore(Integer valueScore) {
+		this.valueScore = valueScore;
+	}
+	public String getReviewDate() {
+		return reviewDate;
+	}
+	public void setReviewDate(String reviewDate) {
+		this.reviewDate = reviewDate;
+	}
+	public String getCusComm() {
+		return cusComm;
+	}
+	public void setCusComm(String cusComm) {
+		this.cusComm = cusComm;
+	}
+	public String getHostComm() {
+		return hostComm;
+	}
+	public void setHostComm(String hostComm) {
+		this.hostComm = hostComm;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getAvatarURL() {
+		return avatarURL;
+	}
+	public void setAvatarURL(String avatarURL) {
+		this.avatarURL = avatarURL;
+	}
+	public ReviewWithCustomerDto(Integer cleanScore, Integer commScore, Integer valueScore, String reviewDate,
+			String cusComm, String hostComm, String email, String avatarURL) {
+		super();
+		this.cleanScore = cleanScore;
+		this.commScore = commScore;
+		this.valueScore = valueScore;
+		this.reviewDate = reviewDate;
+		this.cusComm = cusComm;
+		this.hostComm = hostComm;
+		this.email = email;
+		this.avatarURL = avatarURL;
+	}
+	
+	
+
+	
+
+}

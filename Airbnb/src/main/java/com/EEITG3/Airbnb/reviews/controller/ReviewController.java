@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.EEITG3.Airbnb.reviews.dto.ReviewDTO;
 import com.EEITG3.Airbnb.reviews.dto.ReviewPatchRequest;
+import com.EEITG3.Airbnb.reviews.dto.ReviewWithCustomerDto;
 import com.EEITG3.Airbnb.reviews.entity.Review;
 import com.EEITG3.Airbnb.reviews.service.ReviewService;
 
@@ -33,31 +35,27 @@ public class ReviewController {
 	@Autowired
 	private ReviewService rService;
 
-	@GetMapping("admins/reviews")
-	public List<Review> getAllReviews(
+	@GetMapping("/admins/reviews")
+	public List<ReviewDTO> AdminGetAllReviews(
 			@RequestParam(required = false) String type,
 		    @RequestParam(required = false) String keyword) { 
 		if (type == null || keyword == null || keyword.isBlank()) {
-		        return rService.findAll();
+		        return rService.getAllReviews();
 		    }
-		System.out.println(type + keyword);
-		 return rService.findByTypeAndKeyword(type, keyword);
-	}
 
-	@GetMapping("/listing/{id}")
-	public List<Review> getAllReviewsByList(Integer id) {
-		return rService.findByListId(id);
+		System.out.println(type + keyword);
+    return rService.findByTypeAndKeyword(type, keyword);
+	}
+	@GetMapping("/reviews/listing/{id}")
+	public List<ReviewWithCustomerDto> getAllReviewsByList(@PathVariable Integer id) {
+		return rService.listingReview(id);
 	}
 
 	@GetMapping("/admins/reviews/get/{id}")
-	public Review getReviewById(@PathVariable Integer id) {
+	public ReviewDTO getReviewById(@PathVariable Integer id) {
 		return rService.findByReviewID(id); // 找不到可回 null 或拋異常
 	}
-	@GetMapping("/reviews/getByCust/{id}")
-	public List<Review> getAllReviewsByCustId(@PathVariable String id){
-		return rService.findByCustId(id);
-	}
-
+	
 	@DeleteMapping("admins/reviews/del/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable Integer id) {
 		System.out.println("此api接收參數:" + id);

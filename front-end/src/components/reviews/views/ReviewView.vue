@@ -5,8 +5,8 @@
         v-model="searchType"
         label="搜尋條件"
         :items="[
-          { title: '房東編號', value: 'hostId' },
-          { title: '房客編號', value: 'custId' },
+          { title: '房東編號', value: 'hostEmail' },
+          { title: '房客編號', value: 'customerEmail' },
           { title: '房源編號', value: 'listId' },
         ]"
         item-title="title"
@@ -59,14 +59,14 @@
         <div><strong>評論編號：</strong>{{ selectedReview.reviewId }}</div>
         <div><strong>房源編號：</strong>{{ selectedReview.listId }}</div>
         <div><strong>訂單編號：</strong>{{ selectedReview.bookingId }}</div>
-        <div><strong>房客編號：</strong>{{ selectedReview.custId }}</div>
-        <div><strong>房東編號：</strong>{{ selectedReview.hostId }}</div>
+        <div><strong>房客編號：</strong>{{ selectedReview.customerEmail }}</div>
+        <div><strong>房東編號：</strong>{{ selectedReview.hostEmail }}</div>
         <div><strong>評論日期：</strong>{{ selectedReview.reviewDate }}</div>
         <div><strong>乾淨評分：</strong>{{ selectedReview.cleanScore }}</div>
         <div><strong>溝通評分：</strong>{{ selectedReview.commScore }}</div>
         <div><strong>性價比：</strong>{{ selectedReview.valueScore }}</div>
-        <div><strong>房客評論：</strong>{{ selectedReview.cusComm }}</div>
-        <div><strong>房東評論：</strong>{{ selectedReview.hostComm }}</div>
+        <div><strong>房客：</strong>{{ selectedReview.cusComm }}</div>
+        <div><strong>房東：</strong>{{ selectedReview.hostComm }}</div>
         <div>
           <strong>圖片1：</strong>
           <v-img
@@ -109,13 +109,17 @@ const headers = [
   { title: "評論編號", align: "start", key: "reviewId" },
   { title: "房源編號", align: "start", key: "listId" },
   { title: "訂單編號", align: "start", key: "bookingId" },
-  { title: "房東編號", align: "start", key: "hostId" },
-  { title: "房客編號", align: "start", key: "custId" },
+  { title: "房東", align: "start", key: "hostEmail" },
+  { title: "房客", align: "start", key: "customerEmail" },
   { title: "操作", align: "start", key: "actions", sortable: false },
 ];
 
 import axios from "axios";
-import { fetchReviews, getReviews,deleteReview } from "@/service/review/AdminService";
+import {
+  fetchReviews,
+  getReviews,
+  deleteReview,
+} from "@/service/review/AdminService";
 const reviews = ref([]);
 // 封裝取得數據方法
 /*
@@ -131,12 +135,8 @@ const fetchReviews = async (keyword = "", type = "") => {
 };
 */
 onMounted(async () => {
-  const res = await fetchReviews(keyword.value, searchType.value);
-  if (!res) {
-    router.push({ name: "Homepage" });
-  } else {
-    reviews.value = res;
-  }
+  reviews.value = await fetchReviews(keyword.value, searchType.value);
+  console.log(reviews.value, "reviews fetched on mounted");
 });
 
 const selectedReview = ref(null);
@@ -175,6 +175,10 @@ const keyword = ref("");
  */
 
 const searchReviews = async () => {
+  if (searchType.value === "listId" && isNaN(parseInt(keyword.value))) {
+    alert("請輸入有效的房源ID（整數）");
+    return;
+  }
   if (!keyword.value) return; // ✅ 只呼叫這個
   reviews.value = await fetchReviews(keyword.value, searchType.value);
   console.log(keyword.value, searchType.value);

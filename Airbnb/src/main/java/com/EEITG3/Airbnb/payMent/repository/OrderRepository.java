@@ -39,7 +39,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 		                                               @Param("end") LocalDateTime end);
 	
 	@Query("SELECT o FROM Order o WHERE o.listing.host_Id = :hostId")
-	List<Order> findAllByHostId(@Param("hostId") UUID hostId);
+	List<Order> findAllByHostId(@Param("hostId") String hostId);
 	List<Order> findByListing_ListIdIn(List<Integer> listIds);
 	
 		

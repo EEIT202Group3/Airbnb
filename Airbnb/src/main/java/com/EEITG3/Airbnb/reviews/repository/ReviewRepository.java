@@ -1,31 +1,34 @@
 package com.EEITG3.Airbnb.reviews.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.EEITG3.Airbnb.reviews.dto.ReviewWithCustomerDto;
 import com.EEITG3.Airbnb.reviews.entity.Review;
 
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
-	public Review findByReviewId(Integer id);
 	
-	public List<Review> findByListId(Integer id);
-	
-	public List<Review> findByHostId(String hostId);
-	
-	public List<Review> findByCustId(String custId);
-	
-	//@Query(value="select * from review", nativeQuery = true)
 	public List<Review> findAll();
 	
-	@Query("SELECT r FROM Review r " +
-		       "WHERE (:type = 'hostId' AND CAST(r.hostId AS string) LIKE %:keyword%) " +
-		       "   OR (:type = 'custId' AND CAST(r.custId AS string) LIKE %:keyword%) " +
-		       "   OR (:type = 'listId' AND CAST(r.listId AS string) LIKE %:keyword%)")
-		List<Review> findByTypeAndKeyword(@Param("type") String type, @Param("keyword") String keyword);
+	Optional<Review> findByReviewId(Integer id);
+
+	
+	List<Review> findByHost_HostIdContainingIgnoreCase(String hostId);
+	List<Review> findByCustomer_CustomerIdContainingIgnoreCase(String customerId);
+	List<Review> findByListing_ListId(Integer listId); // 精確比對
+	
+	  @Query("SELECT new com.EEITG3.Airbnb.reviews.dto.ReviewWithCustomerDto(" +
+	           "r.cleanScore, r.commScore, r.valueScore, r.reviewDate, " +
+	           "r.cusComm, r.hostComm, c.email, c.avatarURL) " +
+	           "FROM Review r JOIN r.customer c " +
+	           "WHERE r.listing.listId = :listId " +
+	           "ORDER BY r.reviewDate DESC")
+		List<ReviewWithCustomerDto> findReviewsByListId(@Param("listId") Integer listId);
 	
 //	@Query("SELECT r, l.list_id, l.photo1 FROM Review r JOIN ")
 
