@@ -284,7 +284,7 @@ export default {
     filteredListings() {
       let result = [];
 
-      // ✅ 先依狀態篩選
+      //先依狀態篩選
       switch (this.filterStatus) {
         case "approved":
           result = this.allListings.filter(
@@ -310,7 +310,7 @@ export default {
           result = this.allListings;
       }
 
-      // ✅ 模糊查詢（房源名稱 / 地址 / 電話）
+      //模糊查詢（房源名稱 / 地址 / 電話）
       if (this.searchText) {
         const keyword = this.searchText.toLowerCase();
         result = result.filter(
@@ -321,7 +321,7 @@ export default {
         );
       }
 
-      // ✅ 房東 ID 查詢
+      //房東 ID 查詢
       if (this.searchHostId) {
         result = result.filter((l) =>
           String(l.hostId).includes(this.searchHostId)
@@ -349,7 +349,7 @@ export default {
     this.searchHostId = this.searchHostKeyword;
   },
     deleteListing(id) {
-      if (!confirm("⚠️ 確定要永久刪除這筆房源嗎？刪除後無法恢復！")) return;
+      if (!confirm("確定要永久刪除這筆房源嗎？刪除後無法恢復！")) return;
       axios
         .delete(`http://localhost:8080/listings/${id}`)
         .then(() => {
