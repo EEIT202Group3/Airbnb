@@ -96,10 +96,21 @@
           <div>每晚價格</div>
           <div style="margin: 12px 0;">人數：{{ listing.ppl }} 人</div>
           <button class="book-btn" @click="editHouse(listing.listId)">編輯</button>
-          <button class="remove-btn" @click="unpublishHouse(listing)">
-          <v-icon>mdi-delete-outline</v-icon>
-            移除房源</button>
+            <!-- 上架 / 下架按鈕 -->
+ <!-- 上架 / 下架按鈕 -->
+<button
+  v-if="listing.approved === true"
+  :class="['publish-btn', listing.published ? 'unpublish' : 'publish']"
+  @click="togglePublish(listing)"
+>
+  {{ listing.published ? '下架房源' : '上架房源' }}
+</button>
 
+<!-- 移除房源按鈕 -->
+<button class="remove-btn" @click="deleteHouse(listing)">
+  <v-icon small class="me-1">mdi-delete-outline</v-icon>
+  移除房源
+</button>
         </div>
       </div>
     </div>
@@ -156,7 +167,6 @@
     </div>
   </div>
   <div class="mt-6">
-    <simple-review></simple-review>
   </div>
 </template>
 
@@ -187,22 +197,25 @@ function switchMainPhoto(photo) {
   selectedPhoto.value = photo;
 }
 
+// 地址名稱縣市擷取
 const cityName = computed(() => {
   if (!listing.value) return "";
   const address = listing.value.ads || "";
-  const match = address.match(/(.{2,3}[縣市])/);
-  return match ? match[0] : "某地區";
+
+  const cleanedAddress = address.replace(/台灣/, "");
+
+  const match = cleanedAddress.match(/([\u4e00-\u9fa5]{2,3}[縣市])/);
+
+  return match ? match[1] : "國外地區";
 });
 
 function editHouse(listId) {
   router.push(`/host/edlistings/${listId}`);
 }
 
-
 function openModal() {
   isModalOpen.value = true;
 }
-
 function closeModal() {
   isModalOpen.value = false;
 }
@@ -210,23 +223,55 @@ function closeModal() {
 function openAmenitiesModal() {
   isAmenitiesModalOpen.value = true;
 }
-
 function closeAmenitiesModal() {
   isAmenitiesModalOpen.value = false;
 }
 
-function unpublishHouse(house) {
+function deleteHouse(house) {
   if (confirm(`確定要移除房源「${house.houseName}」嗎？`)) {
     axios
-      .put(`/listings/${house.listId}/unpublish`)
+      .delete(`/listings/${house.listId}`)
       .then(() => {
-        alert("房源已移除")
-        router.push("/host/listing") // 移除後導回房源列表
+        alert("房源已移除");
+        router.push("/host/listing"); // 刪除後回房源列表
       })
       .catch((err) => {
-        console.error(err)
-        alert("移除失敗")
-      })
+        console.error(err);
+        alert("刪除失敗");
+      });
+  }
+}
+
+//  上/下架切換
+function togglePublish(house) {
+  if (house.published) {
+    if (confirm(`確定要下架「${house.houseName}」嗎？`)) {
+      axios
+        .put(`/listings/${house.listId}/unpublish`)
+        .then(() => {
+          alert("房源已下架");
+          listing.value.published = false;
+           router.push("/host/listing");
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("下架失敗");
+        });
+    }
+  } else {
+    if (confirm(`確定要上架「${house.houseName}」嗎？`)) {
+      axios
+        .put(`/listings/${house.listId}/publish`)
+        .then(() => {
+          alert("房源已上架");
+          listing.value.published = true;
+           router.push("/host/listing");
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("上架失敗");
+        });
+    }
   }
 }
 
@@ -277,6 +322,7 @@ onMounted(async () => {
   }
 });
 </script>
+
 
 <style scoped>
 @import "@/assets/listing/list1.css";
@@ -330,6 +376,34 @@ hr {
 
 .remove-btn:hover {
   background-color: #cbcbcb;
+}
+
+.publish-btn {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 8px;
+  width: 100%;
+  font-weight: bold;
+  transition: background 0.3s;
+  color: #fff;
+}
+
+/* 下架 = 紅色 */
+.publish-btn.unpublish {
+  background-color: #e74c3c;
+}
+.publish-btn.unpublish:hover {
+  background-color: #c0392b;
+}
+
+/* 上架 = 綠色 */
+.publish-btn.publish {
+  background-color: #27ae60;
+}
+.publish-btn.publish:hover {
+  background-color: #1e8449;
 }
 
 </style>

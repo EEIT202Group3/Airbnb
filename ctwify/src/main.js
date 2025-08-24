@@ -39,10 +39,9 @@ app.use(vue3GoogleLogin, {
 // Google Maps 設定
 app.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyBO1x0gEVOrnpwN1hLYQUbDwMF6wpYgCvg', //Google Maps API Key  github會警告所以先撤掉
+       key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
 
     libraries: 'places', // 如果要用地點自動補全
   },
 })
-
 app.mount('#app')

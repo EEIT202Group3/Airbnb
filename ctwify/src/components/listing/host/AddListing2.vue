@@ -330,6 +330,9 @@ export default {
       formData.append("ppl", this.form.ppl);
       formData.append("price", this.form.price);
 
+      // 告訴後端清除舊圖片
+  formData.append("replacePhotos", true);
+
      this.form.photos.forEach(file => {
         formData.append("photos", file);
       });
@@ -343,7 +346,7 @@ export default {
         }); 
       if (res.status === 200) {
         Swal.fire("新增成功", "房源新增成功！", "success").then(() => {
-        this.$router.push("/host/listings") 
+        this.$router.push("/host/listing") 
         })
         this.resetForm();
         }
