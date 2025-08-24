@@ -27,17 +27,20 @@ public class AdminOrderService {
 
 		return orders.stream().map(order -> {
 			AdminOrderAllResponseDto dto = new AdminOrderAllResponseDto();
-			dto.setBookingId(order.getBookingId());
-			dto.setHousename(order.getHouseName());
-			dto.setBed(order.getBed());
-			dto.setAddress(order.getAddress());
-			dto.setTel(order.getTel());
-			dto.setPeople(order.getPeople());
-			dto.setBookingstatus(order.getBookingStatus());
-			dto.setUsername(order.getUsername());
-			dto.setGrandtotal(order.getGrandTotal());
-			dto.setCheckindate(order.getCheckinDate());
-			dto.setCheckoutdate(order.getCheckoutDate());
+		    dto.setBookingId(order.getBookingId());
+    	    dto.setReservationId(order.getReservationId());
+    	    dto.setUsername(order.getUsername());
+    	    dto.setHouseName(order.getHouseName());
+    	    dto.setAddress(order.getAddress());
+    	    dto.setTel(order.getTel());
+    	    dto.setBed(order.getBed());
+    	    dto.setCheckinDate(order.getCheckinDate());
+    	    dto.setCheckoutDate(order.getCheckoutDate());
+    	    dto.setPeople(order.getPeople());
+    	    dto.setBookingStatus(order.getBookingStatus());
+    	    dto.setGrandtotal(order.getGrandTotal());
+    	    dto.setBookingMethod(order.getBookingMethod());
+    	    dto.setBookingStatus(order.getBookingStatus());
 			return dto;
 		}).collect(Collectors.toList());
 	}
@@ -50,6 +53,8 @@ public class AdminOrderService {
 
     	 	AdminOrderDetailResponseDto dto = new AdminOrderDetailResponseDto();
     	    dto.setBookingId(order.getBookingId());
+    	    dto.setReservationId(order.getReservationId());
+    	    dto.setLocationId(order.getLocationId());
     	    dto.setUsername(order.getUsername());
     	    dto.setHouseName(order.getHouseName());
     	    dto.setAddress(order.getAddress());

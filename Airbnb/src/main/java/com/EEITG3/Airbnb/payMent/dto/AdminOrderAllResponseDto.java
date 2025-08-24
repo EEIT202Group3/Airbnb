@@ -5,40 +5,41 @@ import java.time.LocalDateTime;
 
 public class AdminOrderAllResponseDto {
 	private String bookingId;
-	private String username;
-//	private String email;
-    private String housename;
-    private String address;
-    private String tel;
-    private String bed;
-    private int people;
-    private String bookingstatus;
-    private LocalDateTime checkindate;
-    private LocalDateTime checkoutdate;
-    private BigDecimal grandtotal;
-    public String getBookingId() {
-    	return bookingId;
-    }
-    public void setBookingId(String bookingId) {
-    	this.bookingId = bookingId;
-    }
+	private Integer reservationId;     
+	private String username;          
+	private String houseName;   
+	private String address;        
+	private String tel;          
+	private String bed;             
+	private Integer people;         
+	private LocalDateTime checkinDate;    
+	private LocalDateTime checkoutDate;    
+	private BigDecimal grandtotal;
+	private String bookingStatus;   
+	private String bookingMethod;    
+	public String getBookingId() {
+		return bookingId;
+	}
+	public void setBookingId(String bookingId) {
+		this.bookingId = bookingId;
+	}
+	public Integer getReservationId() {
+		return reservationId;
+	}
+	public void setReservationId(Integer reservationId) {
+		this.reservationId = reservationId;
+	}
 	public String getUsername() {
 		return username;
 	}
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	public String getHousename() {
-		return housename;
+	public String getHouseName() {
+		return houseName;
 	}
-//	public String getEmail() {
-//		return email;
-//	}
-//	public void setEmail(String email) {
-//		this.email = email;
-//	}
-	public void setHousename(String housename) {
-		this.housename = housename;
+	public void setHouseName(String houseName) {
+		this.houseName = houseName;
 	}
 	public String getAddress() {
 		return address;
@@ -58,29 +59,23 @@ public class AdminOrderAllResponseDto {
 	public void setBed(String bed) {
 		this.bed = bed;
 	}
-	public int getPeople() {
+	public Integer getPeople() {
 		return people;
 	}
-	public void setPeople(int people) {
+	public void setPeople(Integer people) {
 		this.people = people;
 	}
-	public String getBookingstatus() {
-		return bookingstatus;
+	public LocalDateTime getCheckinDate() {
+		return checkinDate;
 	}
-	public void setBookingstatus(String bookingstatus) {
-		this.bookingstatus = bookingstatus;
+	public void setCheckinDate(LocalDateTime checkinDate) {
+		this.checkinDate = checkinDate;
 	}
-	public LocalDateTime getCheckindate() {
-		return checkindate;
+	public LocalDateTime getCheckoutDate() {
+		return checkoutDate;
 	}
-	public void setCheckindate(LocalDateTime checkindate) {
-		this.checkindate = checkindate;
-	}
-	public LocalDateTime getCheckoutdate() {
-		return checkoutdate;
-	}
-	public void setCheckoutdate(LocalDateTime checkoutdate) {
-		this.checkoutdate = checkoutdate;
+	public void setCheckoutDate(LocalDateTime checkoutDate) {
+		this.checkoutDate = checkoutDate;
 	}
 	public BigDecimal getGrandtotal() {
 		return grandtotal;
@@ -88,6 +83,16 @@ public class AdminOrderAllResponseDto {
 	public void setGrandtotal(BigDecimal grandtotal) {
 		this.grandtotal = grandtotal;
 	}
-
-
+	public String getBookingStatus() {
+		return bookingStatus;
+	}
+	public void setBookingStatus(String bookingStatus) {
+		this.bookingStatus = bookingStatus;
+	}
+	public String getBookingMethod() {
+		return bookingMethod;
+	}
+	public void setBookingMethod(String bookingMethod) {
+		this.bookingMethod = bookingMethod;
+	}
 }
