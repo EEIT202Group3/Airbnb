@@ -253,7 +253,7 @@ export default {
    initAutocomplete() {
   const input = this.$refs.dialogInput;
 
-  // 先解除舊的 autocomplete 綁定（如果存在）
+  // 先解除舊的 autocomplete 綁定
   if (this.autocomplete) {
     google.maps.event.clearInstanceListeners(this.autocomplete);
     this.autocomplete.unbindAll?.();
@@ -330,8 +330,8 @@ export default {
       formData.append("ppl", this.form.ppl);
       formData.append("price", this.form.price);
 
-      // 告訴後端清除舊圖片
-  formData.append("replacePhotos", true);
+      
+      formData.append("replacePhotos", true);
 
      this.form.photos.forEach(file => {
         formData.append("photos", file);
