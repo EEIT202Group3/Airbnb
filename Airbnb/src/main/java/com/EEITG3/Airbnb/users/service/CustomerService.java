@@ -49,4 +49,6 @@ public interface CustomerService {
 	List<Customer> findLikeByUsername(String username);
 	//模糊查詢phone
 	List<Customer> findLikeByPhone(String phone);
+	//查當月註冊人數
+	Map<String, Object> getMonthlyRegist();
 }

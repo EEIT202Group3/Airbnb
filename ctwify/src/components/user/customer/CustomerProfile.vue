@@ -52,7 +52,7 @@ function buildItems(){
     }
     items.value = [
         { icon: 'mdi-account-outline', title: '更改使用者名稱', key: 'username', value: customer.value.username },
-        { icon: 'mdi-phone-outline',   title: '更改電話號碼',   key: 'phone',    value: customer.value.phone },
+        { icon: 'mdi-phone-outline',   title: '更改電話號碼',   key: 'phone',    value: customer.value.phone?customer.value.phone:'尚未輸入電話' },
         { icon: 'mdi-lock-outline',    title: '更改密碼',       key: 'password', value: '' },
     ]
 }
@@ -133,17 +133,29 @@ watch(customer,()=>buildItems())
                 <v-divider class="my-6" />
                 <div v-if="customer">
                     <v-list class="py-0">
-                        <v-list-item
-                        v-for="item in items"
-                        :key="item.key"
-                        :to="item.key === 'password' ? { name: 'ChangePassword' } : undefined"
-                        @click="item.key !== 'password' && openDialog(item)"
-                        >
-                        <template #prepend>
-                            <v-icon :icon="item.icon" />
+                        <template v-for="item in items" :key="item.key">
+                            <!-- 需要路由跳轉的 -->
+                            <v-list-item
+                            v-if="item.key === 'password'"
+                            :to="{ name: 'ChangePassword' }"
+                            >
+                            <template #prepend>
+                                <v-icon :icon="item.icon" />
+                            </template>
+                            <v-list-item-title>{{ item.title }}</v-list-item-title>
+                            </v-list-item>
+
+                            <!-- 只要觸發函式的 -->
+                            <v-list-item
+                            v-else
+                            @click="openDialog(item)"
+                            >
+                            <template #prepend>
+                                <v-icon :icon="item.icon" />
+                            </template>
+                            <v-list-item-title>{{ item.value }}</v-list-item-title>
+                            </v-list-item>
                         </template>
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                        </v-list-item>
                     </v-list>
                 </div>
                 <div v-else>找不到資料</div>

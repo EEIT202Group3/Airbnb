@@ -259,6 +259,13 @@ public class CustomerController {
 		log.info("查詢客戶資料，操作者：%s".formatted(adminId));
 		return ResponseEntity.ok(customers);
 	}
+	
+	//查詢當月註冊人數
+	@GetMapping("/getMonthlyRegistCustomers")
+	public ResponseEntity<?> getMonthlyRegist(){
+		Map<String, Object> result = service.getMonthlyRegist();
+		return ResponseEntity.ok(result);
+	}
 }
 
 

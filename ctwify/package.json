@@ -17,6 +17,7 @@
     "@stomp/stompjs": "^7.1.1",
     "@vuepic/vue-datepicker": "^11.0.2",
     "axios": "^1.11.0",
+    "chart.js": "^4.5.0",
     "dayjs": "^1.11.13",
     "lodash": "^4.17.21",
     "pinia": "^3.0.3",
