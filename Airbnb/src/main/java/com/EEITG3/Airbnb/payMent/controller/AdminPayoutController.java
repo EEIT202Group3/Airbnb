@@ -1,5 +1,6 @@
 package com.EEITG3.Airbnb.payMent.controller;
 
+import java.io.IOException;
 import java.time.YearMonth;
 import java.util.Map;
 import java.util.UUID;
@@ -23,6 +24,7 @@ import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
 import com.EEITG3.Airbnb.payMent.service.PayoutService;
 import com.EEITG3.Airbnb.payMent.service.RevenueSplitService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -96,5 +98,22 @@ public class AdminPayoutController {
         String reason = body.getOrDefault("reason", "");
         payoutService.cancelPayout(payoutId, "admin", reason);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping(value = "/export/host-payouts", produces = "text/csv; charset=UTF-8")
+    public void exportHostPayoutsCsv(
+            @RequestParam(required = false) String hostId,
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String status,
+            HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/csv; charset=UTF-8");
+        resp.setHeader("Content-Disposition", "attachment; filename=\"host_payouts.csv\"");
+        payoutService.writeHostPayoutsCsv(resp.getWriter(), hostId, month, status);
+    }
+
+    @GetMapping(value = "/export/payout-orders", produces = "text/csv; charset=UTF-8")
+    public void exportPayoutOrdersCsv(HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/csv; charset=UTF-8");
+        resp.setHeader("Content-Disposition", "attachment; filename=\"payout_orders.csv\"");
+        payoutService.writeAllPayoutOrdersCsv(resp.getWriter());
     }
 }

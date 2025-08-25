@@ -11,9 +11,13 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;   
 import java.util.UUID;
 
@@ -242,10 +246,8 @@ public class PayoutService {
             throw new IllegalStateException("已付款的撥款單不可取消");
         }
         if ("cancelled".equalsIgnoreCase(status)) {
-            // 已經取消就直接返回（或丟錯都可）
             return;
         }
-
         // 2) 先把訂單恢復可再結算
         jdbc.update("""
             UPDATE o SET
@@ -256,15 +258,97 @@ public class PayoutService {
             WHERE po.payout_id = ?
         """, payoutId);
 
-        // 3) 刪掉這張撥款單對應的 payout_orders（保留 host_payouts 做為稽核痕跡）
+        // 3) 刪掉這張撥款單對應的 payout_orders
         jdbc.update("DELETE FROM payout_orders WHERE payout_id = ?", payoutId);
 
-        // 4) 標記 host_payouts 為 cancelled（可視需要記 updated_by / 取消原因）
+        // 4) 標記 host_payouts 為 cancelled
         jdbc.update("""
             UPDATE host_payouts
             SET status = 'cancelled',
                 updated_at = SYSUTCDATETIME()
             WHERE payout_id = ?
         """, payoutId);
+    }
+    //匯出CSV
+    private static String csv(Object o) {
+        if (o == null) return "";
+        String s = String.valueOf(o);
+        // 轉義雙引號，外層再包一層雙引號
+        return "\"" + s.replace("\"", "\"\"") + "\"";
+    }
+
+    private static String bd(BigDecimal v) {
+        return v == null ? "" : v.stripTrailingZeros().toPlainString();
+    }
+
+    private static final DateTimeFormatter ISO = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    // 匯出 host_payouts
+    @Transactional(readOnly = true)
+    public void writeHostPayoutsCsv(Writer w, String hostId, String month, String status) throws IOException {
+        // 標頭
+        w.append("\ufeff"); 
+        w.append("payout_id,host_id,payout_month,total_earnings,total_platform_fee,total_net_payout,status,payout_date,created_at,updated_at,orders\n");
+
+        var rows = findHostPayouts(hostId, month, status);
+        for (var r : rows) {
+            w.append(csv(r.getPayoutId()))
+             .append(',').append(csv(r.getHostId()))
+             .append(',').append(csv(r.getPayoutMonth()))
+             .append(',').append(csv(bd(r.getTotalEarnings())))
+             .append(',').append(csv(bd(r.getTotalPlatformFee())))
+             .append(',').append(csv(bd(r.getTotalNetPayout())))
+             .append(',').append(csv(r.getStatus()))
+             .append(',').append(csv(r.getPayoutDate() == null ? "" : ISO.format(r.getPayoutDate())))
+             .append(',').append(csv(r.getCreatedAt() == null ? "" : ISO.format(r.getCreatedAt())))
+             .append(',').append(csv(r.getUpdatedAt() == null ? "" : ISO.format(r.getUpdatedAt())))
+             .append(',').append(csv(r.getOrders()))
+             .append('\n');
+        }
+        w.flush();
+    }
+
+    // 匯出所有 payout_orders
+    @Transactional(readOnly = true)
+    public void writeAllPayoutOrdersCsv(Writer w) throws IOException {
+        w.append("\ufeff");
+        w.append("payout_order_id,payout_id,host_id,payout_month,booking_id,list_id,gross_amount,platform_fee,net_amount,created_at\n");
+
+        String sql = """
+            SELECT po.payout_order_id,
+                   po.payout_id,
+                   hp.host_id,
+                   hp.payout_month,
+                   po.booking_id,
+                   po.list_id,
+                   po.gross_amount,
+                   po.platform_fee,
+                   po.net_amount,
+                   po.created_at
+            FROM payout_orders po
+            LEFT JOIN host_payouts hp ON hp.payout_id = po.payout_id
+            ORDER BY po.created_at DESC
+        """;
+
+        jdbc.query(sql, rs -> {
+            try {
+                w.append(csv(rs.getObject("payout_order_id").toString()))
+                 .append(',').append(csv(rs.getObject("payout_id").toString()))
+                 .append(',').append(csv(rs.getString("host_id")))
+                 .append(',').append(csv(rs.getString("payout_month")))
+                 .append(',').append(csv(rs.getString("booking_id")))
+                 .append(',').append(csv(String.valueOf(rs.getObject("list_id"))))
+                 .append(',').append(csv(bd(rs.getBigDecimal("gross_amount"))))
+                 .append(',').append(csv(bd(rs.getBigDecimal("platform_fee"))))
+                 .append(',').append(csv(bd(rs.getBigDecimal("net_amount"))))
+                 .append(',').append(csv(
+                         rs.getTimestamp("created_at") == null
+                             ? "" : ISO.format(rs.getTimestamp("created_at").toLocalDateTime())))
+                 .append('\n');
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        w.flush();
     }
 }

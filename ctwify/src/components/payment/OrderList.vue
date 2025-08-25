@@ -206,11 +206,26 @@
               <template #prepend
                 ><v-icon color="deep-orange">mdi-car-info</v-icon></template
               >
-              <v-list-item-title class="kv"
-                >租車明細：<span class="value">{{
-                  selectedOrder.reservationId
-                }}</span></v-list-item-title
-              >
+              <v-list-item-title class="kv">
+                租車明細：
+                <v-tooltip text="查看租車明細">
+                  <template #activator="{ props }">
+                    <v-btn
+                      v-bind="props"
+                      size="small"
+                      variant="text"
+                      color="deep-orange"
+                      class="value-link"
+                      @click.stop="
+                        goCarPaymentResult(selectedOrder.reservationId)
+                      "
+                    >
+                      {{ selectedOrder.reservationId }}
+                      <v-icon end size="16">mdi-open-in-new</v-icon>
+                    </v-btn>
+                  </template>
+                </v-tooltip>
+              </v-list-item-title>
             </v-list-item>
 
             <v-list-item>
@@ -276,19 +291,6 @@
                   formatDate(selectedOrder.checkoutDate)
                 }}</span>
               </v-list-item-title>
-            </v-list-item>
-
-            <v-list-item v-if="selectedOrder.locationId">
-              <template #prepend
-                ><v-icon color="deep-orange"
-                  >mdi-map-marker-distance</v-icon
-                ></template
-              >
-              <v-list-item-title class="kv"
-                >取車地點：<span class="value">{{
-                  selectedOrder.locationId
-                }}</span></v-list-item-title
-              >
             </v-list-item>
 
             <v-list-item>
@@ -460,21 +462,15 @@ export default {
         list.sort((a, b) => {
           const da = getCheckin(a);
           const db = getCheckin(b);
-
           if (!da && !db) return 0;
           if (!da) return 1;
           if (!db) return -1;
 
-          const aIsFutureOrToday = da.getTime() >= today.getTime();
-          const bIsFutureOrToday = db.getTime() >= today.getTime();
+          const aFuture = da.getTime() >= today.getTime();
+          const bFuture = db.getTime() >= today.getTime();
+          if (aFuture !== bFuture) return aFuture ? -1 : 1;
 
-          if (aIsFutureOrToday !== bIsFutureOrToday) {
-            return aIsFutureOrToday ? -1 : 1;
-          }
-
-          const diffA = Math.abs(da.getTime() - today.getTime());
-          const diffB = Math.abs(db.getTime() - today.getTime());
-          return diffA - diffB;
+          return Math.abs(da - today) - Math.abs(db - today);
         });
 
         this.orders = list;
@@ -483,14 +479,13 @@ export default {
       }
     },
 
-    // 先開 dialog + loading，再打 API；回來後再塞資料
     async openDetail(bookingId) {
       this.showDetail = true;
       this.detailLoading = true;
       this.selectedOrder = null;
       try {
         const res = await axios.get("/api/orderconfirm/detail", {
-          params: { bookingId: bookingId },
+          params: { bookingId },
           withCredentials: true,
         });
         this.selectedOrder = res.data;
@@ -513,9 +508,18 @@ export default {
       if (!v) return "-";
       return new Date(v).toLocaleString("zh-TW");
     },
+
+    goCarPaymentResult(reservationId) {
+      if (!reservationId) return;
+      this.$router.push({
+        name: "CarPaymentResult",
+        query: { reservationId: String(reservationId) },
+      });
+    },
   },
 };
 </script>
+
 
 <style scoped>
 .soft-card {
@@ -577,5 +581,14 @@ export default {
 }
 .sep {
   opacity: 0.5;
+}
+.value-link {
+  font-weight: 700;
+  padding: 0 6px;
+  min-width: 0;
+  text-transform: none;
+}
+.value-link :deep(.v-btn__content) {
+  text-decoration: underline;
 }
 </style>

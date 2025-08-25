@@ -12,6 +12,25 @@
       >
         重新整理
       </v-btn>
+      <!--匯出CSV -->
+      <v-btn
+        variant="outlined"
+        color="primary"
+        class="big-btn ml-3"
+        :disabled="loading"
+        @click="exportHostCsv"
+      >
+        匯出 應付款房東明細 CSV
+      </v-btn>
+      <v-btn
+        variant="outlined"
+        color="primary"
+        class="big-btn ml-3"
+        :disabled="loading"
+        @click="exportOrdersCsv"
+      >
+        匯出 每筆付款明細涵蓋的訂單 CSV
+      </v-btn>
     </div>
 
     <!-- 篩選列 -->
@@ -90,7 +109,7 @@
         :loading="loading"
         class="elevation-0 big-table"
       >
-        <!-- 狀態彩色 Chip -->
+        <!-- 狀態 -->
         <template #item.status="{ item }">
           <v-chip
             size="small"
@@ -128,7 +147,6 @@
           dt(item.payoutDate)
         }}</template>
 
-        <!-- 動作列：明細永遠可點，其餘在 paid/cancelled 返灰 -->
         <template #item.actions="{ item }">
           <div class="action-bar">
             <v-btn
@@ -373,6 +391,42 @@ const markingType = ref<"paid" | "cancel" | null>(null);
 const cancelDialog = ref(false);
 const cancelTarget = ref<PayoutRow | null>(null);
 const cancelReason = ref("");
+
+//匯出CSV
+async function downloadCsv(url: string, filename: string) {
+  try {
+    const { data } = await api.get(url, {
+      responseType: "blob",
+      withCredentials: true,
+    });
+    const blob = new Blob([data], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const objectUrl = URL.createObjectURL(blob);
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(objectUrl);
+  } catch (e: any) {
+    error.value = e?.response?.data || e?.message || "匯出失敗";
+  }
+}
+
+function exportHostCsv() {
+  const qs = new URLSearchParams();
+  if (filters.value.hostId) qs.append("hostId", filters.value.hostId);
+  if (filters.value.month) qs.append("month", filters.value.month);
+  if (filters.value.status) qs.append("status", filters.value.status);
+
+  const url = `payouts/export/host-payouts${qs.toString() ? `?${qs}` : ""}`;
+  downloadCsv(url, "host_payouts.csv");
+}
+
+function exportOrdersCsv() {
+  const url = `payouts/export/payout-orders`;
+  downloadCsv(url, "payout_orders.csv");
+}
 
 // 狀態顏色
 function statusColor(s = "") {
