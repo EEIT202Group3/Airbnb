@@ -77,6 +77,7 @@
     </div>
   </div>
 
+  <br>
   <!-- 房源卡片分類-->
   <div
     v-for="(category, index) in categories"
@@ -236,27 +237,35 @@ export default {
 </script>
 
 <style>
-@import "/src/assets/listing/list1.css";
+/* @import "/src/assets/listing/list1.css"; */
 @import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css";
 @import "/src/assets/listing/listingCard.css";
 @import "/src/assets/listing/searchBar.css";
 @import "@/assets/listing/datepicker.css";
 
+/* 共用容器：讓內容左右對齊 */
+.container,
+.container1,
+.listing-wrapper {
+  width: 100%;
+  max-width: 1200px; /* 你要的對齊寬度 */
+  margin: 0 auto;    /* 置中 */
+  padding: 0 16px;   /* 預留邊距，避免太貼邊 */
+  box-sizing: border-box;
+}
+
 .background {
   width: 100%;
-  height: 300px;
-  box-sizing: border-box;
-  background-color: rgba(184, 184, 184, 0.5);
+  aspect-ratio: 10/ 3; /* 固定長寬比，例如 16:9 */
   background: url('/src/icon/sone.png') center/cover no-repeat;
-  display: flex;
   border-radius: 15px;
+  display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 20px;
 }
 .sone {
   width: 100%;
-  height: 200px;
+  height: auto;
   box-sizing: border-box;
   display: flex;
   border-radius: 10px;
@@ -264,6 +273,8 @@ export default {
   align-items: center;
   font-size: 20px;
 }
+
+/* 🔹 Datepicker 樣式 */
 .card-datepicker .dp__input {
   border: none;
   background: transparent !important;
@@ -272,16 +283,40 @@ export default {
   font-size: 16px;
   cursor: pointer;
 }
+
+/* 🔹 房源卡片 */
 .listing-card {
   text-decoration: none;
   color: inherit;
   display: block;
+  flex: 0 0 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.listing-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
 }
 
-/* dropdown 自訂縣市 */
+/* 🔹 房源橫向滑動區 */
+.listing-container {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+.listing-scroll {
+  display: flex;
+  gap: 16px;
+  scroll-snap-align: start;
+}
+
+/* 🔹 dropdown 自訂縣市 */
 .input-wrapper {
   position: relative;
-  width:280px;
+  width: 100%; /* 改成 100% 讓他在小螢幕撐滿 */
+  max-width: 280px;
 }
 .dropdown-list {
   position: absolute;
@@ -305,17 +340,37 @@ export default {
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   border-radius: 8px;
-    font-size: 16px;  
+  font-size: 16px;  
   line-height: 1.5; 
 }
 .dropdown-list li:hover {
   background-color: #f5f5f5;
   color: #333;
 }
-/* 簡單淡入動畫 */
+
+/* 🔹 簡單淡入動畫 */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* 🔹 響應式設計 (RWD) */
+@media (max-width: 992px) {
+  .background {
+    height: auto;
+    padding: 20px;
+  }
+  .listing-card {
+    flex: 0 0 220px;
+  }
+}
+@media (max-width: 576px) {
+  .background {
+    border-radius: 0; /* 手機滿版 */
+  }
+  .listing-card {
+    flex: 0 0 90%; /* 手機一次一張大卡片 */
+  }
 }
 
 </style>

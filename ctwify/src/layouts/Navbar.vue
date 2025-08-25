@@ -45,13 +45,12 @@ async function toHost(){
 </script>
 
 <template>
-  <v-app-bar position: relative density="comfortable" elevation="2.5" class="d-flex justify-center" style="height: 9%;" >
+  <v-app-bar position: relative density="comfortable" elevation="2.5" class="d-flex justify-center" style="height: 70px;" >
+    <div class="navbar-container">
     <!-- 左：Logo（不重整導回首頁） -->
-    <div role="button" tabindex="0" @click="goHome" style="margin-left:13%;">
-
-      <v-img :src="logo" alt="Ctwify" height="150" width="150" eager class="me-2" />
-
-    </div>
+    <div role="button" tabindex="0" @click="goHome" style="margin-left: 0px;">
+  <v-img :src="logo" alt="Ctwify" height="150" width="150" eager class="me-2" />
+</div>
 
     <v-spacer />
 
@@ -111,6 +110,7 @@ async function toHost(){
       </v-list>
     </v-menu>
     </div>
+    </div>
   </v-app-bar>
 
   <!-- 登入 / 註冊 Dialog -->
@@ -120,9 +120,20 @@ async function toHost(){
 </template>
 
 <style scoped>
-
-.right-section {
-  margin-right: 14%;
+.navbar-container {
+  width: 100%;
+  max-width: 1200px; /* 與內容區域一致 */
+  margin: 0 auto;    /* 置中 */
+  display: flex;
+  justify-content: space-between; /* 左右兩邊對齊 */
+  align-items: center;
+  padding: 0 16px;   /* 預留邊距 */
+  box-sizing: border-box;
 }
 
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* 按鈕間距 */
+}
 </style>

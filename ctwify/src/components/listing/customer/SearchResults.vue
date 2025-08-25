@@ -1,5 +1,6 @@
 <template>
     <br>
+      <div class="container">
   <div class="search-results-container">
     <!-- 左邊搜尋結果 -->
     <div class="results-list">
@@ -54,6 +55,7 @@
 
     <!-- 右邊地圖 -->
     <div id="map" class="results-map"></div>
+  </div>
   </div>
 </template>
 
@@ -246,6 +248,15 @@ export default {
 @import "/src/assets/listing/listingCard.css";
 
 
+.container {
+  width: 100%;
+  max-width: 1300px; /* 與 navbar 對齊 */
+  margin: 0 auto;    /* 置中 */
+  padding: 0 16px;   /* 預留左右邊距 */
+  box-sizing: border-box;
+}
+
+
 .listing-card {
   display: flex;
   flex-direction: row;
@@ -291,7 +302,7 @@ export default {
 }
 .results-map {
   flex: 0.8;
-  height: 80vh;
+   height: 650px; /* 固定高度 */
   border-radius: 20px;
    margin-top: 50px;  
 }

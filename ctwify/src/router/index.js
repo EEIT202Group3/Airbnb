@@ -26,12 +26,7 @@ const routes = [
         path: '/search',
         component: () => import('@/components/listing/customer/SearchResults.vue'),
       },
-      //修維的API串上之後可砍
-      {
-        path: "/listing/card",
-        name: "ListingCard",
-        component: () => import("@/components/payment/ListingCard.vue"),
-      },
+
       //宜臻之後的部分，不能砍
       {
         path: "/booking/start",
@@ -144,6 +139,7 @@ const routes = [
             component: () => import("@/components/user/host/HostOrder.vue"),
             name: "HostOrder",
           },
+          
         ],
       },
       {
@@ -166,7 +162,12 @@ const routes = [
       {
         path: 'details/:id',
         component: () => import('@/components/listing/host/Detail.vue'),
-      }
+      },
+       {
+            path: "edlistings/:id",
+            component: () => import("@/components/listing/host/EditListing.vue"),
+          }
+     
     ],
   },
 

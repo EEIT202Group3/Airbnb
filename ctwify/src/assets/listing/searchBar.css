@@ -3,48 +3,46 @@
   align-items: center;
   justify-content: space-between;
   border: 1px solid #ddd;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 20px;
-  padding: 5px 24px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* 稍微加深陰影 */
+  border-radius: 24px; /* 放大圓角 */
+  padding: 12px 32px; /* 放大內邊距 */
   background-color: #ffffffef;
-  max-width: 950px;
+  max-width: 1000px; /* 放寬寬度 */
   margin: 80px auto 20px;
   gap: 24px;
-  height: 60px;       
-  max-height: 60px;  
-  overflow: hidden;   
-  flex-wrap: nowrap; 
-  overflow: visible; /* 允許下拉超出 */
-  position: relative; /* 下拉用 z-index */ 
+  height: 70px;  /* 增高 */
+  flex-wrap: nowrap;
+  overflow: visible;
+  position: relative;
 }
+
 .search-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px; /* 稍微放大間距 */
   border-right: 1px solid #ccc;
 }
+
 .search-bar {
   display: flex;
-  align-items: stretch; /* 讓每個 search-section 撐滿高度 */
+  align-items: stretch;
 }
+
 .search-section:first-child {
   flex: 2;
 }
 
-
-.search-section:nth-child(2){
-  flex:  1.5;
+.search-section:nth-child(2) {
+  flex: 1.5;
 }
-
 
 .search-section:nth-child(3) {
   border-right: none;
 }
 
-
 .search-section i {
   color: #555;
-  font-size: 25px;
+  font-size: 28px; /* 放大圖示 */
 }
 
 .search-text {
@@ -53,27 +51,20 @@
   width: 100%;
 }
 
-.search-label {
-  font-size: 12px;
+.search-label, .search-label1 {
+  font-size: 14px; /* 放大文字 */
   color: #888;
-  margin-bottom: 2px;
-   position: relative;
-  top: 7px; 
-}
-.search-label1 {
-  font-size: 12px;
-  color: #888;
-  margin-bottom: 2px;
-   position: relative;
-  top: 7px; 
+  margin-bottom: 4px;
+  position: relative;
+  top: 5px;
 }
 
 .search-value,
 .search-input {
-  font-size: 15px;
+  font-size: 16px; /* 放大文字 */
   border: none;
   outline: none;
-  padding: 0;
+  padding: 2px 0;
   background: transparent;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s;
@@ -86,17 +77,17 @@
 .date-inputs {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .date-inputs input[type="date"] {
-  font-size: 14px;
+  font-size: 15px; /* 放大文字 */
   border: none;
   border-bottom: 1px solid #ccc;
   outline: none;
-  padding: 2px 4px;
+  padding: 4px 6px;
   background: transparent;
-  width: 110px;
+  width: 120px;
   cursor: pointer;
 }
 
@@ -110,16 +101,15 @@
 }
 
 .search-button {
-  background-color:#f07b2d;
+  background-color: #f07b2d;
   border: none;
-  padding: 12px 24px;
+  padding: 14px 28px; /* 放大按鈕 */
   color: white;
-  font-size: 16px;
-  border-radius: 10px;
+  font-size: 17px;
+  border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
 
 .search-button:hover {
   background-color: #e86107;
@@ -130,5 +120,12 @@
     flex-direction: column;
     align-items: stretch;
     gap: 16px;
+    padding: 16px 24px;
+    height: auto;
+  }
+  
+  .search-section {
+    flex: 1 1 100%;
+    border-right: none;
   }
 }
