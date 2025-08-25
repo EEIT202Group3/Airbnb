@@ -107,12 +107,6 @@
       <i class="fa-solid fa-chevron-right"></i>
     </button>
   </div>
-
-  <router-link to="/reviews/insert" custom v-slot="{ navigate }">
-    <v-btn @click="navigate" icon>
-      <v-icon>mdi-car</v-icon>
-    </v-btn>
-  </router-link>
 </template>
 
 <script>

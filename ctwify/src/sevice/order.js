@@ -32,6 +32,19 @@ export async function getOrderDetail(bookingId) {
         throw error;
     }
 }
+
+// 依使用者ID查詢訂單明細 - 修正參數名稱
+export async function getOrdersByCustomerId(bookingId) {
+    console.log('呼叫 getOrdersByCustomerId API，bookingId:', bookingId);
+    try {
+        const { data } = await axios.get(`/api/orderconfirm/getOrdersByCustomerId?customerId=${customerId}`);
+        console.log('getOrdersByCustomerId 回應:', data);
+        return data;
+    } catch (error) {
+        console.error('getOrdersByCustomerId 錯誤:', error);
+        throw error;
+    }
+}
 // 房東查詢訂單明細 - 修正參數名稱
 export async function byHostId(hostId) {
     console.log('呼叫 byHostId API，hostId:', hostId);

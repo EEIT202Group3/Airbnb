@@ -334,7 +334,6 @@ const totalOrders = computed(() => orders.value.length);
   border-color: #f2ab27;
 }
 
-/* Dialog 內的資訊欄位排版 */
 .label {
   font-size: 0.85rem;
   color: rgba(0, 0, 0, 0.6);
@@ -353,7 +352,6 @@ const totalOrders = computed(() => orders.value.length);
   margin-bottom: 6px;
 }
 
-/* 條列式 Key–Value */
 .kv-list {
   background: #fff;
   border: 1px solid #eee;
@@ -371,7 +369,7 @@ const totalOrders = computed(() => orders.value.length);
   border-bottom: none;
 }
 .kv-label {
-  width: 96px; /* 調整欄寬即可對齊 */
+  width: 96px;
   flex: none;
   color: rgba(0, 0, 0, 0.55);
 }

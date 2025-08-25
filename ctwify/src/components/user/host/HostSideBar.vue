@@ -6,6 +6,7 @@ const leftMenu = ref([
   { title: '關於我', icon: 'mdi-account-circle', to:{name:'HostInfo'} },
   { title: '房源管理', icon: 'mdi-home', to:{name:'HostListing'} },
   { title: '訂單一覽', icon: 'mdi-list-box-outline', to:{name:'HostOrder'} },
+  { title: '評論一覽', icon: 'mdi-list-box-outline', to:{name:'HostReview'} },
 ])
 </script>
 <template>

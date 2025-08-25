@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,7 +19,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.EEITG3.Airbnb.jwt.JwtService;
+import com.EEITG3.Airbnb.payMent.dto.OrderAllResponseDto;
 import com.EEITG3.Airbnb.reviews.dto.ReviewDTO;
+import com.EEITG3.Airbnb.reviews.dto.ReviewInsertDto;
 import com.EEITG3.Airbnb.reviews.dto.ReviewPatchRequest;
 import com.EEITG3.Airbnb.reviews.dto.ReviewWithCustomerDto;
 import com.EEITG3.Airbnb.reviews.entity.Review;
@@ -34,8 +38,17 @@ public class ReviewController {
 
 	@Autowired
 	private ReviewService rService;
+	@Autowired
+	private JwtService jwtService;
+	
+	@GetMapping("/reviews/insertData/{bookingId}")
+	public ReviewInsertDto getInsertData(@PathVariable String bookingId) {
+		System.out.println(rService.insertData(bookingId));
+		return rService.insertData(bookingId);
+	}
+	
 
-	@GetMapping("/admins/reviews")
+	@GetMapping("/reviews")
 	public List<ReviewDTO> AdminGetAllReviews(
 			@RequestParam(required = false) String type,
 		    @RequestParam(required = false) String keyword) { 
@@ -54,6 +67,24 @@ public class ReviewController {
 	@GetMapping("/admins/reviews/get/{id}")
 	public ReviewDTO getReviewById(@PathVariable Integer id) {
 		return rService.findByReviewID(id); // 找不到可回 null 或拋異常
+	}
+	@GetMapping("/reviews/getByCust/{id}")
+	public List<ReviewDTO> getReviewByCustId(@PathVariable String id){
+		return rService.findByCustId(id);
+	}
+	
+	@GetMapping("/reviews/token/byCustomer")
+	public List<ReviewDTO> getReviewsByCustomerToken(@CookieValue(value = "jwt_customer") String token) {
+		String email = jwtService.extractEmail(token);
+		System.out.println(email);
+		return rService.getReviewsByCustomerToken(email);
+	}
+	
+	@GetMapping("/reviews/token/byHost")
+	public List<ReviewDTO> getReviewsByHostToken(@CookieValue(value = "jwt_host") String token) {
+		String email = jwtService.extractEmail(token);
+		System.out.println(email);
+		return rService.getReviewsByHostToken(email);
 	}
 	
 	@DeleteMapping("admins/reviews/del/{id}")
