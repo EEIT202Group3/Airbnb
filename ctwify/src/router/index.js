@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import CarRentFrontHomepage from "@/components/carRent/frontpageComponent/CarRentFrontHomepage.vue";
 import CarSelect from "@/components/carRent/frontpageComponent/CarSelect.vue";
 import CarDetail from "@/components/carRent/frontpageComponent/CarDetail.vue";
+import CarResult from "@/components/carRent/frontpageComponent/CarPaymentResult.vue";
 
 const routes = [
   //客戶首頁
@@ -177,6 +178,12 @@ const routes = [
     path: '/car-detail/:id',
     name: 'carDetail',
     component: CarDetail,
+    props: true
+  },
+  {
+    path: '/carpaymentresult',
+    name: 'carpaymentresult',
+    component: CarResult,
     props: true
   }
 ]
