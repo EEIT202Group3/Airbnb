@@ -124,6 +124,13 @@ public class HostController {
 		return ResponseEntity.ok(result);
 	}
 	
+	//查當月收益
+	@GetMapping("/getRevenue")
+	public ResponseEntity<?> getRevenue(){
+		Double result = service.getMonthlyRevenue();
+		return ResponseEntity.ok(result);
+	}
+	
 //後台功能
 	//找全部房東
 	@GetMapping("/admins/hosts")
@@ -195,5 +202,7 @@ public class HostController {
 		Integer result = service.getVerifiedHosts();
 		return ResponseEntity.ok(result);
 	}
+	
+
 	
 }

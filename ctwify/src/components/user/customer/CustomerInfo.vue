@@ -8,7 +8,7 @@ import SimpleReview from "@/components/reviews/SimpleReview.vue";
 const customerStore = useCustomerStore();
 const { customer } = storeToRefs(customerStore);
 const reviews = ref([]);
-console.log(customer.value.customerId);
+console.log(customer.value.customerId); 
 
 onMounted(async () => {
   const reviewRes = await api.get(

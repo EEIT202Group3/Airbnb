@@ -45,4 +45,6 @@ public interface HostService {
 	Integer getTotalHosts();
 	//查已驗證房東
 	Integer getVerifiedHosts();
+	//查當月收益
+	Double getMonthlyRevenue();
 }

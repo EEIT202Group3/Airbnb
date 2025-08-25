@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { ref,onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useHostStore } from '@/stores/host';
+import { getRevenue } from '@/service/host/hostService';
 import defaultAvatar from '@/images/default.png'
 
 const hostStore = useHostStore()
 const {host} = storeToRefs(hostStore)
-
+const revenue = ref()
 
 onMounted(
     async()=>{
         if(!host.value){
             hostStore.fetchUser();
         }
+        revenue.value = await getRevenue()
     }
 )
 </script>
@@ -62,10 +64,10 @@ onMounted(
 
         <div class="d-flex align-center mb-4">
             <v-icon class="mr-2">mdi-chat-processing-outline</v-icon>
-            <span class="text-subtitle-1 font-weight-medium">這邊看要放甚麼</span>
+            <span class="text-subtitle-1 font-weight-medium">每月收益</span>
         </div>
         <v-sheet class="pa-8 text-medium-emphasis rounded-lg bg-grey-lighten-5 text-center">
-        待定
+        {{revenue}}
         </v-sheet>
     </v-card>
 </template>
