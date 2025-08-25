@@ -254,6 +254,7 @@
         <button class="close-btn" @click="closeAmenitiesModal">關閉</button>
       </div>
     </div>
+        <simple-review></simple-review>
   </div>
 </template>
 

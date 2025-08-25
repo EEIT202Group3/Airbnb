@@ -1,63 +1,64 @@
 <template>
   <v-container class="my-4">
     <h2 class="mb-4">房源管理</h2>
+    
+    <!-- 篩選區 -->
+    <v-row dense class="mb-4" align="center">
+      <!-- 房源狀態下拉選單 -->
+      <v-col cols="12" sm="4" md="4">
+        <v-select
+          v-model="filterStatus"
+          :items="statusOptions"
+          label="選擇房源狀態"
+          dense
+          outlined
+          item-title="text"
+          item-value="value"
+        />
+      </v-col>
 
-   <!-- 篩選區 -->
-<v-row dense class="mb-4" align="center">
-  <!-- 房源狀態下拉選單 -->
-  <v-col cols="12" sm="4" md="4">
-    <v-select
-      v-model="filterStatus"
-      :items="statusOptions"
-      label="選擇房源狀態"
-      dense
-      outlined
-      item-title="text"
-      item-value="value"
-    />
-  </v-col>
+      <!-- 關鍵字搜尋 -->
+      <v-col cols="12" sm="4" md="4">
+        <v-text-field
+          v-model="searchKeyword"
+          label="輸入關鍵字 (名稱/地址/電話)"
+          dense
+          outlined
+          clearable
+        />
+      </v-col>
 
-  <!-- 關鍵字搜尋 -->
-  <v-col cols="12" sm="4" md="4">
-    <v-text-field
-      v-model="searchKeyword"
-      label="輸入關鍵字 (名稱/地址/電話)"
-      dense
-      outlined
-      clearable
-    />
-  </v-col>
-
-  <!-- 房東 ID + 放大鏡 -->
-  <v-col cols="12" sm="4" md="4" class="d-flex align-center">
-    <v-text-field
-      v-model="searchHostKeyword"
-      label="輸入房東 ID"
-      dense
-      outlined
-      clearable
-      class="flex-grow-1"
-    >
-      <template #append>
-        <v-icon
-          @click="doSearchAll"
-          style="cursor: pointer; color: #1976d2;"
+      <!-- 房東 ID + 放大鏡 -->
+      <v-col cols="12" sm="4" md="4" class="d-flex align-center">
+        <v-text-field
+          v-model="searchHostKeyword"
+          label="輸入房東 ID"
+          dense
+          outlined
+          clearable
+          class="flex-grow-1"
         >
-          mdi-magnify
-        </v-icon>
-      </template>
-    </v-text-field>
-  </v-col>
-</v-row>
+          <template #append>
+            <v-icon
+              @click="doSearchAll"
+              style="cursor: pointer; color: #1976d2;"
+            >
+              mdi-magnify
+            </v-icon>
+          </template>
+        </v-text-field>
+      </v-col>
+    </v-row>
 
-
+    <!-- 無符合資料提示 -->
     <v-alert v-if="filteredListings.length === 0" type="info" class="mb-4">
       目前沒有符合條件的房源。
     </v-alert>
 
+    <!-- 房源列表 -->
     <v-row dense>
       <v-col
-        v-for="listing in filteredListings"
+        v-for="listing in paginatedListings"
         :key="listing.listId"
         cols="12"
       >
@@ -97,28 +98,16 @@
                   >
                     資訊錯誤
                   </v-btn>
-                  <v-btn
-                    color="warning"
-                    @click="unpublishListing(listing.listId)"
-                  >
-                    下架房源
-                  </v-btn>
                 </template>
 
                 <template v-else-if="filterStatus === 'unpublished'">
                   <v-btn
-                    color="success"
-                    @click="publishListing(listing.listId)"
+                    color="error"
+                    @click="deleteListing(listing.listId)"
                   >
-                    重新上架        
-        </v-btn>
-        <v-btn
-        color="error"
-         @click="deleteListing(listing.listId)"
-    >
-        刪除房源
-       </v-btn>
-      </template>
+                    刪除房源
+                  </v-btn>
+                </template>
 
                 <template v-else-if="filterStatus === 'rejected'">
                   <v-btn
@@ -128,12 +117,7 @@
                   >
                     通過審核
                   </v-btn>
-                  <v-btn
-                    color="warning"
-                    @click="unpublishListing(listing.listId)"
-                  >
-                    下架房源
-                  </v-btn>
+                
                 </template>
 
                 <template v-else-if="filterStatus === 'pending'">
@@ -157,6 +141,15 @@
           </div>
         </v-card>
       </v-col>
+    </v-row>
+
+    <!-- 分頁按鈕 -->
+    <v-row justify="center" class="mt-4" v-if="totalPages > 1">
+      <v-pagination
+        v-model="currentPage"
+        :length="totalPages"
+        color="primary"
+      ></v-pagination>
     </v-row>
 
     <!-- 詳細資料 Modal -->
@@ -254,6 +247,7 @@
   </v-container>
 </template>
 
+
 <script>
 import axios from "axios";
 
@@ -267,6 +261,7 @@ export default {
         { text: "資訊錯誤", value: "rejected" },
         { text: "待審核", value: "pending" },
         { text: "已下架", value: "unpublished" },
+        
       ],
       
       allListings: [],
@@ -278,6 +273,9 @@ export default {
       searchText: "",     // 模糊搜尋 (名稱 / 地址 / 電話)
       searchHostId: "",   // 房東 ID 查詢
       searchHostKeyword: "",   
+      currentPage: 1,
+      itemsPerPage: 10,
+
     };
   },
   computed: {
@@ -285,6 +283,7 @@ export default {
       let result = [];
 
       //先依狀態篩選
+
       switch (this.filterStatus) {
         case "approved":
           result = this.allListings.filter(
@@ -311,6 +310,7 @@ export default {
       }
 
       //模糊查詢（房源名稱 / 地址 / 電話）
+
       if (this.searchText) {
         const keyword = this.searchText.toLowerCase();
         result = result.filter(
@@ -319,18 +319,28 @@ export default {
             (l.ads && l.ads.toLowerCase().includes(keyword)) ||
             (l.tel && String(l.tel).toLowerCase().includes(keyword))
         );
+
       }
 
-      //房東 ID 查詢
+      //  房東 ID 查詢
       if (this.searchHostId) {
         result = result.filter((l) =>
           String(l.hostId).includes(this.searchHostId)
         );
       }
 
+
       return result;
     },
+    paginatedListings() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.filteredListings.slice(start, end);
   },
+  totalPages() {
+    return Math.ceil(this.filteredListings.length / this.itemsPerPage);
+  }
+},
   methods: {
     fetchAllListings() {
       axios

@@ -13,7 +13,16 @@
           alt="房源圖片"
           class="listing-img"
         />
-        <br>
+
+     
+  <!-- 只有審核通過才顯示上架 / 下架 -->
+  <p
+    v-if="house.approved === true"
+    class="listing-status"
+    :class="house.published ? 'published' : 'unpublished'"
+  >
+    {{ house.published ? '已上架' : '已下架' }}
+  </p>
      <div class="listing-info">
   <h5 class="listing-title">{{ house.houseName }}</h5>
   <p class="listing-ads">
@@ -39,6 +48,8 @@
       <span class="status-text">
         {{ house.approved === null ? "審核中" : (house.approved ? "已通過" : "未通過") }}
       </span>
+
+
   </div>
       </router-link>
 
@@ -69,10 +80,9 @@ export default {
       axios
         .get(`http://localhost:8080/listings/host`)
         .then((res) => {
-          // 過濾掉已下架或已刪除的房源
-          this.houseList = res.data.filter(
-            house => house.published !== false && house.deleted !== true
-          );
+
+          this.houseList = res.data.filter(house => house.deleted !== true);
+
         })
         .catch((err) => {
           console.error("查詢會員房源失敗", err);
@@ -180,6 +190,20 @@ export default {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+}
+
+.listing-status {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.listing-status.published {
+  color: #28a745; /* 綠色 */
+}
+
+.listing-status.unpublished {
+  color: #dc3545; /* 紅色 */
 }
 
 </style>

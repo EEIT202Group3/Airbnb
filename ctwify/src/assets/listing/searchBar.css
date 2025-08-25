@@ -13,7 +13,9 @@
   height: 60px;       
   max-height: 60px;  
   overflow: hidden;   
-  flex-wrap: nowrap;  
+  flex-wrap: nowrap; 
+  overflow: visible; /* 允許下拉超出 */
+  position: relative; /* 下拉用 z-index */ 
 }
 .search-section {
   display: flex;
@@ -25,13 +27,6 @@
   display: flex;
   align-items: stretch; /* 讓每個 search-section 撐滿高度 */
 }
-.search-section {
-  display: flex;
-  align-items: center; /* 讓內容垂直置中 */
-  gap: 10px;
-  border-right: 1px solid #ccc;
-}
-
 .search-section:first-child {
   flex: 2;
 }
@@ -62,6 +57,8 @@
   font-size: 12px;
   color: #888;
   margin-bottom: 2px;
+   position: relative;
+  top: 7px; 
 }
 .search-label1 {
   font-size: 12px;
