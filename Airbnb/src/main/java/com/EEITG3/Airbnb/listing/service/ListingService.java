@@ -14,10 +14,12 @@ import java.util.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.EEITG3.Airbnb.listing.dto.ListingWithHostDTO;
 import com.EEITG3.Airbnb.listing.entity.EquipmentBean;
 import com.EEITG3.Airbnb.listing.entity.LisBean;
 import com.EEITG3.Airbnb.listing.repository.ListRepository;
-
+import com.EEITG3.Airbnb.users.entity.Host;
+import com.EEITG3.Airbnb.users.repository.HostRepository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -29,9 +31,10 @@ import com.EEITG3.Airbnb.listing.repository.LisBeanSpecifications;
 
 @Service
 public class ListingService {
-
+	
 
     private final ListRepository listRepository;
+    private final HostRepository hostRepository;
     
     @Value("${app.storage.base-dir}")
     private String baseDir;
@@ -40,9 +43,52 @@ public class ListingService {
     @PersistenceContext
     private EntityManager em;
 
-    public ListingService(ListRepository listRepository) {
-        this.listRepository = listRepository;
+    public ListingService(ListRepository listingRepository, HostRepository hostRepository) {
+        this.listRepository = listingRepository;
+        this.hostRepository = hostRepository;
     }
+    
+    public ListingWithHostDTO getListingWithHost(Integer listId) {
+        Optional<LisBean> optListing = listRepository.findById(listId);
+        if (optListing.isEmpty()) return null;
+
+        LisBean listing = optListing.get();
+        Optional<Host> optHost = hostRepository.findById(listing.getHostId());
+        Host host = optHost.orElse(null);
+
+        ListingWithHostDTO dto = new ListingWithHostDTO();
+        dto.setListId(listing.getListId());
+        dto.setHouseName(listing.getHouseName());
+        dto.setAds(listing.getAds());
+        dto.setRoom(listing.getRoom());
+        dto.setBed(listing.getBed());
+        dto.setPpl(listing.getPpl());
+        dto.setPrice(listing.getPrice());
+        dto.setDescribe(listing.getDescribe());
+        dto.setTel(listing.getTel());
+        dto.setReviewCount(listing.getReviewCount());
+
+        // 圖片欄位
+        dto.setPhoto1(listing.getPhoto1());
+        dto.setPhoto2(listing.getPhoto2());
+        dto.setPhoto3(listing.getPhoto3());
+        dto.setPhoto4(listing.getPhoto4());
+        dto.setPhoto5(listing.getPhoto5());
+        dto.setPhoto6(listing.getPhoto6());
+        dto.setPhoto7(listing.getPhoto7());
+        dto.setPhoto8(listing.getPhoto8());
+        dto.setPhoto9(listing.getPhoto9());
+        dto.setPhoto10(listing.getPhoto10());
+
+        // 房東資訊
+        if (host != null) {
+            dto.setHostName(host.getUsername());
+            dto.setHostAvatarURL(host.getAvatarURL());
+        }
+
+        return dto;
+    }
+
 
     //查詢全部房源
     public List<LisBean> findAll() {

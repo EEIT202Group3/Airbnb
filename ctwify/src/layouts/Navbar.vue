@@ -45,7 +45,7 @@ async function toHost(){
 </script>
 
 <template>
-  <v-app-bar density="comfortable" elevation="2.5" class="d-flex justify-center" style="height: 9%;">
+  <v-app-bar position: relative density="comfortable" elevation="2.5" class="d-flex justify-center" style="height: 9%;" >
     <!-- 左：Logo（不重整導回首頁） -->
     <div role="button" tabindex="0" @click="goHome" style="margin-left:13%;">
 
