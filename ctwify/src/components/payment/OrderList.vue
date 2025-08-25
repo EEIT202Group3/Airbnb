@@ -134,7 +134,7 @@
 
         <router-link
           :to="{
-            name: 'InsertReview',
+            name: 'HostReview',
             query: {
               bookingId: order.bookingId,
             },
@@ -143,7 +143,7 @@
           v-slot="{ navigate }"
         >
           <v-btn
-            :disabled="order.bookingstatus !== '已完成'"
+            :disabled="order.bookingStatus !== '已完成'"
             @click="navigate"
             icon
           >
@@ -216,9 +216,7 @@
                       variant="text"
                       color="deep-orange"
                       class="value-link"
-                      @click.stop="
-                        goCarPaymentResult(selectedOrder.reservationId)
-                      "
+                      @click.stop="goCarPaymentResult(selectedOrder.bookingId)"
                     >
                       {{ selectedOrder.reservationId }}
                       <v-icon end size="16">mdi-open-in-new</v-icon>
@@ -509,11 +507,11 @@ export default {
       return new Date(v).toLocaleString("zh-TW");
     },
 
-    goCarPaymentResult(reservationId) {
-      if (!reservationId) return;
+    goCarPaymentResult(bookingId) {
+      if (!bookingId) return;
       this.$router.push({
-        name: "CarPaymentResult",
-        query: { reservationId: String(reservationId) },
+        name: "carpaymentresult",
+        query: { bookingId: String(bookingId) },
       });
     },
   },
