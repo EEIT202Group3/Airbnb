@@ -1,152 +1,285 @@
 <template>
-  <v-container class="py-6">
-    <v-card class="mx-auto px-6 py-4" max-width="600" elevation="2">
-      <v-card-title class="text-h6 text-center mb-4"> 評論表單 </v-card-title>
-
-      <v-form v-model="valid">
-        <v-row dense>
-          <v-col cols="12" sm="6">
-            <v-text-field v-model="listId" label="ListID" dense></v-text-field>
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="bookingId"
-              label="BookingID"
-              dense
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-text-field v-model="custId" label="CustID" dense></v-text-field>
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-text-field v-model="hostId" label="HostID" dense></v-text-field>
-          </v-col>
-        </v-row>
-
-        <v-divider class="my-4"></v-divider>
-
-        <v-row dense>
-          <v-col cols="12" sm="4">
-            <div class="text-subtitle-2 font-weight-medium mb-1">乾淨度</div>
-            <v-rating
-              v-model="cleanScore"
-              hover
-              :length="5"
-              :size="28"
-              active-color="yellow-darken-1"
-            />
-          </v-col>
-          <v-col cols="12" sm="4">
-            <div class="text-subtitle-2 font-weight-medium mb-1">溝通</div>
-            <v-rating
-              v-model="commScore"
-              hover
-              :length="5"
-              :size="28"
-              active-color="yellow-darken-1"
-            />
-          </v-col>
-          <v-col cols="12" sm="4">
-            <div class="text-subtitle-2 font-weight-medium mb-1">性價比</div>
-            <v-rating
-              v-model="valueScore"
-              hover
-              :length="5"
-              :size="28"
-              active-color="yellow-darken-1"
-            />
-          </v-col>
-        </v-row>
-
-        <v-textarea
-          v-model="custComm"
-          label="文字評論"
-          variant="outlined"
-          rows="3"
-          auto-grow
-          clearable
-          :counter="200"
-          maxlength="200"
-          class="my-4"
-        ></v-textarea>
-
-        <v-file-input
-          v-model="files"
-          multiple
-          show-size
-          accept="image/*"
-          label="上傳評論圖片 (最多三張)"
-          counter
-          :counter-size="3"
-          prepend-icon="mdi-camera"
-          class="mb-4"
-        ></v-file-input>
-
-        <div class="text-center">
-          <v-btn color="#e7630b" @click="submit" class="text-white">
-            送出
-          </v-btn>
+  <v-container class="py-8">
+    <v-card class="mx-auto" max-width="760" elevation="3" rounded="xl">
+      <!-- 頂部房源圖 + 標題區 -->
+      <v-img :src="photoUrl" height="240" cover class="rounded-t-xl">
+        <div class="hero-overlay">
+          <div class="text-white text-h6 font-medium truncate">
+            {{ houseName || "此房源" }}
+          </div>
+          <div class="text-white text-caption opacity-80">
+            訂單：{{ bookingId || "-" }}
+          </div>
         </div>
-      </v-form>
+      </v-img>
+
+      <v-card-text class="px-6 pb-6 pt-4">
+        <v-form v-model="valid">
+          <!-- 評分區 -->
+          <v-card variant="tonal" class="mb-4" rounded="lg">
+            <v-card-text class="pb-1">
+              <div class="text-subtitle-1 font-medium mb-3">
+                請給這次住宿評分
+              </div>
+              <v-row dense>
+                <v-col cols="12" sm="4">
+                  <div class="text-body-2 mb-1">乾淨度</div>
+                  <v-rating
+                    v-model="cleanScore"
+                    :length="5"
+                    :size="28"
+                    hover
+                    active-color="yellow-darken-1"
+                  />
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <div class="text-body-2 mb-1">溝通</div>
+                  <v-rating
+                    v-model="commScore"
+                    :length="5"
+                    :size="28"
+                    hover
+                    active-color="yellow-darken-1"
+                  />
+                </v-col>
+                <v-col cols="12" sm="4">
+                  <div class="text-body-2 mb-1">性價比</div>
+                  <v-rating
+                    v-model="valueScore"
+                    :length="5"
+                    :size="28"
+                    hover
+                    active-color="yellow-darken-1"
+                  />
+                </v-col>
+              </v-row>
+              <div class="text-caption text-medium-emphasis mt-2">
+                小提醒：星等越高代表體驗越好。
+              </div>
+            </v-card-text>
+          </v-card>
+
+          <!-- 文字評論 -->
+          <v-textarea
+            v-model="custComm"
+            label="文字評論"
+            variant="outlined"
+            rows="3"
+            auto-grow
+            clearable
+            :counter="200"
+            maxlength="200"
+            class="mb-4"
+            :rules="[
+              (v) => !!v || '請輸入評論',
+              (v) => (v?.trim().length ?? 0) >= 10 || '至少 10 個字',
+            ]"
+          />
+
+          <!-- 圖片上傳 -->
+          <v-card variant="outlined" rounded="lg" class="mb-4">
+            <v-card-text>
+              <v-file-input
+                v-model="files"
+                multiple
+                show-size
+                accept="image/*"
+                label="上傳評論圖片（最多 3 張）"
+                counter
+                :counter-size="3"
+                prepend-icon="mdi-camera"
+                :rules="[(f) => !f || f.length <= 3 || '最多 3 張']"
+              />
+
+              <v-row v-if="previews.length" class="mt-2" dense>
+                <v-col
+                  v-for="(p, i) in previews"
+                  :key="p.url"
+                  cols="4"
+                  class="d-flex"
+                >
+                  <v-hover v-slot="{ isHovering, props }">
+                    <div class="w-100 relative" v-bind="props">
+                      <v-img
+                        :src="p.url"
+                        aspect-ratio="1"
+                        cover
+                        class="rounded-lg"
+                      />
+                      <v-btn
+                        size="small"
+                        icon="mdi-close"
+                        variant="flat"
+                        class="thumb-close"
+                        @click="removeFile(i)"
+                        v-show="isHovering"
+                      />
+                    </div>
+                  </v-hover>
+                </v-col>
+              </v-row>
+              <div class="text-caption text-medium-emphasis mt-2">
+                支援 jpg / png / webp；單檔請控制大小適中，加快上傳速度。
+              </div>
+            </v-card-text>
+          </v-card>
+
+          <!-- 送出 -->
+          <div class="text-center">
+            <v-btn
+              color="#e7630b"
+              class="text-white"
+              :loading="submitting"
+              :disabled="!valid || !ready || submitting"
+              @click="submit"
+            >
+              送出
+            </v-btn>
+          </div>
+        </v-form>
+      </v-card-text>
     </v-card>
   </v-container>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, onBeforeUnmount, ref, computed, watch } from "vue";
 import axios from "axios";
-import { useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
-const router = useRouter();
+// ===== 路由 & 狀態 =====
+const route = useRoute();
+const bookingId = String(route.query.bookingId || ""); // 不是 ref，直接字串即可
 
+// 這些僅存在前端記憶體，不顯示在畫面
+const listId = ref(null);
+const custId = ref("");
+const hostId = ref("");
+
+// 顯示用資訊
+const houseName = ref("");
+const photo1 = ref("");
+const IMG_BASE = "http://localhost:8080/images/listings"; // 若後端實際是 /images/reviews/**，請改這裡
+const photoUrl = computed(() =>
+  photo1.value ? `${IMG_BASE}/${photo1.value}` : ""
+);
+
+// 表單欄位
 const valid = ref(false);
-const custComm = ref("");
+const submitting = ref(false);
 const cleanScore = ref(1);
 const commScore = ref(1);
 const valueScore = ref(1);
-const listId = ref("");
-const bookingId = ref("");
-const custId = ref("");
-const hostId = ref("");
-// const reviewDate = ref("");
-const files = ref([]); // 圖片上傳
+const custComm = ref("");
 
-const submit = async () => {
-  const formData = new FormData();
-  formData.append("listId", listId.value);
-  formData.append("bookingId", bookingId.value);
-  formData.append("custId", custId.value);
-  formData.append("hostId", hostId.value);
-  formData.append("cleanScore", cleanScore.value);
-  formData.append("commScore", commScore.value);
-  formData.append("valueScore", valueScore.value);
-  formData.append("custComm", custComm.value);
+// 上傳檔案 & 預覽（含 revoke 機制避免記憶體洩漏）
+const files = ref([]);
+const previews = ref([]); // [{ url, revoke }]
 
-  files.value.forEach((file, index) => {
-    formData.append(`images`, file); // 多張圖片用相同名稱
+function refreshPreviews() {
+  // 先釋放舊的 URL
+  previews.value.forEach((p) => p.revoke && p.revoke());
+  previews.value = [];
+  (files.value || []).slice(0, 3).forEach((file) => {
+    const url = URL.createObjectURL(file);
+    const revoke = () => URL.revokeObjectURL(url);
+    previews.value.push({ url, revoke });
   });
-  try {
-    const res = await axios.post(
-      "http://localhost:8080/api/reviews/insert",
-      formData,
-      {
-        withCredentials: true,
-      }
-    );
-    alert("送出成功");
-    console.log(formData);
+}
 
-    // 送出後刷新頁面 -> 跳轉至個人的所有評論 ?
-    //window.location.reload();
-  } catch (err) {
-    console.log(formData);
-    console.error(err);
-    alert("送出失敗");
-    // window.location.reload();
+watch(files, refreshPreviews);
+onBeforeUnmount(() => {
+  previews.value.forEach((p) => p.revoke && p.revoke());
+});
+
+function removeFile(index) {
+  const arr = [...(files.value || [])];
+  arr.splice(index, 1);
+  files.value = arr;
+  refreshPreviews();
+}
+
+// 必要資料是否齊全
+const ready = computed(() =>
+  Boolean(
+    listId.value &&
+      custId.value &&
+      hostId.value &&
+      bookingId &&
+      cleanScore.value &&
+      commScore.value &&
+      valueScore.value &&
+      custComm.value?.trim().length >= 10
+  )
+);
+
+// ===== 初始化載入 Insert 所需資料 =====
+onMounted(async () => {
+  try {
+    const { data } = await axios.get(
+      `http://localhost:8080/api/reviews/insertData/${bookingId}`,
+      { withCredentials: true }
+    );
+    // 後端回傳鍵名請維持小駝峰
+    listId.value = data.listId;
+    custId.value = data.customerId;
+    // hostId.value = data.hostId;
+    hostId.value = "91954B18-C5F6-4E66-8A83-A38F96A74750"; // 測試用，之後刪除
+    photo1.value = data.listImg;
+    houseName.value = data.houseName || "";
+  } catch (e) {
+    console.error("載入 insert 資料失敗", e);
+    alert("無法載入評論資料，請返回重試");
   }
-};
+});
+
+// ===== 送出 =====
+async function submit() {
+  if (!valid.value || !ready.value || submitting.value) return;
+  submitting.value = true;
+
+  try {
+    const selected = (files.value || []).slice(0, 3);
+    const formData = new FormData();
+    formData.append("listId", listId.value ?? "");
+    formData.append("bookingId", bookingId);
+    formData.append("custId", custId.value ?? "");
+    formData.append("hostId", hostId.value ?? "");
+    formData.append("cleanScore", String(cleanScore.value));
+    formData.append("commScore", String(commScore.value));
+    formData.append("valueScore", String(valueScore.value));
+    formData.append("custComm", custComm.value);
+    selected.forEach((f) => formData.append("images", f)); // 多檔同名欄位
+
+    await axios.post("http://localhost:8080/api/reviews/insert", formData, {
+      withCredentials: true,
+    });
+    alert("送出成功！感謝您的評論 🙏");
+    // 這裡可導回列表或清空表單
+    // router.push('/reviews/mine')
+  } catch (e) {
+    console.error(e);
+    alert("送出失敗，請稍後再試");
+  } finally {
+    submitting.value = false;
+  }
+}
 </script>
+
 <style scoped>
+.hero-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 16px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+}
+.thumb-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+}
 .v-rating {
   justify-content: center;
 }

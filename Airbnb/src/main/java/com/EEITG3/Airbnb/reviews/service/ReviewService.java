@@ -2,6 +2,7 @@ package com.EEITG3.Airbnb.reviews.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.EEITG3.Airbnb.listing.entity.LisBean;
 import com.EEITG3.Airbnb.reviews.dto.ReviewDTO;
+import com.EEITG3.Airbnb.reviews.dto.ReviewInsertDto;
 import com.EEITG3.Airbnb.reviews.dto.ReviewMapper;
 import com.EEITG3.Airbnb.reviews.dto.ReviewPatchRequest;
 import com.EEITG3.Airbnb.reviews.dto.ReviewWithCustomerDto;
@@ -77,7 +79,6 @@ public class ReviewService {
 	            .map(ReviewMapper::toDTO)
 	            .collect(Collectors.toList());
 	}
-	
 
 	
 	public List<ReviewDTO> findByCustId(String id){
@@ -94,7 +95,26 @@ public class ReviewService {
                   .map(ReviewMapper::toDTO)
                   .orElse(null); // 或丟出例外
 	}
-
+	
+	public List<ReviewDTO> getReviewsByHostToken(String email) {
+		  Optional<Host> hostByEmail = hostRepository.findHostByEmail(email);
+		  String HostId = hostByEmail.get().getHostId();
+		
+		return rRepository.findByHost_HostIdContainingIgnoreCase(HostId).stream()
+	            .map(ReviewMapper::toDTO)
+	            .collect(Collectors.toList());
+		
+	}
+	
+	public List<ReviewDTO> getReviewsByCustomerToken(String email) {
+		  Optional<Customer> customerByEmail = customerRepository.findCustomerByEmail(email);
+		  String customerId = customerByEmail.get().getCustomerId();
+		
+		return rRepository.findByCustomer_CustomerIdContainingIgnoreCase(customerId).stream()
+	            .map(ReviewMapper::toDTO)
+	            .collect(Collectors.toList());
+		
+	}
 
 	public void deleteById(Integer id) {
 		rRepository.deleteById(id);
@@ -205,6 +225,18 @@ public class ReviewService {
 		Review saved = rRepository.save(r);
 
 		return ResponseEntity.ok(saved);
+	}
+	
+	public ReviewInsertDto insertData(String bookingId) {
+		ReviewInsertDto reviewInsertDto = new ReviewInsertDto();
+		Optional<Order> order = orderRepository.findByBookingId(bookingId);
+		reviewInsertDto.setBookingId(bookingId);
+		reviewInsertDto.setCustomerId(order.get().getCustomerId());
+		reviewInsertDto.setHostId(order.get().getHostId());
+		reviewInsertDto.setListId(order.get().getListing().getListId());
+		reviewInsertDto.setListImg(order.get().getListing().getPhoto1());
+		reviewInsertDto.setHouseName(order.get().getListing().getHouseName());
+		return reviewInsertDto;
 	}
 
 }
