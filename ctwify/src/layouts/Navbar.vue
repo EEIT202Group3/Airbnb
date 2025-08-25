@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useCustomerStore } from '@/stores/customer'
+import { useHostStore } from '@/stores/host';
 import LoginSignup from '@/components/user/customer/LoginSignup.vue'
 import defaultAvatar from '@/images/default.png'
 import logo from '@/icon/logo.png'
@@ -11,6 +12,7 @@ const router = useRouter()
 const showAuthPage = ref(false)
 const customerStore = useCustomerStore()
 const { customer } = storeToRefs(customerStore)
+const hostStore = useHostStore()
 
 const avatarUrl = computed(
   () => (customer.value?.avatarURL ? 'http://localhost:8080' + customer.value.avatarURL : defaultAvatar)
@@ -30,6 +32,15 @@ async function logout(){
     console.log(error.response)
     alert('登出失敗')
   }
+}
+
+async function toHost(){
+  const request = {
+    email:'nickck0527@gmail.com',
+    password:'@Test123',
+  }
+  await hostStore.login(request);
+  router.push('/host');
 }
 </script>
 
@@ -68,12 +79,12 @@ async function logout(){
       登入 / 註冊
     </v-btn>
 
-    <v-btn 
-      to="/hostLogin" 
+    <v-btn  
       variant="text" 
       class="text-black" 
       size="large"
       style="font-size: large;"  
+      @click="toHost"
     >房東專區</v-btn>
 
     <!-- 右：漢堡選單 -->
