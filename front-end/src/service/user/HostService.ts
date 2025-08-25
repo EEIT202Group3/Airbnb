@@ -31,9 +31,9 @@ export async function permission(status, hostEmail) {
     return await response.json();
 }
 
-export async function findLike(keyword,context){
+export async function findLike(keyword, context) {
     try {
-        const response = await axios.get(`${BASE_URL}/api/admins/hosts/findlike`,{
+        const response = await axios.get(`${BASE_URL}/api/admins/hosts/findlike`, {
             params: {
                 keyword: keyword,
                 context: context,
@@ -52,4 +52,20 @@ export async function findLike(keyword,context){
             throw error;
         }
     }
+}
+
+//查當月註冊人數
+export async function getMonthlyHosts() {
+    const response = await axios.get(`${BASE_URL}/api/getMonthlyRegistHosts`)
+    return response.data;
+}
+//查總房東數
+export async function getTotalHosts() {
+    const response = await axios.get(`${BASE_URL}/api/getTotalHosts`)
+    return response.data
+}
+//查已驗證客戶數
+export async function getVerifiedHosts() {
+    const response = await axios.get(`${BASE_URL}/api/getVerifiedHosts`)
+    return response.data
 }

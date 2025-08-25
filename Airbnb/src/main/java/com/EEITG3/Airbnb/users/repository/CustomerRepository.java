@@ -59,5 +59,20 @@ public interface CustomerRepository extends JpaRepository<Customer, String> {
 			OPTION (MAXRECURSION 12);
 			""", nativeQuery = true)
 	public List<MonthlyRegist> getMonthlyRegist();
+	
+	//查全部客戶
+	@Query(value="""
+			SELECT COUNT(*) AS total_customers
+			FROM customers;
+			""",nativeQuery=true)
+	public Integer getTotalCustomers();
+	
+	//查已驗證客戶
+	@Query(value="""
+			SELECT COUNT(*) AS verified_customers
+			FROM customers
+			WHERE is_verified = 1
+			""",nativeQuery=true)
+	public Integer getVerifiedCustomers();
 
 }

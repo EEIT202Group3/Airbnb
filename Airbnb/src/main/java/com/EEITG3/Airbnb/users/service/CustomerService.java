@@ -51,4 +51,8 @@ public interface CustomerService {
 	List<Customer> findLikeByPhone(String phone);
 	//查當月註冊人數
 	Map<String, Object> getMonthlyRegist();
+	//查總客戶數
+	Integer getTotalCustomers();
+	//查已驗證客戶
+	Integer getVerifiedCustomers();
 }

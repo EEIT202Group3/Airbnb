@@ -266,6 +266,19 @@ public class CustomerController {
 		Map<String, Object> result = service.getMonthlyRegist();
 		return ResponseEntity.ok(result);
 	}
+	
+	//查總客戶數
+	@GetMapping("/getTotalCustomers")
+	public ResponseEntity<?> getTotalCustomers(){
+		Integer result = service.getTotalCustomers();
+		return ResponseEntity.ok(result);
+	}
+	//查已驗證客戶數
+	@GetMapping("/getVerifiedCustomers")
+	public ResponseEntity<?> getVerifiedCustomers(){
+		Integer result = service.getVerifiedCustomers();
+		return ResponseEntity.ok(result);
+	}
 }
 
 

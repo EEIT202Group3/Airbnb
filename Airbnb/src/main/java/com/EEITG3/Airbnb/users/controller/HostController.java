@@ -175,4 +175,25 @@ public class HostController {
 		return ResponseEntity.ok(hosts);
 	}
 	
+	//查詢當月註冊人數
+	@GetMapping("/getMonthlyRegistHosts")
+	public ResponseEntity<?> getMonthlyRegist(){
+		Map<String, Object> result = service.getMonthlyRegist();
+		return ResponseEntity.ok(result);
+	}
+	
+	//查總房東數
+	@GetMapping("/getTotalHosts")
+	public ResponseEntity<?> getTotalHosts(){
+		Integer result = service.getTotalHosts();
+		return ResponseEntity.ok(result);
+	}
+	
+	//查已驗證房東數
+	@GetMapping("/getVerifiedHosts")
+	public ResponseEntity<?> getVerifiedHosts(){
+		Integer result = service.getVerifiedHosts();
+		return ResponseEntity.ok(result);
+	}
+	
 }

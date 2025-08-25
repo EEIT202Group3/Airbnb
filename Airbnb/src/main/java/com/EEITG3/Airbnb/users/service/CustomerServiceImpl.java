@@ -277,5 +277,15 @@ public class CustomerServiceImpl implements CustomerService {
 		result.put("registrations", registrations);
 		return result;
 	}
+
+	@Override
+	public Integer getTotalCustomers() {
+		return repo.getTotalCustomers();
+	}
+
+	@Override
+	public Integer getVerifiedCustomers() {
+		return repo.getVerifiedCustomers();
+	}
 	
 }
