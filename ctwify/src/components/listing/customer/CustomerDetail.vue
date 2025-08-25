@@ -88,6 +88,19 @@
           </div>
 
           <br />
+          <hr>
+       <div v-if="host" class="host-info">
+  <img
+    class="host-avatar"
+    :src="host.avatarURL"
+    alt="房東頭貼"
+  />
+  <div class="host-text">
+    <div class="host-name">房東 ：{{ host.username }}</div>
+    <div class="host-extra">超讚房東 · 1年待客經驗</div>
+  </div>
+</div>
+
           <hr />
 
           <!-- 房源介紹 -->
@@ -265,7 +278,7 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import { ref, onMounted, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SimpleReview from "@/components/reviews/SimpleReview.vue";
-
+import DefaultAvatar from "@/images/default.png";
 
 const route = useRoute();
 const router = useRouter();
@@ -278,6 +291,8 @@ const photos = ref([]);
 const isModalOpen = ref(false);
 const showFullDescription = ref(false);
 const isAmenitiesModalOpen = ref(false);
+
+const host = ref(null); // 房東資料
 const limitCount = 6;
 
 // 日期 & 旅客數
@@ -288,7 +303,7 @@ const dateRange = ref([new Date(), new Date(new Date().getTime() + 86400000)]);
 
 // 地圖
 const mapCenter = ref({ lat: 25.034, lng: 121.5645 }); // 預設台北市中心
-const mapBounds = ref(null); // 用來放 viewport bounds
+const mapBounds = ref(null);
 const mapRef = ref(null);
 const zoomLevel = ref(3);
 
@@ -300,33 +315,22 @@ function switchMainPhoto(photo) {
   selectedPhoto.value = photo;
 }
 
-//地址名稱縣市擷取
+// 地址名稱縣市擷取
 const cityName = computed(() => {
   if (!listing.value) return "";
   const address = listing.value.ads || "";
-
   const cleanedAddress = address.replace(/台灣/, "");
-
   const match = cleanedAddress.match(/([\u4e00-\u9fa5]{2,3}[縣市])/);
-
   return match ? match[1] : "國外地區";
 });
 
 // 房源介紹彈窗
-function openModal() {
-  isModalOpen.value = true;
-}
-function closeModal() {
-  isModalOpen.value = false;
-}
+function openModal() { isModalOpen.value = true; }
+function closeModal() { isModalOpen.value = false; }
 
 // 設備彈窗
-function openAmenitiesModal() {
-  isAmenitiesModalOpen.value = true;
-}
-function closeAmenitiesModal() {
-  isAmenitiesModalOpen.value = false;
-}
+function openAmenitiesModal() { isAmenitiesModalOpen.value = true; }
+function closeAmenitiesModal() { isAmenitiesModalOpen.value = false; }
 
 // 文字截斷
 const truncatedText = computed(() => {
@@ -383,11 +387,8 @@ function isFontAwesome(icon) {
 // Geocoding API 將地址轉經緯度
 async function geocodeAddress(address) {
   try {
-    const res = await axios.get(`/api/geocode`, {
-      params: { address },
-    });
+    const res = await axios.get(`/api/geocode`, { params: { address } });
     const data = res.data;
-
     if (data.status === "OK" && data.results.length > 0) {
       const geometry = data.results[0].geometry;
       return {
@@ -404,8 +405,8 @@ async function geocodeAddress(address) {
   }
 }
 
+// 前往預訂
 function goToBooking() {
-  console.log(listing.value);
   router.push({
     name: "BookingStart",
     query: {
@@ -424,18 +425,14 @@ function goToBooking() {
   });
 }
 
-// 取得房源資料
+// 取得房源資料並整理圖片、地圖、房東資訊
 onMounted(async () => {
   const id = route.params.id;
   try {
     const res = await axios.get(`/listings/${id}`);
     listing.value = res.data;
 
-    // 測試用分數
-
-    // listing.value.reviewCount = 4.5
-
-    // 圖片整理
+    // 圖片整理（支援10張）
     photos.value = [];
     for (let i = 1; i <= 10; i++) {
       const key = `photo${i}`;
@@ -445,20 +442,21 @@ onMounted(async () => {
     mainPhoto.value = photos.value.length > 0 ? photos.value[0] : "";
     selectedPhoto.value = mainPhoto.value;
 
+    // 房東資料直接從 DTO
+  host.value = {
+  username: listing.value.hostName,
+  avatarURL: listing.value.hostAvatarURL
+    ? "http://localhost:8080" + listing.value.hostAvatarURL
+    : DefaultAvatar,
+};
+
     // 地圖設定
     if (listing.value.lat && listing.value.lng) {
       const rawLat = parseFloat(listing.value.lat);
       const rawLng = parseFloat(listing.value.lng);
-
-      // 隨機偏移
       const offset = () => (Math.random() - 0.5) * 0.004;
-
-      mapCenter.value = {
-        lat: rawLat + offset(),
-        lng: rawLng + offset(),
-      };
+      mapCenter.value = { lat: rawLat + offset(), lng: rawLng + offset() };
     } else if (listing.value.ads) {
-      // 沒有經緯度時用地址 geocode
       const geocodeResult = await geocodeAddress(listing.value.ads);
       if (geocodeResult) {
         mapCenter.value = geocodeResult.location;
@@ -470,7 +468,7 @@ onMounted(async () => {
   }
 });
 
-// 監聽 mapBounds 變動，當有範圍時調整地圖
+// 監聽 mapBounds 變動
 watch(mapBounds, async (newBounds) => {
   if (newBounds && mapRef.value && mapRef.value.$mapObject) {
     const bounds = new google.maps.LatLngBounds(
@@ -478,8 +476,6 @@ watch(mapBounds, async (newBounds) => {
       new google.maps.LatLng(newBounds.northeast.lat, newBounds.northeast.lng)
     );
     mapRef.value.$mapObject.fitBounds(bounds);
-
-    // 更新 zoomLevel，保持響應式
     zoomLevel.value = mapRef.value.$mapObject.getZoom();
   }
 });
@@ -501,6 +497,8 @@ onMounted(() => {
   checkOut.value = tomorrow.toISOString().split("T")[0];
 });
 </script>
+
+
 
 <style>
 @import "@/assets/listing/list1.css";
@@ -629,6 +627,45 @@ onMounted(() => {
 .info-right {
   position: relative;
   z-index: 1000; 
+}
+
+
+/* 房東資訊區塊 */
+.host-info {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* 文字與頭貼間距 */
+  margin: 16px 0;
+  padding: 0px;
+  /* background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); */
+}
+
+.host-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: none; 
+}
+
+.host-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.host-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 4px;
+}
+
+.host-extra {
+  font-size: 14px;
+  color: #717171;
 }
 
 </style>

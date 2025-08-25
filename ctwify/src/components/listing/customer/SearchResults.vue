@@ -293,6 +293,7 @@ export default {
   flex: 0.8;
   height: 80vh;
   border-radius: 20px;
+   margin-top: 50px;  
 }
 
 /* 價格放右下角 */

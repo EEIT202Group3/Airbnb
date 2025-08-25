@@ -1,15 +1,17 @@
 <template>
   <Nav></Nav>
-  <v-main style="margin-top: 45px;">
+   <v-app>
+  <v-main style="padding-top: 70px;padding-bottom:-200px;">
     <router-view></router-view>
   </v-main>
   <Footer app fixed></Footer>
+  </v-app>
 </template>
 <script setup>
 
 import Nav from "@/layouts/Navbar.vue";
 import Footer from "@/layouts/Footer.vue";
 </script>
-<style scoped>
+<style>
 
 </style>

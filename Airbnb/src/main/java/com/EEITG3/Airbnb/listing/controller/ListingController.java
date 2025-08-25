@@ -1,10 +1,9 @@
 package com.EEITG3.Airbnb.listing.controller;
 
 import java.time.LocalDate;
+
 import java.util.*;
-
-
-
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,11 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.EEITG3.Airbnb.listing.dto.ListingWithHostDTO;
 import com.EEITG3.Airbnb.listing.entity.LisBean;
 import com.EEITG3.Airbnb.listing.repository.ListRepository;
 import com.EEITG3.Airbnb.listing.service.ListingService;
 import com.EEITG3.Airbnb.users.entity.Host;
 import com.EEITG3.Airbnb.users.entity.HostDetails;
+import com.EEITG3.Airbnb.users.repository.HostRepository;
 import com.EEITG3.Airbnb.users.service.HostService;
 
 @RestController
@@ -34,8 +35,16 @@ public class ListingController {
     @Autowired
     private ListingService listingService;
     
+    private final HostRepository hostRepository;
+    
     @Autowired
     private HostService hostservice;
+    
+    @Autowired
+    public ListingController(ListRepository listRepository, HostRepository hostRepository) {
+        this.listRepository = listRepository;
+        this.hostRepository = hostRepository;
+    }
 
 
     //刪除房源
@@ -91,7 +100,6 @@ public class ListingController {
         return result;
     }
 
- 
 
     //查詢單筆房源(房源基本資料)
     @GetMapping("/{id}/basic")
@@ -99,11 +107,70 @@ public class ListingController {
         return listingService.findById(id);
     }
     
-    //查詢單筆房源（房源資料與設備）
+    
+ // 查詢房源（房源、圖片、設備、房東）
     @GetMapping("/{id}")
-    public LisBean getListingById(@PathVariable("id") int id) {
-        return listingService.getListingById(id);
+    public ResponseEntity<?> getListingWithHost(@PathVariable("id") Integer listId) {
+        Optional<LisBean> optListing = listRepository.findById(listId);
+        if (optListing.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        LisBean listing = optListing.get();
+
+        // 取得房東
+        Optional<Host> optHost = hostRepository.findById(listing.getHostId());
+        Host host = optHost.orElse(null);
+
+        // DTO
+        ListingWithHostDTO dto = new ListingWithHostDTO();
+        dto.setListId(listing.getListId());
+        dto.setHouseName(listing.getHouseName());
+        dto.setAds(listing.getAds());
+        dto.setRoom(listing.getRoom());
+        dto.setBed(listing.getBed());
+        dto.setPpl(listing.getPpl());
+        dto.setPrice(listing.getPrice());
+        dto.setDescribe(listing.getDescribe());
+        dto.setTel(listing.getTel());
+        dto.setReviewCount(listing.getReviewCount());
+
+        // 圖片
+        dto.setPhoto1(listing.getPhoto1());
+        dto.setPhoto2(listing.getPhoto2());
+        dto.setPhoto3(listing.getPhoto3());
+        dto.setPhoto4(listing.getPhoto4());
+        dto.setPhoto5(listing.getPhoto5());
+        dto.setPhoto6(listing.getPhoto6());
+        dto.setPhoto7(listing.getPhoto7());
+        dto.setPhoto8(listing.getPhoto8());
+        dto.setPhoto9(listing.getPhoto9());
+        dto.setPhoto10(listing.getPhoto10());
+
+     // 房東資訊 
+        if (host != null) { 
+        	dto.setHostName(host.getUsername()); 
+        	dto.setHostAvatarURL(host.getAvatarURL());
+        	}
+        
+        
+        // 設備資訊
+        if (listing.getEquipments() != null && !listing.getEquipments().isEmpty()) {
+            dto.setEquipments(
+                listing.getEquipments().stream().map(equip -> {
+                    ListingWithHostDTO.EquipmentDTO eDto = new ListingWithHostDTO.EquipmentDTO();
+                    eDto.setEquip_id(equip.getEquip_id());
+                    eDto.setEquip_name(equip.getEquip_name());
+                    eDto.setEquip_icon(equip.getEquip_icon());
+                    eDto.setEquip_category(equip.getEquip_category());
+                    return eDto;
+                }).collect(Collectors.toList())
+            );
+        }
+
+        return ResponseEntity.ok(dto);
     }
+
 
 
     // 儲存房源設備（修改後更新設備）

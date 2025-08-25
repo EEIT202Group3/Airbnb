@@ -21,7 +21,10 @@ const routes = [
         path: '/coustomerlistings/:id',
         component: () => import('@/components/listing/customer/CustomerDetail.vue'),
       },
-
+       {
+        path: '/search',
+        component: () => import('@/components/listing/customer/SearchResults.vue'),
+      },
       //修維的API串上之後可砍
       {
         path: "/listing/card",
@@ -152,11 +155,17 @@ const routes = [
         component: () => import("@/components/user/host/ChangePassword.vue"),
         name: "HostPassword",
       },
+
       {
         path: '/addlistings',
         component: () => import('@/components/listing/host/AddListing2.vue'),
         name: 'addlistings',
       },
+      
+      {
+        path: 'details/:id',
+        component: () => import('@/components/listing/host/Detail.vue'),
+      }
     ],
   },
 
