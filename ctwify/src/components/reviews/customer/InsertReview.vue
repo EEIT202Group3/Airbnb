@@ -224,7 +224,7 @@ onMounted(async () => {
     listId.value = data.listId;
     custId.value = data.customerId;
     // hostId.value = data.hostId;
-    hostId.value = "91954B18-C5F6-4E66-8A83-A38F96A74750"; // 測試用，之後刪除
+    hostId.value = ""; // 測試用，之後刪除
     photo1.value = data.listImg;
     houseName.value = data.houseName || "";
   } catch (e) {
