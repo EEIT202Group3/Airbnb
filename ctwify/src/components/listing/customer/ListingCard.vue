@@ -312,7 +312,7 @@ export default {
   scroll-snap-align: start;
 }
 
-/* 🔹 dropdown 自訂縣市 */
+/* dropdown 自訂縣市 */
 .input-wrapper {
   position: relative;
   width: 100%; /* 改成 100% 讓他在小螢幕撐滿 */
