@@ -57,7 +57,7 @@ function buildItems(){
     items.value = [
         { icon: 'mdi-account-outline', title: '更改使用者名稱', key: 'username', value: host.value.username },
         { icon: 'mdi-phone-outline',   title: '更改電話號碼',   key: 'phone',    value: host.value.phone },
-        { icon: 'mdi-text-account',   title: '更改自我介紹',   key: 'intro',    value: host.value.intro },
+        { icon: 'mdi-text-account',   title: '更改自我介紹',   key: 'intro',    value: host.value.intro?host.value.intro:'此房東沒有自我介紹' },
         { icon: 'mdi-lock-outline',    title: '更改密碼',       key: 'password', value: '' },
     ]
 }
@@ -156,7 +156,7 @@ watch(host,()=>buildItems())
                             <template #prepend>
                                 <v-icon :icon="item.icon" />
                             </template>
-                            <v-list-item-title>{{ item.title }}</v-list-item-title>
+                            <v-list-item-title>{{ item.value }}</v-list-item-title>
                             </v-list-item>
                         </template>
                     </v-list>

@@ -69,3 +69,8 @@ export async function findLike(keyword, context) {
         }
     }
 }
+//查當月註冊人數
+export async function getMonthlyCustomers() {
+    const response = await axios.get(`${BASE_URL}/api/getMonthlyRegistCustomers`)
+    return response.data;
+}

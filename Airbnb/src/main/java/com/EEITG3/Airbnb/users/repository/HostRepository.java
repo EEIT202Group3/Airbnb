@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.EEITG3.Airbnb.users.dto.MonthlyRegist;
 import com.EEITG3.Airbnb.users.entity.Host;
 
 public interface HostRepository extends JpaRepository<Host, String> {
@@ -30,4 +31,32 @@ public interface HostRepository extends JpaRepository<Host, String> {
 	//透過phone模糊搜尋
 	@Query("SELECT h FROM Host h WHERE h.phone LIKE :phone")
 	List<Host> findLikeByPhone(@Param("phone") String phone);
+	
+	//查詢過去12個月的註冊人數
+	@Query(value="""
+			;WITH bounds AS (
+			  SELECT
+			    DATETRUNC(month, DATEADD(month, -11, GETDATE())) AS start_m,
+			    DATETRUNC(month, GETDATE())                      AS end_m
+			),
+			months AS (
+			  SELECT start_m AS m FROM bounds
+			  UNION ALL
+			  SELECT DATEADD(month, 1, m)
+			  FROM months, bounds
+			  WHERE m < (SELECT end_m FROM bounds)
+			)
+			SELECT
+			  FORMAT(m.m, 'yyyy-MM')        AS [month],
+			  ISNULL(c.cnt, 0)              AS registrations
+			FROM months m
+			OUTER APPLY (
+			  SELECT COUNT(*) AS cnt
+			  FROM hosts
+			  WHERE DATETRUNC(month, created_at) = m.m
+			) c
+			ORDER BY m.m
+			OPTION (MAXRECURSION 12);
+			""", nativeQuery = true)
+	public List<MonthlyRegist> getMonthlyRegist();
 }
