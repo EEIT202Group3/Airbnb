@@ -42,5 +42,14 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 	List<Order> findAllByHostId(@Param("hostId") String hostId);
 	List<Order> findByListing_ListIdIn(List<Integer> listIds);
 	
+	@Query(value="""
+			SELECT SUM(host_net_amount) AS total_revenue
+			FROM orderlist
+			WHERE booking_status = '已完成'
+			  AND YEAR(checkout_date) = YEAR(GETDATE())
+			  AND MONTH(checkout_date) = MONTH(GETDATE());
+			""",nativeQuery = true)
+	Double getMonthlyRevenue();
+	
 		
 }

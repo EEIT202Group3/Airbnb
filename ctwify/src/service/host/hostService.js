@@ -48,3 +48,9 @@ export async function updateAvatar(data) {
     });
     return response.data;
 }
+export async function getRevenue() {
+    const response = await axios.get(`${BASE_URL}/api/getRevenue`, {
+        withCredentials: true,
+    })
+    return response.data
+}

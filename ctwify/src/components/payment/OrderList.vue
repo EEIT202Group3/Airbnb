@@ -143,7 +143,7 @@
           v-slot="{ navigate }"
         >
           <v-btn
-            :disabled="order.bookingStatus !== '已完成'"
+            :disabled="order.bookingStatus == '已完成'"
             @click="navigate"
             icon
           >

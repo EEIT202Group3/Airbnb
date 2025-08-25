@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.EEITG3.Airbnb.jwt.EmailService;
 import com.EEITG3.Airbnb.jwt.JwtService;
+import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
 import com.EEITG3.Airbnb.users.dto.MonthlyRegist;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
@@ -42,13 +43,14 @@ public class HostServiceImpl implements HostService {
 	private AuthenticationManager authManager;
 	private PasswordEncoder encoder;
 	private EmailService emailService;
+	private OrderRepository orderRepo;
 	
 	@Value("${app.storage.base-dir}")
 	private String baseDir;
 	
 	@Autowired
 	public HostServiceImpl(HostRepository repo, ObjectMapper objectMapper, JwtService jwtService,
-			AuthenticationManager authManager, PasswordEncoder encoder, EmailService emailService) {
+			AuthenticationManager authManager, PasswordEncoder encoder, EmailService emailService, OrderRepository orderRepo) {
 		super();
 		this.repo = repo;
 		this.objectMapper = objectMapper;
@@ -56,6 +58,7 @@ public class HostServiceImpl implements HostService {
 		this.authManager = authManager;
 		this.encoder = encoder;
 		this.emailService = emailService;
+		this.orderRepo = orderRepo;
 	}
 
 	@Override
@@ -216,6 +219,11 @@ public class HostServiceImpl implements HostService {
 	@Override
 	public Integer getVerifiedHosts() {
 		return repo.getVerifiedHosts();
+	}
+
+	@Override
+	public Double getMonthlyRevenue() {
+		return orderRepo.getMonthlyRevenue();
 	}
 
 	
