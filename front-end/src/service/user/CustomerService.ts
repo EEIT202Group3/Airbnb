@@ -74,3 +74,13 @@ export async function getMonthlyCustomers() {
     const response = await axios.get(`${BASE_URL}/api/getMonthlyRegistCustomers`)
     return response.data;
 }
+//查總客戶數
+export async function getTotalCustomers() {
+    const response = await axios.get(`${BASE_URL}/api/getTotalCustomers`)
+    return response.data
+}
+//查已驗證客戶數
+export async function getVerifiedCustomers() {
+    const response = await axios.get(`${BASE_URL}/api/getVerifiedCustomers`)
+    return response.data
+}

@@ -59,4 +59,19 @@ public interface HostRepository extends JpaRepository<Host, String> {
 			OPTION (MAXRECURSION 12);
 			""", nativeQuery = true)
 	public List<MonthlyRegist> getMonthlyRegist();
+	
+	//查全部房東
+	@Query(value="""
+			SELECT COUNT(*) AS total_hosts
+			FROM hosts;
+			""",nativeQuery=true)
+	public Integer getTotalHosts();
+	
+	//查已驗證客戶
+	@Query(value="""
+			SELECT COUNT(*) AS verified_hosts
+			FROM hosts
+			WHERE is_verified = 1
+			""",nativeQuery=true)
+	public Integer getVerifiedHosts();
 }

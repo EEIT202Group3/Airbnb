@@ -39,4 +39,10 @@ public interface HostService {
 	List<Host> findLikeByUsername(String username);
 	//模糊查詢phone
 	List<Host> findLikeByPhone(String phone);
+	//查當月註冊人數
+	Map<String, Object> getMonthlyRegist();
+	//查總房東數
+	Integer getTotalHosts();
+	//查已驗證房東
+	Integer getVerifiedHosts();
 }

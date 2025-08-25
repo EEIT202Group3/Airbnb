@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.EEITG3.Airbnb.jwt.EmailService;
 import com.EEITG3.Airbnb.jwt.JwtService;
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
+import com.EEITG3.Airbnb.users.dto.MonthlyRegist;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
 import com.EEITG3.Airbnb.users.entity.Host;
 import com.EEITG3.Airbnb.users.entity.HostDetails;
@@ -188,6 +191,31 @@ public class HostServiceImpl implements HostService {
 	public List<Host> findLikeByPhone(String phone) {
 		String likePhone = "%"+phone+"%";
 		return repo.findLikeByPhone(likePhone);
+	}
+
+	@Override
+	public Map<String, Object> getMonthlyRegist() {
+		List<MonthlyRegist> monthlyRegists = repo.getMonthlyRegist();
+		Map<String, Object> result = new HashMap<String, Object>();
+		List<String> months = new ArrayList<String>();
+		List<Integer> registrations = new ArrayList<Integer>();
+		for(MonthlyRegist data : monthlyRegists) {
+			months.add(data.getMonth());
+			registrations.add(data.getRegistrations());
+		}
+		result.put("months", months);
+		result.put("registrations", registrations);
+		return result;
+	}
+
+	@Override
+	public Integer getTotalHosts() {
+		return repo.getTotalHosts();
+	}
+
+	@Override
+	public Integer getVerifiedHosts() {
+		return repo.getVerifiedHosts();
 	}
 
 	
