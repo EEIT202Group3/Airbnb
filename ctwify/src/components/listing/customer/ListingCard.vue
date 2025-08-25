@@ -248,7 +248,7 @@ export default {
 .container1,
 .listing-wrapper {
   width: 100%;
-  max-width: 1200px; /* 你要的對齊寬度 */
+  max-width: 1150px; /* 你要的對齊寬度 */
   margin: 0 auto;    /* 置中 */
   padding: 0 16px;   /* 預留邊距，避免太貼邊 */
   box-sizing: border-box;
@@ -274,7 +274,7 @@ export default {
   font-size: 20px;
 }
 
-/* 🔹 Datepicker 樣式 */
+/* Datepicker 樣式 */
 .card-datepicker .dp__input {
   border: none;
   background: transparent !important;
@@ -284,7 +284,7 @@ export default {
   cursor: pointer;
 }
 
-/* 🔹 房源卡片 */
+/* 房源卡片 */
 .listing-card {
   text-decoration: none;
   color: inherit;
@@ -301,7 +301,7 @@ export default {
   object-fit: cover;
 }
 
-/* 🔹 房源橫向滑動區 */
+/* 房源橫向滑動區 */
 .listing-container {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -348,13 +348,13 @@ export default {
   color: #333;
 }
 
-/* 🔹 簡單淡入動畫 */
+/* 簡單淡入動畫 */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 🔹 響應式設計 (RWD) */
+/* 響應式設計 (RWD) */
 @media (max-width: 992px) {
   .background {
     height: auto;
