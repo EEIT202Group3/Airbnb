@@ -29,7 +29,8 @@ onMounted(
 )
 
 async function goHome(){
-  router.push('/host')
+  await hostStore.logout()
+  router.push('/')
 }
 
 </script>

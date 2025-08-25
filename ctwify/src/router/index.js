@@ -19,14 +19,14 @@ const routes = [
                 path: '/coustomerlistings/:id',
                 component: () => import('@/components/listing/customer/CustomerDetail.vue'),
             },
-              
+
             {
-              path: '/search',
+                path: '/search',
                 component: () => import('@/components/listing/customer/SearchResults.vue'),
 
             },
 
-             {
+            {
                 path: '/search',
                 component: () => import('@/components/listing/customer/SearchResults.vue'),
             },
@@ -120,13 +120,6 @@ const routes = [
                 component: () =>
                     import("@/components/reviews/customer/InsertReview.vue"),
             },
-
-            //房東登入介面，接續之後的房東首頁
-            {
-                path: "hostLogin",
-                component: () => import("@/components/user/host/HostLoginPage.vue"),
-                name: "HostLogin",
-            },
         ],
     },
 
@@ -212,7 +205,8 @@ const routes = [
         component: () => import('@/components/carRent/frontpageComponent/CarDetail.vue'),
         props: true
     },
-    { path: '/car-payment-result',
+    {
+        path: '/car-payment-result',
         name: 'CarPaymentResult',
         component: () => import('@/components/carRent/frontpageComponent/CarPaymentResult.vue')
     }
