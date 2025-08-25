@@ -19,7 +19,9 @@ const reviews = ref([]);
 const list = ref({});
 
 const fetchReviews = async () => {
-  reviews.value = (await api.get("/api/reviews")).data;
+  reviews.value = (
+    await api.get("/api/reviews/token/byUser", { withCredentials: true })
+  ).data;
   console.log(reviews.value);
 };
 

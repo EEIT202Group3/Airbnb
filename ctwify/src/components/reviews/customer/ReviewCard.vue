@@ -48,10 +48,12 @@
               ><strong>訂單編號：</strong>{{ selectedReview.bookingId }}</v-col
             >
             <v-col cols="12" sm="6"
-              ><strong>房客編號：</strong>{{ selectedReview.custId }}</v-col
+              ><strong>房客編號：</strong
+              >{{ maskEmail(selectedReview.customerEmail) }}</v-col
             >
             <v-col cols="12" sm="6"
-              ><strong>房東編號：</strong>{{ selectedReview.hostId }}</v-col
+              ><strong>房東編號：</strong
+              >{{ maskEmail(selectedReview.hostEmail) }}</v-col
             >
             <v-col cols="12" sm="6"
               ><strong>評論日期：</strong>{{ selectedReview.reviewDate }}</v-col
@@ -208,8 +210,8 @@ type Review = {
   reviewId: number;
   listId: number;
   bookingId: number;
-  custId: number;
-  hostId: number;
+  customerEmail: number;
+  hostEmail: number;
   reviewDate: string;
   cleanScore: number;
   commScore: number;
@@ -429,6 +431,33 @@ async function saveReview() {
     console.log("Server response data:", err?.response?.data);
   } finally {
     saving.value = false;
+  }
+}
+// 隱藏email
+function maskEmail(email) {
+  if (!email) return "";
+
+  const [name, domain] = email.split("@");
+  if (!domain) return email;
+
+  // 保留前2與後2，中間補*
+  if (name.length > 4) {
+    return (
+      name.slice(0, 2) +
+      "*".repeat(name.length - 4) +
+      name.slice(-2) +
+      "@" +
+      domain
+    );
+  } else {
+    // 太短的名字，至少留頭尾
+    return (
+      name[0] +
+      "*".repeat(Math.max(name.length - 2, 1)) +
+      name.slice(-1) +
+      "@" +
+      domain
+    );
   }
 }
 </script>

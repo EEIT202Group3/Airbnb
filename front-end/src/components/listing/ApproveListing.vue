@@ -1,7 +1,7 @@
 <template>
   <v-container class="my-4">
     <h2 class="mb-4">房源管理</h2>
-
+    
     <!-- 篩選區 -->
     <v-row dense class="mb-4" align="center">
       <!-- 房源狀態下拉選單 -->
@@ -275,13 +275,15 @@ export default {
       searchHostKeyword: "",   
       currentPage: 1,
       itemsPerPage: 10,
+
     };
   },
   computed: {
     filteredListings() {
       let result = [];
 
-      // 先依狀態篩選
+      //先依狀態篩選
+
       switch (this.filterStatus) {
         case "approved":
           result = this.allListings.filter(
@@ -307,7 +309,8 @@ export default {
           result = this.allListings;
       }
 
-      // 模糊查詢（房源名稱 / 地址 / 電話）
+      //模糊查詢（房源名稱 / 地址 / 電話）
+
       if (this.searchText) {
         const keyword = this.searchText.toLowerCase();
         result = result.filter(
@@ -316,6 +319,7 @@ export default {
             (l.ads && l.ads.toLowerCase().includes(keyword)) ||
             (l.tel && String(l.tel).toLowerCase().includes(keyword))
         );
+
       }
 
       //  房東 ID 查詢
@@ -324,6 +328,7 @@ export default {
           String(l.hostId).includes(this.searchHostId)
         );
       }
+
 
       return result;
     },
