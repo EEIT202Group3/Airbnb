@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
-const route = useRoute()
+import { ref } from "vue";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const leftMenu = ref([
-  { title: '關於我', icon: 'mdi-account-circle', to:{name:'HostInfo'} },
-  { title: '房源管理', icon: 'mdi-home', to:{name:'HostListing'} },
-  { title: '訂單一覽', icon: 'mdi-list-box-outline', to:{name:'HostOrder'} },
-  { title: '評論一覽', icon: 'mdi-list-box-outline', to:{name:'HostReview'} },
-])
+  { title: "關於我", icon: "mdi-account-circle", to: { name: "HostInfo" } },
+  { title: "房源管理", icon: "mdi-home", to: { name: "HostListing" } },
+  {
+    title: "訂單一覽",
+    icon: "mdi-list-box-outline",
+    to: { name: "HostOrder" },
+  },
+  {
+    title: "所有評論",
+    icon: "mdi-comment-processing-outline",
+    to: { name: "HostReview" },
+  },
+]);
 </script>
 <template>
     <v-list nav class="transparent-card rounded-lg pa-2" style="display: flex; flex-direction: column; align-items:  flex-start;">
@@ -21,6 +29,7 @@ const leftMenu = ref([
             :active="route.name === m.to.name"           
         >{{ m.title }}</v-list-item>
     </v-list>
+
 </template>
 <style scoped>
 .sidebar-item {

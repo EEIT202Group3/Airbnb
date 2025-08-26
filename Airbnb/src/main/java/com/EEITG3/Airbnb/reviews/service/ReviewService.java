@@ -1,11 +1,10 @@
 package com.EEITG3.Airbnb.reviews.service;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,6 @@ public class ReviewService {
 	private final OrderRepository orderRepository;
 	private final ListRepository listingRepository;
     private final ReviewUtils reviewUtils;
-	private ImageStorageService storage;
     private final ReviewMapper mapper;
 
     public ReviewService(ReviewRepository rRepository, CustomerRepository customerRepository, HostRepository hostRepository, OrderRepository orderRepository, ListRepository listingRepository, ReviewUtils reviewUtils, ImageStorageService storage, ReviewMapper mapper) {
@@ -50,7 +48,6 @@ public class ReviewService {
 		this.orderRepository = orderRepository;
 		this.listingRepository = listingRepository;
         this.reviewUtils = reviewUtils;
-        this.storage = storage;
         this.mapper = mapper;
     }
 	
@@ -89,9 +86,6 @@ public class ReviewService {
 	            .map(ReviewMapper::toDTO)
 	            .collect(Collectors.toList());
 	}
-//	public List<Review> findByTypeAndKeyword(String type, String keyword) {
-//		return rRepository.findByTypeAndKeyword(type, keyword);
-//	}
 
 	public ReviewDTO findByReviewID(Integer id) {
 		  return rRepository.findByReviewId(id)
@@ -240,6 +234,21 @@ public class ReviewService {
 		reviewInsertDto.setListImg(order.get().getListing().getPhoto1());
 		reviewInsertDto.setHouseName(order.get().getListing().getHouseName());
 		return reviewInsertDto;
+	}
+
+	public ResponseEntity<?> hostReplyReview(Integer reviewId,Map<String, String> payload) {
+		Optional<Review> reviewOptional = rRepository.findById(reviewId);
+		Review r = reviewOptional.get();
+		String hostComm = payload.getOrDefault("hostComm", "").trim();
+	    
+	    if (hostComm.isEmpty()) {
+	        return ResponseEntity.badRequest().body(Map.of("message", "回覆不得為空"));
+	    }
+	    // 可加權限檢查：principal 是否為此 review 的房東
+	    r.setHostComm(hostComm);
+	    rRepository.save(r);
+
+	    return ResponseEntity.ok(Map.of("message", "ok"));
 	}
 
 }

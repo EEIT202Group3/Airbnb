@@ -88,18 +88,14 @@
           </div>
 
           <br />
-          <hr>
-       <div v-if="host" class="host-info">
-  <img
-    class="host-avatar"
-    :src="host.avatarURL"
-    alt="房東頭貼"
-  />
-  <div class="host-text">
-    <div class="host-name">房東 ：{{ host.username }}</div>
-    <div class="host-extra">超讚房東 · 1年待客經驗</div>
-  </div>
-</div>
+          <hr />
+          <div v-if="host" class="host-info">
+            <img class="host-avatar" :src="host.avatarURL" alt="房東頭貼" />
+            <div class="host-text">
+              <div class="host-name">房東 ：{{ host.username }}</div>
+              <div class="host-extra">超讚房東 · 1年待客經驗</div>
+            </div>
+          </div>
 
           <hr />
 
@@ -267,7 +263,7 @@
         <button class="close-btn" @click="closeAmenitiesModal">關閉</button>
       </div>
     </div>
-        <simple-review></simple-review>
+    <simple-review :reviews="reviews"></simple-review>
   </div>
 </template>
 
@@ -280,6 +276,7 @@ import { useRoute, useRouter } from "vue-router";
 import SimpleReview from "@/components/reviews/SimpleReview.vue";
 import DefaultAvatar from "@/images/default.png";
 
+const reviews = ref([]); // 評論列表
 const route = useRoute();
 const router = useRouter();
 
@@ -325,12 +322,20 @@ const cityName = computed(() => {
 });
 
 // 房源介紹彈窗
-function openModal() { isModalOpen.value = true; }
-function closeModal() { isModalOpen.value = false; }
+function openModal() {
+  isModalOpen.value = true;
+}
+function closeModal() {
+  isModalOpen.value = false;
+}
 
 // 設備彈窗
-function openAmenitiesModal() { isAmenitiesModalOpen.value = true; }
-function closeAmenitiesModal() { isAmenitiesModalOpen.value = false; }
+function openAmenitiesModal() {
+  isAmenitiesModalOpen.value = true;
+}
+function closeAmenitiesModal() {
+  isAmenitiesModalOpen.value = false;
+}
 
 // 文字截斷
 const truncatedText = computed(() => {
@@ -428,10 +433,15 @@ function goToBooking() {
 // 取得房源資料並整理圖片、地圖、房東資訊
 onMounted(async () => {
   const id = route.params.id;
+  console.log(id);
+
   try {
     const res = await axios.get(`/listings/${id}`);
     listing.value = res.data;
-
+    const reviewRes = await axios.get(`/api/reviews/listing/${id}`, {
+      withCredentials: true,
+    });
+    reviews.value = reviewRes.data;
     // 圖片整理（支援10張）
     photos.value = [];
     for (let i = 1; i <= 10; i++) {
@@ -443,12 +453,12 @@ onMounted(async () => {
     selectedPhoto.value = mainPhoto.value;
 
     // 房東資料直接從 DTO
-  host.value = {
-  username: listing.value.hostName,
-  avatarURL: listing.value.hostAvatarURL
-    ? "http://localhost:8080" + listing.value.hostAvatarURL
-    : DefaultAvatar,
-};
+    host.value = {
+      username: listing.value.hostName,
+      avatarURL: listing.value.hostAvatarURL
+        ? "http://localhost:8080" + listing.value.hostAvatarURL
+        : DefaultAvatar,
+    };
 
     // 地圖設定
     if (listing.value.lat && listing.value.lng) {
@@ -498,8 +508,6 @@ onMounted(() => {
 });
 </script>
 
-
-
 <style>
 @import "@/assets/listing/list1.css";
 @import "@/assets/listing/reviews.css";
@@ -509,12 +517,10 @@ onMounted(() => {
 .container {
   width: 100%;
   max-width: 1100px; /* 與 navbar 對齊 */
-  margin: 0 auto;    /* 置中 */
-  padding: 0 16px;   /* 預留左右邊距 */
+  margin: 0 auto; /* 置中 */
+  padding: 0 16px; /* 預留左右邊距 */
   box-sizing: border-box;
 }
-
-
 
 /* 右側預訂卡片 */
 .booking-card {
@@ -629,16 +635,14 @@ onMounted(() => {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-
 .swal2-container {
-  z-index: 100000 !important; 
+  z-index: 100000 !important;
 }
 
 .info-right {
   position: relative;
-  z-index: 1000; 
+  z-index: 1000;
 }
-
 
 /* 房東資訊區塊 */
 .host-info {
@@ -657,7 +661,7 @@ onMounted(() => {
   height: 64px;
   border-radius: 50%;
   object-fit: cover;
-  border: none; 
+  border: none;
 }
 
 .host-text {
@@ -677,5 +681,4 @@ onMounted(() => {
   font-size: 14px;
   color: #717171;
 }
-
 </style>

@@ -3,12 +3,58 @@ import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 axios.defaults.withCredentials = true;
 
+// 新增於 <script setup> 內
+const replying = ref(false);
+const replyDialog = ref(false);
+const replyText = ref("");
+const snackbar = ref({ show: false, color: "success", text: "" });
+
+function showReplyBox() {
+  if (!selected.value) return;
+  replyText.value = selected.value.hostComm || ""; // 若已有回覆，帶入可再編修
+  replyDialog.value = true;
+}
+
+async function submitReply() {
+  if (!selected.value) return;
+  if (!replyText.value.trim()) {
+    snackbar.value = { show: true, color: "error", text: "請輸入回覆內容" };
+    return;
+  }
+
+  try {
+    replying.value = true;
+
+    // 假設你的後端提供這個端點：PATCH /api/reviews/{reviewId}/host-reply
+    // 也可以 POST 看你設計
+    await axios.patch(`/api/reviews/${selected.value.reviewId}/host-reply`, {
+      hostComm: replyText.value.trim(),
+    });
+
+    // 前端立即更新（避免重整）
+    selected.value.hostComm = replyText.value.trim();
+    const card = fullMap.value[selected.value.reviewId];
+    if (card) card.hostComm = replyText.value.trim();
+
+    replyDialog.value = false;
+    snackbar.value = { show: true, color: "success", text: "已送出回覆" };
+  } catch (e: any) {
+    snackbar.value = {
+      show: true,
+      color: "error",
+      text: e?.response?.data?.message || "送出失敗，請稍後再試",
+    };
+  } finally {
+    replying.value = false;
+  }
+}
+
 // ===== 後端 DTO（依你的實際欄位微調） =====
 type HostReview = {
   reviewId: number | string;
   bookingId: string;
   houseName: string;
-  customerName: string; // 或 username
+  customerEmail: string; // 或 username
   reviewDate: string | Date;
   cleanScore: number;
   commScore: number;
@@ -80,7 +126,7 @@ async function loadReviews() {
     reviews.value = list.map((r) => ({
       id: r.reviewId,
       title: r.houseName,
-      subtitle: r.customerName,
+      subtitle: r.customerEmail,
       date: r.reviewDate,
       avg: avgScore(r),
       snippet: snippet(r.custComm, 90),
@@ -98,6 +144,33 @@ function openDetail(id: string | number) {
   if (r) {
     selected.value = r;
     showDetail.value = true;
+  }
+}
+
+function maskEmail(email) {
+  if (!email) return "";
+
+  const [name, domain] = email.split("@");
+  if (!domain) return email;
+
+  // 保留前2與後2，中間補*
+  if (name.length > 4) {
+    return (
+      name.slice(0, 2) +
+      "*".repeat(name.length - 4) +
+      name.slice(-2) +
+      "@" +
+      domain
+    );
+  } else {
+    // 太短的名字，至少留頭尾
+    return (
+      name[0] +
+      "*".repeat(Math.max(name.length - 2, 1)) +
+      name.slice(-1) +
+      "@" +
+      domain
+    );
   }
 }
 </script>
@@ -163,7 +236,7 @@ function openDetail(id: string | number) {
             </div>
 
             <div class="text-caption text-medium-emphasis mb-2">
-              住客：{{ r.subtitle || "匿名" }}
+              住客：{{ maskEmail(r.subtitle) || "匿名" }}
             </div>
 
             <div class="text-body-2 mb-4 two-line">{{ r.snippet }}</div>
@@ -198,6 +271,7 @@ function openDetail(id: string | number) {
           <b>{{ avgScore(selected).toFixed(1) }}</b>
         </div>
       </v-toolbar>
+
       <v-divider />
 
       <v-card-text class="pt-6">
@@ -210,11 +284,11 @@ function openDetail(id: string | number) {
           </div>
           <div class="kv-row">
             <div class="kv-label">房源</div>
-            <div class="kv-value">{{ selected.houseName }}</div>
+            <div class="kv-value">{{ selected.listId }}</div>
           </div>
           <div class="kv-row">
             <div class="kv-label">住客</div>
-            <div class="kv-value">{{ selected.customerName }}</div>
+            <div class="kv-value">{{ selected.customerEmail }}</div>
           </div>
           <div class="kv-row">
             <div class="kv-label">評論時間</div>
@@ -269,6 +343,9 @@ function openDetail(id: string | number) {
         <v-sheet class="pa-3 rounded-lg" color="grey-lighten-4">{{
           selected.hostComm
         }}</v-sheet>
+        <v-btn color="orange-darken-1" variant="elevated" @click="showReplyBox">
+          回覆評論
+        </v-btn>
 
         <!-- 圖片 -->
         <div
@@ -298,6 +375,44 @@ function openDetail(id: string | number) {
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <v-dialog v-model="replyDialog" max-width="600">
+    <v-card class="rounded-xl">
+      <v-card-title class="d-flex align-center">
+        <v-icon class="mr-2">mdi-reply</v-icon> 房東回覆
+        <v-spacer />
+        <v-btn icon @click="replyDialog = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
+      <v-divider></v-divider>
+      <v-card-text class="pt-4">
+        <v-textarea
+          v-model="replyText"
+          label="輸入回覆內容"
+          rows="5"
+          auto-grow
+          variant="outlined"
+          density="comfortable"
+          counter="500"
+          :maxlength="500"
+        />
+      </v-card-text>
+      <v-card-actions class="px-4 pb-4 justify-end">
+        <v-btn variant="text" @click="replyDialog = false">取消</v-btn>
+        <v-btn
+          color="orange-darken-1"
+          variant="elevated"
+          :loading="replying"
+          @click="submitReply"
+        >
+          送出回覆
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="2000">
+    {{ snackbar.text }}
+  </v-snackbar>
 </template>
 
 <style scoped>

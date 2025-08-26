@@ -1,6 +1,7 @@
 package com.EEITG3.Airbnb.reviews.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -20,12 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EEITG3.Airbnb.jwt.JwtService;
-import com.EEITG3.Airbnb.payMent.dto.OrderAllResponseDto;
 import com.EEITG3.Airbnb.reviews.dto.ReviewDTO;
 import com.EEITG3.Airbnb.reviews.dto.ReviewInsertDto;
 import com.EEITG3.Airbnb.reviews.dto.ReviewPatchRequest;
 import com.EEITG3.Airbnb.reviews.dto.ReviewWithCustomerDto;
-import com.EEITG3.Airbnb.reviews.entity.Review;
 import com.EEITG3.Airbnb.reviews.service.ReviewService;
 
 
@@ -45,6 +44,12 @@ public class ReviewController {
 	public ReviewInsertDto getInsertData(@PathVariable String bookingId) {
 		System.out.println(rService.insertData(bookingId));
 		return rService.insertData(bookingId);
+	}
+	
+	@PatchMapping("reviews/{id}/host-reply")
+	public ResponseEntity<?> hostReplyReview(@PathVariable Integer id, @RequestBody Map<String, String> payload) {
+	    
+		return rService.hostReplyReview(id,payload);
 	}
 	
 
