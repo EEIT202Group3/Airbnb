@@ -72,7 +72,7 @@ public class ChatController {
             return;
         }
         
-        String receiver = "eszrdx417@gmail.com";
+        String receiver = message.getReceiver();
         System.out.println("adminReply" + receiver);
         message.setReceiver(receiver);
         
