@@ -11,9 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ReviewUtils {
+	@Value("${app.storage.base-dir}")
+    private String baseDir;
 	
 	public String getToday() {
         return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -22,11 +25,6 @@ public class ReviewUtils {
 
     public List<String> uploadImg(List<MultipartFile> images){
     	
-    	String saveFileDir = "D:/photo/listing";
-    	File dir = new File(saveFileDir);
-    	if (!dir.exists()) {
-    		dir.mkdirs();
-    	}
     	List<String> imgList = new ArrayList<>();
     	String image1 = null, image2 = null, image3 = null;
         int count = 0;
@@ -35,8 +33,8 @@ public class ReviewUtils {
                 if (mf.isEmpty()) continue;
 
                 String fileName = UUID.randomUUID() + "_" + mf.getOriginalFilename(); // 避免覆蓋
-                File saveFilePath = new File(saveFileDir, fileName);
-                System.out.println("Utils.uploadImg()" + saveFileDir + fileName);
+                File saveFilePath = new File(baseDir, fileName);
+                System.out.println("Utils.uploadImg()" + baseDir + fileName);
                 imgList.add(fileName);
 
                 try {

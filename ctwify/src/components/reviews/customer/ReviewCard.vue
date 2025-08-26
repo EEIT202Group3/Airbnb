@@ -1,22 +1,46 @@
 <template>
   <v-col cols="12" class="d-flex justify-center">
-    <v-card class="w-100" max-width="1000">
+    <v-card
+      class="w-100 soft-card hoverable"
+      elevation="2"
+      rounded="xl"
+      max-width="1000"
+    >
       <!-- Header / Title -->
       <v-card-title class="d-flex align-center gap-4">
-        <v-img :src="coverSrc" height="100" width="100" class="rounded" cover />
-        <div class="text-subtitle-1 font-weight-medium">{{ title }}</div>
+        <v-img
+          :src="
+            review?.image1
+              ? `http://localhost:8080/images/reviews/${review.image1}`
+              : defaultImg
+          "
+          alt="Cover"
+          height="100"
+          width="100"
+          class="rounded"
+          cover
+        />
+        <div class="text-subtitle-1 font-weight-bold text-deep-orange">
+          {{ title }}
+        </div>
+        <v-spacer />
       </v-card-title>
 
+      <v-divider class="mx-4"></v-divider>
+
       <!-- Summary -->
-      <v-card-text class="text-wrap">
+      <v-card-text class="text-wrap py-3">
         {{ review?.cusComm || "（尚無評論內容）" }}
       </v-card-text>
 
       <!-- Actions -->
-      <v-card-actions>
+      <v-card-actions class="px-4 pb-4">
+        <v-spacer />
         <v-btn
-          @click="showDialog(review)"
+          color="orange-darken-1"
           variant="elevated"
+          :disabled="saving || deleting"
+          @click="showDialog(review)"
           prepend-icon="mdi-eye"
         >
           顯示評論
@@ -26,43 +50,44 @@
 
     <!-- Dialog -->
     <v-dialog v-model="dialog" max-width="720">
-      <v-card>
-        <v-card-title class="d-flex align-center">
-          <span>評論詳情</span>
+      <v-card class="soft-card" rounded="xl">
+        <v-card-title class="text-h6 d-flex align-center">
+          <v-icon class="mr-2" color="deep-orange-accent-3"
+            >mdi-file-document-alert-outline</v-icon
+          >
+          <span class="card-title">評論詳情</span>
           <v-spacer />
-          <v-btn icon :disabled="saving || deleting" @click="dialog = false">
+          <v-btn icon :disabled="saving || deleting" @click="closeDialog">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
 
+        <v-divider class="mx-4"></v-divider>
+
         <v-card-text>
           <!-- Meta -->
           <v-row dense class="mb-2">
-            <v-col cols="12" sm="6"
-              ><strong>評論編號：</strong>{{ selectedReview.reviewId }}</v-col
-            >
-            <v-col cols="12" sm="6"
-              ><strong>房源編號：</strong>{{ selectedReview.listId }}</v-col
-            >
-            <v-col cols="12" sm="6"
-              ><strong>訂單編號：</strong>{{ selectedReview.bookingId }}</v-col
-            >
-            <v-col cols="12" sm="6"
-              ><strong>房客編號：</strong
-              >{{ maskEmail(selectedReview.customerEmail) }}</v-col
-            >
-            <v-col cols="12" sm="6"
-              ><strong>房東編號：</strong
-              >{{ maskEmail(selectedReview.hostEmail) }}</v-col
-            >
-            <v-col cols="12" sm="6"
-              ><strong>評論日期：</strong>{{ selectedReview.reviewDate }}</v-col
-            >
+            <v-col cols="12" sm="6">
+              <span class="kv">訂單編號：</span>
+              <span class="value">{{ selectedReview.bookingId }}</span>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <span class="kv">房客信箱：</span>
+              <span class="value">{{ selectedReview.customerEmail }}</span>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <span class="kv">房東信箱：</span>
+              <span class="value">{{ selectedReview.hostEmail }}</span>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <span class="kv">評論日期：</span>
+              <span class="value">{{ selectedReview.reviewDate || "-" }}</span>
+            </v-col>
           </v-row>
 
           <!-- Ratings -->
           <div class="mb-2">
-            <strong>乾淨評分：</strong>
+            <span class="kv">乾淨評分：</span>
             <v-rating
               v-model="selectedReview.cleanScore"
               :length="5"
@@ -72,9 +97,8 @@
               :readonly="!isEditing"
             />
           </div>
-
           <div class="mb-2">
-            <strong>溝通評分：</strong>
+            <span class="kv">溝通評分：</span>
             <v-rating
               v-model="selectedReview.commScore"
               :length="5"
@@ -84,9 +108,8 @@
               :readonly="!isEditing"
             />
           </div>
-
           <div class="mb-4">
-            <strong>性價比：</strong>
+            <span class="kv">性價比：</span>
             <v-rating
               v-model="selectedReview.valueScore"
               :length="5"
@@ -99,15 +122,15 @@
 
           <!-- Texts -->
           <div class="mb-3">
-            <strong>房東回覆：</strong>
-            <div class="mt-1">
+            <span class="kv">房東回覆：</span>
+            <div class="mt-1 value">
               {{ selectedReview.hostComm || "（無房東回覆）" }}
             </div>
           </div>
 
           <div class="mb-4">
-            <strong>房客評論：</strong>
-            <div v-if="!isEditing" class="mt-1">
+            <span class="kv">房客評論：</span>
+            <div v-if="!isEditing" class="mt-1 value">
               {{ selectedReview.cusComm || "（無評論）" }}
             </div>
             <v-textarea
@@ -133,7 +156,7 @@
               <div class="thumb-wrapper">
                 <v-img :src="previewUrl(img)" cover class="rounded thumb" />
                 <v-btn
-                  v-if="isEditing"
+                  v-if="isEditing && img !== null"
                   size="x-small"
                   icon
                   class="thumb-close"
@@ -148,6 +171,7 @@
           <!-- Add Images -->
           <div class="d-flex justify-center mt-4" v-if="isEditing">
             <v-file-input
+              v-model="fileInputModel"
               label="新增圖片（最多 3 張）"
               accept="image/*"
               prepend-icon="mdi-plus"
@@ -157,15 +181,18 @@
               variant="outlined"
               density="comfortable"
               style="max-width: 320px"
-              :disabled="saving"
-              @update:model-value="uploadImage"
+              :disabled="saving || cannotAddMore"
+              @change="onFilesPicked"
             />
+            <div v-if="cannotAddMore" class="text-caption ml-2">
+              （已達 3 張上限）
+            </div>
           </div>
         </v-card-text>
 
-        <v-card-actions class="justify-end">
+        <v-card-actions class="px-4 pb-4 justify-end">
           <v-btn
-            color="primary"
+            color="orange-darken-1"
             variant="elevated"
             :loading="saving"
             :disabled="deleting"
@@ -183,9 +210,10 @@
             刪除
           </v-btn>
           <v-btn
+            color="orange-darken-1"
             variant="text"
             :disabled="saving || deleting"
-            @click="dialog = false"
+            @click="closeDialog"
           >
             關閉
           </v-btn>
@@ -200,8 +228,11 @@ import { ref, computed, onBeforeUnmount } from "vue";
 import axios from "axios";
 
 /** ======== 常數 / 工具 ======== */
-const API_BASE = "http://localhost:8080";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8080"; // 建議用環境變數
+const IMAGE_BASE = `${API_BASE}/images/listing`; // 依後端實際路徑調整
 const MAX_IMAGES = 3;
+const MAX_FILE_SIZE_MB = 5; // 單檔 5MB 上限，可調整
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"]; // 可擴充
 const isFile = (v: unknown): v is File =>
   typeof File !== "undefined" && v instanceof File;
 
@@ -210,15 +241,14 @@ type Review = {
   reviewId: number;
   listId: number;
   bookingId: number;
-  customerEmail: number;
-  hostEmail: number;
+  customerEmail: String;
+  hostEmail: String;
   reviewDate: string;
   cleanScore: number;
   commScore: number;
   valueScore: number;
   cusComm: string;
   hostComm: string;
-  // 後端原始三個欄位（檔名或 null）
   image1?: string | null;
   image2?: string | null;
   image3?: string | null;
@@ -227,6 +257,8 @@ type Review = {
 const props = defineProps<{
   review: Review;
   title?: string;
+  defaultImgSrc?: string;
+  imageBasePath?: string; // 若後端路徑不同可自訂
 }>();
 
 const emit = defineEmits<{
@@ -235,8 +267,7 @@ const emit = defineEmits<{
 }>();
 
 /** ======== 靜態資源 ======== */
-// 若你用 Vite，建議用 URL 方式確保路徑正確
-const defaultImg = "../icon/default.png"; // 替換為實際的預設圖片路徑
+const defaultImg = props.defaultImgSrc ?? "/icon/default.png";
 
 /** ======== UI 狀態 ======== */
 const dialog = ref(false);
@@ -246,11 +277,9 @@ const deleting = ref(false);
 
 /** ======== 選中評論與影像槽 ======== */
 type MixedImage = File | string | null;
-
-// 進入對話框時的原始檔名快照（用來判斷哪些槽被刪）
+// 原始檔名快照：用於判斷哪些槽被刪除
 const originals = ref<(string | null)[]>([null, null, null]);
-
-// 對話框中可編輯的評論物件；images 固定三槽
+// 預設選取之評論
 const selectedReview = ref<Review & { images: MixedImage[] }>({
   ...(props.review as Review),
   images: [
@@ -260,12 +289,14 @@ const selectedReview = ref<Review & { images: MixedImage[] }>({
   ],
 });
 
+// 檔案輸入暫存（為了能 reset）
+const fileInputModel = ref<File[] | null>(null);
+
 /** ======== 封面圖（卡片標題用） ======== */
 const coverSrc = computed(() => {
-  const src = props.review?.image1
-    ? `${API_BASE}/images/listing/${props.review.image1}`
-    : defaultImg;
-  return src;
+  const base = props.imageBasePath ?? IMAGE_BASE;
+  const img = props.review?.image1;
+  return img ? `${base}/${img}` : defaultImg;
 });
 
 /** ======== 標題 ======== */
@@ -273,7 +304,7 @@ const title = computed(
   () => props.title || "海漾小木屋：一邊森林一邊太平洋(適合1-3人獨棟+廚房)"
 );
 
-/** ======== 預覽與資源釋放 ======== */
+/** ======== Object URL 快取與釋放 ======== */
 const objectUrlCache = new Map<File, string>();
 
 function previewUrl(img: MixedImage) {
@@ -285,17 +316,17 @@ function previewUrl(img: MixedImage) {
     return objectUrlCache.get(img)!;
   }
   // 舊檔名
-  return `${API_BASE}/images/listing/${img}`;
+  const base = props.imageBasePath ?? IMAGE_BASE;
+  return typeof img === "string" && img.trim() ? `${base}/${img}` : defaultImg;
 }
-/*
+
 onBeforeUnmount(() => {
   for (const url of objectUrlCache.values()) URL.revokeObjectURL(url);
   objectUrlCache.clear();
 });
-*/
-/** ======== Dialog 開關 ======== */
+
+/** ======== Dialog ======== */
 function showDialog(item: Review) {
-  // 深拷貝 + 初始化三槽（保持固定長度）
   selectedReview.value = {
     ...(item as Review),
     images: [
@@ -309,9 +340,22 @@ function showDialog(item: Review) {
     item.image2 ?? null,
     item.image3 ?? null,
   ];
+  fileInputModel.value = null;
   isEditing.value = false;
   dialog.value = true;
 }
+
+function closeDialog() {
+  dialog.value = false;
+  isEditing.value = false;
+  fileInputModel.value = null;
+}
+
+/** ======== 判斷是否可再新增圖片 ======== */
+const currentCount = computed(
+  () => selectedReview.value.images.filter((v) => v !== null).length
+);
+const cannotAddMore = computed(() => currentCount.value >= MAX_IMAGES);
 
 /** ======== 編輯/儲存 ======== */
 async function toggleEdit() {
@@ -322,6 +366,7 @@ async function toggleEdit() {
   }
 }
 
+/** ======== 刪除評論 ======== */
 async function deleteReview() {
   if (!selectedReview.value?.reviewId) return;
   const id = selectedReview.value.reviewId;
@@ -335,35 +380,58 @@ async function deleteReview() {
     });
     dialog.value = false;
     emit("deleted");
+    notify("已刪除", "success");
   } catch (err) {
     console.error("刪除失敗:", err);
+    notify("刪除失敗", "error");
   } finally {
     deleting.value = false;
   }
 }
 
-/** ======== 移除某一槽影像 ======== */
+/** ======== 移除某一槽影像（標記為 null） ======== */
 function removeImage(index: number) {
-  if (!Array.isArray(selectedReview.value.images)) return;
-  // 標註為空槽（null）
-  selectedReview.value.images[index] = null;
+  const imgArr = [...selectedReview.value.images];
+  imgArr[index] = null;
+  selectedReview.value.images = imgArr; // 強制 reactivity
 }
 
 /** ======== 上傳影像（追加到空槽，最多 3 張） ======== */
+function onFilesPicked() {
+  const files = fileInputModel.value;
+  uploadImage(files);
+  // 清空 input，避免同檔案無法再次選取
+  fileInputModel.value = null;
+}
+
 function uploadImage(files: File[] | File | null) {
   const list: File[] = Array.isArray(files) ? files : files ? [files] : [];
-  if (!Array.isArray(selectedReview.value.images)) {
-    selectedReview.value.images = new Array(MAX_IMAGES).fill(null);
-  }
+  if (list.length === 0) return;
+
+  const next = [...selectedReview.value.images];
+
   for (const f of list) {
-    const emptyIdx = selectedReview.value.images.findIndex((v) => v === null);
+    // 基本驗證
+    if (!ALLOWED_TYPES.includes(f.type)) {
+      notify(`不支援的檔案類型：${f.type}`, "warning");
+      continue;
+    }
+    if (f.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      notify(`檔案過大（上限 ${MAX_FILE_SIZE_MB}MB）：${f.name}`, "warning");
+      continue;
+    }
+
+    // 找空槽
+    const emptyIdx = next.findIndex((v) => v === null);
     if (emptyIdx !== -1) {
-      selectedReview.value.images[emptyIdx] = f;
+      next[emptyIdx] = f;
     } else {
-      // 已滿則覆蓋第 0 槽（可改成提示）
-      selectedReview.value.images[0] = f;
+      notify("已達 3 張上限（將覆蓋第一張）", "info");
+      next[0] = f; // 或者直接跳過
     }
   }
+
+  selectedReview.value.images = next; // 觸發 reactivity
 }
 
 /** ======== 儲存（PATCH） ======== */
@@ -378,7 +446,7 @@ async function saveReview() {
     const id = selectedReview.value.reviewId;
     const fd = new FormData();
 
-    // 送純文字欄位
+    // 純文字欄位
     const reviewData = {
       cleanScore: selectedReview.value.cleanScore,
       commScore: selectedReview.value.commScore,
@@ -390,27 +458,32 @@ async function saveReview() {
       new Blob([JSON.stringify(reviewData)], { type: "application/json" })
     );
 
-    // 2) 圖片欄位（重點）
-    //    只要該槽是 File 才 append；若是 null 或 舊檔名（string），一律不 append
+    // 新圖才 append；舊檔名與 null 都不傳
     const imgs = selectedReview.value.images ?? [null, null, null];
     if (imgs[0] instanceof File) fd.append("image1", imgs[0]);
     if (imgs[1] instanceof File) fd.append("image2", imgs[1]);
     if (imgs[2] instanceof File) fd.append("image3", imgs[2]);
-    // ⛔ 不要 append 任何空 Blob 或 deleteSlots
 
-    // 若後端是接收多值同 key，可重複 append；若是 JSON，改成一次 append JSON 字串即可。
-    // 這裡用多值同 key：
+    // 告知後端：哪些槽位被刪（原本有檔名，現在為 null）
+    originals.value.forEach((old, i) => {
+      const now = imgs[i];
+      if (old && now === null) {
+        fd.append("deleteSlot", String(i + 1)); // 後端可接收 List<Integer> deleteSlot
+      }
+    });
+
     const url = `${API_BASE}/api/reviews/update/${id}`;
     const res = await axios.patch(url, fd, {
       headers: {}, // axios 會自動帶 multipart/form-data 邊界
       withCredentials: true,
     });
 
-    // 後端回傳最新資料後，更新本地並關閉
+    // 後端建議回傳 DTO（避免 Lazy Proxy）
     const updated: Review = {
       ...res.data,
-      reviewId: selectedReview.value.reviewId, // ✅ 補上 ID
+      reviewId: selectedReview.value.reviewId, // 防止漏傳
     };
+
     selectedReview.value = {
       ...(updated as Review),
       images: [
@@ -419,70 +492,81 @@ async function saveReview() {
         updated.image3 ?? null,
       ],
     };
+
+    // 更新封面/畫面
     isEditing.value = false;
     dialog.value = false;
     emit("update", updated);
-    console.log("後端回傳 res.data：", res.data);
-    console.log("更新後的評論：", selectedReview.value);
-    console.log("更新後的評論 ID：", updated.reviewId);
-    console.log("即將 emit 的 review：", updated);
+    notify("更新成功", "success");
   } catch (err: any) {
     console.error("更新失敗", err);
     console.log("Server response data:", err?.response?.data);
+    notify("更新失敗", "error");
   } finally {
     saving.value = false;
-  }
-}
-// 隱藏email
-function maskEmail(email) {
-  if (!email) return "";
-
-  const [name, domain] = email.split("@");
-  if (!domain) return email;
-
-  // 保留前2與後2，中間補*
-  if (name.length > 4) {
-    return (
-      name.slice(0, 2) +
-      "*".repeat(name.length - 4) +
-      name.slice(-2) +
-      "@" +
-      domain
-    );
-  } else {
-    // 太短的名字，至少留頭尾
-    return (
-      name[0] +
-      "*".repeat(Math.max(name.length - 2, 1)) +
-      name.slice(-1) +
-      "@" +
-      domain
-    );
   }
 }
 </script>
 
 <style scoped>
-.text-wrap {
-  white-space: normal;
-  word-break: break-word;
+/* 與「我的訂單」一致的樣式 */
+.soft-card {
+  background: #fff7ed;
 }
 
-/* 縮圖樣式 */
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.text-deep-orange {
+  color: #c2410c;
+}
+
+.kv {
+  font-size: 15px;
+  color: #1f2937; /* 文字主色，讀性好 */
+}
+.value {
+  font-weight: 700;
+  color: #7c2d12;
+}
+.value.emphasis {
+  color: #b45309;
+}
+
+.hoverable {
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+  cursor: pointer;
+}
+.hoverable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
+}
+
+/* 內文用的連結樣式（沿用你的「value-link」語意） */
+.value-link {
+  font-weight: 700;
+  padding: 0 6px;
+  min-width: 0;
+  text-transform: none;
+}
+.value-link :deep(.v-btn__content) {
+  text-decoration: underline;
+}
+
+/* 縮圖按鈕覆蓋 */
 .thumb-wrapper {
   position: relative;
-  width: 150px;
-  aspect-ratio: 1 / 1;
+  width: 100%;
 }
 .thumb {
   width: 100%;
-  height: 100%;
+  height: 100px;
 }
 .thumb-close {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  background: #fff;
-  opacity: 0.9;
+  top: 4px;
+  right: 4px;
 }
 </style>

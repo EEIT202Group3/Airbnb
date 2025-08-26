@@ -26,7 +26,7 @@
       <div class="private-chat">
         <div class="chat-header">
           <h3>私人訊息</h3>
-          <div class="recipient-selector">
+          <!-- <div class="recipient-selector">
             <label>回覆給:</label>
             <input
               v-model="toUser"
@@ -34,7 +34,7 @@
               class="recipient-input"
               :disabled="!connected"
             />
-          </div>
+          </div> -->
         </div>
 
         <!-- 訊息列表 -->
@@ -65,11 +65,11 @@
             @keypress.enter="sendPrivate"
             placeholder="輸入訊息..."
             class="message-input"
-            :disabled="!connected || !toUser.trim()"
+            :disabled="!connected"
           />
           <button
             @click="sendPrivate"
-            :disabled="!connected || !draft.trim() || !toUser.trim()"
+            :disabled="!connected || !draft.trim()"
             class="send-btn"
           >
             發送
@@ -80,10 +80,20 @@
       <!-- 在線用戶列表（可選） -->
       <div class="online-users" v-if="showOnlineUsers">
         <h4>在線客戶</h4>
-        <div v-for="user in onlineUsers" :key="user" class="user-item">
+
+        <div v-if="onlineUsers.length === 0" class="empty">
+          目前沒有其他用戶在線
+        </div>
+
+        <div
+          v-for="user in onlineUsers"
+          :key="user"
+          class="user-item"
+          :class="{ active: user === selectedUser }"
+        >
           <span>{{ user }}</span>
           <button @click="selectUser(user)" class="select-user-btn">
-            選擇
+            {{ user === selectedUser ? "已選擇" : "選擇" }}
           </button>
         </div>
       </div>
@@ -106,9 +116,23 @@ const onlineUsers = ref([]);
 const showOnlineUsers = ref(true);
 const privateListRef = ref(null);
 
+const selectedUser = ref(""); // 目前選中的 receiver
+
+// const isReadyToSend = computed(
+//   () => !!selectedUser.value && !!draft.value.trim()
+// );
+
 let client;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
+
+function selectUser(user) {
+  selectedUser.value = user;
+  toUser.value = user; // 設定 receiver
+}
+function clearSelection() {
+  selectedUser.value = "";
+}
 
 // 連接到 WebSocket
 function connect() {
@@ -188,7 +212,10 @@ function connect() {
     client.subscribe("/topic/users", (frame) => {
       try {
         const users = JSON.parse(frame.body);
+        console.log("用戶列表", users);
+
         onlineUsers.value = users.filter((user) => user !== myUser.value);
+        console.log(onlineUsers.value);
       } catch (error) {
         console.error("解析用戶列表失敗:", error);
       }
@@ -271,17 +298,11 @@ const MSG_TYPE = {
 };
 
 function sendPrivate() {
-  if (
-    !client ||
-    !connected.value ||
-    !draft.value.trim() ||
-    !toUser.value.trim()
-  )
-    return;
+  if (!client || !connected.value || !draft.value.trim()) return;
 
   const message = {
     sender: myUser.value, // "ADMIN"（請確保與後端 Principal 名稱一致）
-    receiver: toUser.value.trim(), // 目標使用者的 Principal 名稱（guest_xxx 或 userId）
+    receiver: toUser.value, // 目標使用者的 Principal 名稱（guest_xxx 或 userId）
     content: draft.value.trim(),
     type: MSG_TYPE.ADMIN_REPLY, // 或用 MSG_TYPE.TEXT，看你的後端邏輯
     isGuest: false,
@@ -334,12 +355,6 @@ function handleSystemNotification(notification) {
       break;
   }
 }
-
-// 選擇用戶
-function selectUser(username) {
-  toUser.value = username;
-}
-
 // 滾動到底部
 async function scrollToBottom() {
   await nextTick();

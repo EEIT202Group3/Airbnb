@@ -192,7 +192,7 @@ public class ReviewService {
 		}
 	}
 
-	public ResponseEntity<Review> patchReview(Integer id, ReviewPatchRequest req, MultipartFile image1,
+	public ResponseEntity<ReviewDTO> patchReview(Integer id, ReviewPatchRequest req, MultipartFile image1,
 			MultipartFile image2, MultipartFile image3) {
 		Review r = rRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Review not found"));
@@ -223,8 +223,10 @@ public class ReviewService {
 		}
 
 		Review saved = rRepository.save(r);
+		
+		ReviewMapper map = new ReviewMapper();
 
-		return ResponseEntity.ok(saved);
+		return ResponseEntity.ok(map.toDTO(saved));
 	}
 	
 	public ReviewInsertDto insertData(String bookingId) {

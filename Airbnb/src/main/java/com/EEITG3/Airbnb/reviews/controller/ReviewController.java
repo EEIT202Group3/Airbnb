@@ -88,6 +88,17 @@ public class ReviewController {
 	}
 	
 	@DeleteMapping("admins/reviews/del/{id}")
+	public ResponseEntity<?> adminDeleteById(@PathVariable Integer id) {
+		System.out.println("此api接收參數:" + id);
+		try {
+			rService.deleteById(id);
+			return ResponseEntity.ok("刪除成功");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("刪除失敗: " + e.getMessage());
+
+		}
+	}
+	@DeleteMapping("reviews/del/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable Integer id) {
 		System.out.println("此api接收參數:" + id);
 		try {
@@ -135,7 +146,7 @@ public class ReviewController {
 	}
 	*/
 	@PatchMapping(value = "/reviews/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<Review> patchReview(
+	public ResponseEntity<ReviewDTO> patchReview(
 	        @PathVariable("id") Integer reviewId,
 	        @RequestPart("review") ReviewPatchRequest review,
 	        @RequestPart(value = "image1", required = false) MultipartFile image1,
