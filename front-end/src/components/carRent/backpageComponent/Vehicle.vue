@@ -513,11 +513,11 @@ const fillTestDriver = () => {
 
 <template>
   <div v-if="vehicle">
-    <v-container fluid class="px-6 py-4 main-content">
+    <v-container fluid class="px-1 py-1 main-content">
       <!-- 功能選單按鈕 -->
       <v-btn
           variant="outlined"
-          class="ma-2"
+          class="ma-0"
           prepend-icon="mdi-menu"
           @click="showSidebar = true"
       >
@@ -740,56 +740,7 @@ const fillTestDriver = () => {
                         </td>
                       </tr>
 
-                      <tr>
-                        <td class="label-cell">傳動系統</td>
-                        <td>
-                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
-                            <div
-                                class="fe-display"
-                                v-show="!(isInlineEditable && activeField === 'transmission')"
-                                @click="isInlineEditable && (activeField = 'transmission')"
-                            >{{ vehicle.transmission || '—' }}
-                            </div>
-                            <v-text-field
-                                v-show="isInlineEditable && activeField === 'transmission'"
-                                v-model="vehicle.transmission"
-                                density="comfortable"
-                                variant="outlined"
-                                hide-details
-                                class="fe-input"
-                                @blur="activeField = null"
-                            />
-                          </div>
-                        </td>
-                      </tr>
 
-                      <tr>
-                        <td class="label-cell">狀態</td>
-                        <td>
-                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
-                            <div
-                                class="fe-display"
-                                v-show="!(isInlineEditable && activeField === 'status')"
-                                @click="isInlineEditable && (activeField = 'status')"
-                            >{{ vehicle.status || '—' }}
-                            </div>
-                            <v-select
-                                v-show="isInlineEditable && activeField === 'status'"
-                                v-model="vehicle.status"
-                                :items="[
-                                  { title: '可租用', value: '可租用' },
-                                  { title: '維修中', value: '維修中' },
-                                  { title: '下架', value: '下架' }
-                                ]"
-                                density="comfortable"
-                                variant="outlined"
-                                hide-details
-                                class="fe-input"
-                                @blur="activeField = null"
-                            />
-                          </div>
-                        </td>
-                      </tr>
                       </tbody>
                     </v-table>
                   </v-card-text>
@@ -855,6 +806,30 @@ const fillTestDriver = () => {
                       </tr>
 
                       <tr>
+                        <td class="label-cell">里程</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'mileage')"
+                                @click="isInlineEditable && (activeField = 'mileage')"
+                            >{{ vehicle.mileage ?? '—' }}
+                            </div>
+                            <v-text-field
+                                v-show="isInlineEditable && activeField === 'mileage'"
+                                v-model.number="vehicle.mileage"
+                                type="number"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
                         <td class="label-cell">座位數</td>
                         <td>
                           <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
@@ -904,19 +879,18 @@ const fillTestDriver = () => {
                       </tr>
 
                       <tr>
-                        <td class="label-cell">里程</td>
+                        <td class="label-cell">傳動系統</td>
                         <td>
                           <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
                             <div
                                 class="fe-display"
-                                v-show="!(isInlineEditable && activeField === 'mileage')"
-                                @click="isInlineEditable && (activeField = 'mileage')"
-                            >{{ vehicle.mileage ?? '—' }}
+                                v-show="!(isInlineEditable && activeField === 'transmission')"
+                                @click="isInlineEditable && (activeField = 'transmission')"
+                            >{{ vehicle.transmission || '—' }}
                             </div>
                             <v-text-field
-                                v-show="isInlineEditable && activeField === 'mileage'"
-                                v-model.number="vehicle.mileage"
-                                type="number"
+                                v-show="isInlineEditable && activeField === 'transmission'"
+                                v-model="vehicle.transmission"
                                 density="comfortable"
                                 variant="outlined"
                                 hide-details
@@ -926,6 +900,35 @@ const fillTestDriver = () => {
                           </div>
                         </td>
                       </tr>
+
+                      <tr>
+                        <td class="label-cell">狀態</td>
+                        <td>
+                          <div class="fe-wrapper" :class="{ 'is-editable': isInlineEditable }">
+                            <div
+                                class="fe-display"
+                                v-show="!(isInlineEditable && activeField === 'status')"
+                                @click="isInlineEditable && (activeField = 'status')"
+                            >{{ vehicle.status || '—' }}
+                            </div>
+                            <v-select
+                                v-show="isInlineEditable && activeField === 'status'"
+                                v-model="vehicle.status"
+                                :items="[
+                                  { title: '可租用', value: '可租用' },
+                                  { title: '維修中', value: '維修中' },
+                                  { title: '下架', value: '下架' }
+                                ]"
+                                density="comfortable"
+                                variant="outlined"
+                                hide-details
+                                class="fe-input"
+                                @blur="activeField = null"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+
                       </tbody>
                     </v-table>
                   </v-card-text>
