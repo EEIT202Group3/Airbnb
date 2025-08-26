@@ -202,7 +202,7 @@ function formatDateTime(dt?: string) {
 
 <template>
   <v-container fluid class="py-1 main-content">
-    <v-btn variant="outlined" class="ma-2" prepend-icon="mdi-menu" @click="showSidebar = true">功能選單</v-btn>
+    <v-btn variant="outlined" class="ma-0" prepend-icon="mdi-menu" @click="showSidebar = true">功能選單</v-btn>
     <Sidebar :visible="showSidebar" :close="() => (showSidebar = false)"/>
 
     <v-row class="mt-2" dense>
