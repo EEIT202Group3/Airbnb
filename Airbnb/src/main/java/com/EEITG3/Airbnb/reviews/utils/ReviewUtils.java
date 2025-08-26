@@ -11,22 +11,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+@Component
 public class ReviewUtils {
-	
-	public String getToday() {
+    @Value("${app.storage.base-dir}")
+    private String baseDir;
+    @Getter
+    private Path storageDir;
+    @PostConstruct
+    public void init() throws IOException {
+        storageDir = Paths.get(baseDir, "reviews").toAbsolutePath().normalize();
+        Files.createDirectories(storageDir);
+        System.out.println("Storage directory created at: " + storageDir);
+    }
+
+    public String getToday() {
         return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
 	}
 
     public List<String> uploadImg(List<MultipartFile> images){
     	
-    	String saveFileDir = "D:/photo/listing";
-    	File dir = new File(saveFileDir);
-    	if (!dir.exists()) {
-    		dir.mkdirs();
-    	}
     	List<String> imgList = new ArrayList<>();
     	String image1 = null, image2 = null, image3 = null;
         int count = 0;
@@ -35,8 +45,8 @@ public class ReviewUtils {
                 if (mf.isEmpty()) continue;
 
                 String fileName = UUID.randomUUID() + "_" + mf.getOriginalFilename(); // 避免覆蓋
-                File saveFilePath = new File(saveFileDir, fileName);
-                System.out.println("Utils.uploadImg()" + saveFileDir + fileName);
+                File saveFilePath = new File(storageDir.toString(), fileName);
+                System.out.println("Utils.uploadImg()" + storageDir.toString() + fileName);
                 imgList.add(fileName);
 
                 try {
@@ -64,7 +74,7 @@ public class ReviewUtils {
     
     public String saveImage(MultipartFile file) {
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path path = Paths.get("your_upload_path", fileName);
+        Path path = Paths.get(storageDir.toString(), fileName);
         try {
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {

@@ -8,10 +8,8 @@
   </v-app>
 </template>
 <script setup>
-
 import Nav from "@/layouts/Navbar.vue";
 import Footer from "@/layouts/Footer.vue";
+import Chat from "@/components/chat/Robot.vue";
 </script>
-<style>
-
-</style>
+<style></style>

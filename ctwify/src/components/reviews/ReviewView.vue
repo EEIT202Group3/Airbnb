@@ -1,14 +1,22 @@
 <template>
-  <v-row>
-    <ReviewCard
-      v-for="r in reviews"
-      :index="r.reviewId"
-      :review="r"
-      justify="center"
-      @update="updateReviewInList"
-      @deleted="fetchReviews"
-    ></ReviewCard>
-  </v-row>
+  <v-container class="py-6" max-width="1000">
+    <div class="header-row">
+      <v-icon size="30" class="mr-2" color="deep-orange-darken-1"
+        >mdi-clipboard-text-clock</v-icon
+      >
+      <h2 class="page-title">我的評論</h2>
+    </div>
+    <v-row>
+      <ReviewCard
+        v-for="r in reviews"
+        :index="r.reviewId"
+        :review="r"
+        justify="center"
+        @update="updateReviewInList"
+        @deleted="fetchReviews"
+      ></ReviewCard>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup>
@@ -19,9 +27,7 @@ const reviews = ref([]);
 const list = ref({});
 
 const fetchReviews = async () => {
-  reviews.value = (
-    await api.get("/api/reviews/token/byUser", { withCredentials: true })
-  ).data;
+  reviews.value = (await api.get("/api/reviews")).data;
   console.log(reviews.value);
 };
 
@@ -48,4 +54,16 @@ function updateReviewInList(updatedReview) {
 }
 </script>
 
-<style></style>
+<style>
+.header-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #c2410c;
+  margin: 0;
+}
+</style>
