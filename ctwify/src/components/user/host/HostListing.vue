@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div v-if="loading" class="text-center py-4">資料載入中...</div>
     <div v-else class="listings-grid">
       <router-link
@@ -121,6 +121,14 @@ export default {
 @import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css";
 @import "/src/assets/listing/list3.css";
 
+.container {
+  width: 100%;
+  max-width: 1100px; /* 與 navbar 對齊 */
+  margin: 0 auto;    /* 置中 */
+  padding: 0 16px;   /* 預留左右邊距 */
+  box-sizing: border-box;
+}
+
 .listing {
   position: relative; /* 讓內部絕對定位以 listing 為基準 */
   padding: 16px;
@@ -170,27 +178,12 @@ export default {
 .status-light.red {
   background-color: #dc3545;
 }
-.listing-ads {
-   font-size: 15px;
-  color: #828282;
-}
 
 .listing-info {
   display: flex;
   flex-direction: column;
 }
 
-.listing-title {
-  flex-grow: 1; 
-  margin-bottom: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-}
 
 .listing-status {
   margin-top: 6px;
@@ -208,20 +201,35 @@ export default {
 }
 
 
-.listing-info-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  height: 80px; /* 可調整總高度 */
-}
-
 .listing-status-placeholder {
   height: 18px; /* 固定高度，保持名稱位置不跳動 */
   line-height: 18px;
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 4px;
+}
+
+/* 房源名稱 */
+.listing-title {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1.4;
+  height: 80px; /* 固定高度 ≈ 兩行字 */
+  overflow: hidden;
+  display: -webkit-box;
+  /* -webkit-line-clamp: 2; 最多顯示兩行 */
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
+/* 地址 */
+.listing-ads {
+  font-size: 14px;
+  color: #828282;
+  height: 20px; /* 固定一行高度 */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 

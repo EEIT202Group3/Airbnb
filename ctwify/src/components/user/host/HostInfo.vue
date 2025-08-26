@@ -30,11 +30,13 @@ onMounted(
         <br>
         <v-row>
             <v-col cols="3">
-                <v-card class="pa-8 elevation-2 rounded-xl" style="width: 100%;">
+                <v-card class="pa-8 elevation-2 rounded-xl" style="width: 140%;">
                     <div v-if="host" class="d-flex align-center">
                         <v-avatar size="80" class="mr-4">
                             <!--  -->
-                            <v-img :src="host?.avatarURL ? 'http://localhost:8080' + host.avatarURL : defaultAvatar" />
+                            <v-img :src="host?.avatarURL ? 'http://localhost:8080' + host.avatarURL : defaultAvatar" 
+                            />
+                            
                         </v-avatar>
                         <div>
                             <div class="text-h6">{{ host.username }}</div>
@@ -52,7 +54,7 @@ onMounted(
                 </v-card>
             </v-col>
             <v-col cols="9">
-                <v-card class="pa-8 elevation-2 rounded-xl" style="width: 100%;">
+                <v-card class="pa-8 elevation-2 rounded-xl" style="width: 90%; margin-left: 50px;" >
                     <h3 style="font-weight: bold;">房東介紹</h3>
                     <p>{{ host?.intro?host.intro:'此房東沒有介紹' }}</p>
                 </v-card>

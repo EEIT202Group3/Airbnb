@@ -8,7 +8,7 @@ const leftMenu = ref([
 ])
 </script>
 <template>
-    <v-list nav class="transparent-card rounded-lg pa-2" style="display: flex; flex-direction: column; align-items: center;">
+    <v-list nav class="transparent-card rounded-lg pa-10" style="display: flex; flex-direction: column; align-items: center;">
         <h1 style="font-weight: bolder;">個人簡介</h1>
         <br>
         <v-list-item

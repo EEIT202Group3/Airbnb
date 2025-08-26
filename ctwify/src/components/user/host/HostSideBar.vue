@@ -10,8 +10,8 @@ const leftMenu = ref([
 ])
 </script>
 <template>
-    <v-list nav class="transparent-card rounded-lg pa-2" style="display: flex; flex-direction: column; align-items:  flex-start;">
-        <h1 style="font-weight: bolder;">個人簡介</h1>
+  <div class="container">
+        <h1 style="font-weight: bolder;">個人簡介</h1>  <v-list nav class="transparent-card rounded-lg pa-2" style="display: flex; flex-direction: column; align-items:  flex-start;">
         <br>
         <v-list-item
             v-for="m in leftMenu"
@@ -21,6 +21,7 @@ const leftMenu = ref([
             :active="route.name === m.to.name"           
         >{{ m.title }}</v-list-item>
     </v-list>
+    </div>
 </template>
 <style scoped>
 .sidebar-item {
@@ -32,4 +33,13 @@ const leftMenu = ref([
   background-color: transparent !important; /* 背景透明 */
   box-shadow: none !important; /* 移除陰影，若需要 */
 }
+
+.container {
+  max-width: 1100px; /* 與 navbar 對齊 */
+  margin: 0 auto;    /* 置中 */
+  padding: 0 16px;   /* 預留左右邊距 */
+  box-sizing: border-box;
+}
+
+
 </style>
