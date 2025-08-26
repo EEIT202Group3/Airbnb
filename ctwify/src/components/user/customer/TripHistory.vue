@@ -1,131 +1,3 @@
-<script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import axios from "axios";
-axios.defaults.withCredentials = true;
-
-// 後端 DTO
-type customerOrder = {
-  bookingId: string;
-  username: string;
-  houseName: string;
-  address: string;
-  tel: string;
-  bed: string;
-  people: number;
-  bookingStatus: string;
-  checkinDate: string | Date;
-  checkoutDate: string | Date;
-  grandtotal: number | string;
-  hostNetAmount: number | string;
-  platformFeeAmount: number | string;
-};
-
-// 卡片資料
-type OrderCard = {
-  id: string;
-  amount: number;
-  date: string | Date;
-  status: string;
-};
-
-const orders = ref<OrderCard[]>([]);
-const fullMap = ref<Record<string, customerOrder>>({});
-const showDetail = ref(false);
-const selectedOrder = ref<customerOrder | null>(null);
-const error = ref<string | null>(null);
-const loading = ref(true);
-
-// 取資料
-function normalize(o: any): customerOrder {
-  return {
-    bookingId: o.bookingId ?? o.booking_id ?? o.id,
-    username: o.username,
-    houseName: o.houseName ?? o.housename,
-    address: o.address,
-    tel: o.tel,
-    bed: o.bed,
-    people: o.people ?? o.persons ?? 0,
-    bookingStatus: o.bookingStatus ?? o.bookingstatus,
-    checkinDate: o.checkinDate ?? o.checkindate ?? o.checkInDate ?? null,
-    checkoutDate: o.checkoutDate ?? o.checkoutdate ?? o.checkOutDate ?? null,
-    grandtotal: o.grandtotal ?? o.grandTotal ?? 0,
-    hostNetAmount: o.hostNetAmount ?? o.hostnetamount ?? 0,
-    platformFeeAmount: o.platformFeeAmount ?? o.platformfeeamount ?? 0,
-  };
-}
-
-onMounted(loadOrders);
-async function loadOrders() {
-  loading.value = true;
-  try {
-    const { data } = await axios.get("/api/orderconfirm/byCustomer");
-    const list = Array.isArray(data) ? data : [];
-    const normalized = list.map(normalize);
-
-    fullMap.value = Object.fromEntries(normalized.map((o) => [o.bookingId, o]));
-
-    // 卡片資料
-    orders.value = normalized.map((o) => ({
-      id: o.bookingId,
-      amount: Number((o as any).grandtotal ?? 0),
-      date: o.checkinDate,
-      status: o.bookingStatus ?? "—",
-    }));
-  } catch (e: any) {
-    error.value = e?.response?.data || "無法取得訂單資料";
-  } finally {
-    loading.value = false;
-  }
-}
-
-function openDetail(bookingId: string) {
-  const raw = fullMap.value[bookingId];
-  if (raw) {
-    selectedOrder.value = normalize(raw);
-    showDetail.value = true;
-  }
-}
-
-// ====== 顯示工具 ======
-function pad2(n: number) {
-  return n.toString().padStart(2, "0");
-}
-
-function fmtDate(v?: string | Date) {
-  if (!v) return "-";
-  const d = new Date(v);
-  const y = d.getFullYear();
-  const M = pad2(d.getMonth() + 1);
-  const D = pad2(d.getDate());
-  const h = pad2(d.getHours());
-  const m = pad2(d.getMinutes());
-  return `${y}-${M}-${D} ${h}:${m}`;
-}
-
-function fmtAmount(n?: number) {
-  return new Intl.NumberFormat("zh-TW", { maximumFractionDigits: 0 }).format(
-    n || 0
-  );
-}
-
-function statusColor(status?: string) {
-  switch ((status || "").trim()) {
-    case "待入住":
-      return "amber";
-    case "已入住":
-      return "blue";
-    case "完成":
-      return "green";
-    case "已取消":
-      return "red";
-    default:
-      return "grey";
-  }
-}
-
-const totalOrders = computed(() => orders.value.length);
-</script>
-
 <template>
   <v-card
     class="pa-6 elevation-1 rounded-xl mx-auto order-wrap"
@@ -135,9 +7,9 @@ const totalOrders = computed(() => orders.value.length);
       <div class="d-flex align-center ga-2">
         <v-icon size="28">mdi-clipboard-text-clock</v-icon>
         <h2 class="m-0 fw-700">訂單總覽</h2>
-        <v-chip size="small" variant="tonal" color="primary"
-          >{{ totalOrders }} 筆</v-chip
-        >
+        <v-chip size="small" variant="tonal" color="primary">
+          {{ totalOrders }} 筆
+        </v-chip>
       </div>
       <div class="text-disabled text-caption"></div>
     </div>
@@ -197,12 +69,12 @@ const totalOrders = computed(() => orders.value.length);
 
             <div class="d-flex align-center mb-4 ga-2 text-medium-emphasis">
               <v-icon size="18">mdi-cash</v-icon>
-              <span
-                >金額 NT$
+              <span>
+                金額 NT$
                 <span class="fw-700 text-high-emphasis">{{
                   fmtAmount(o.amount)
-                }}</span></span
-              >
+                }}</span>
+              </span>
             </div>
 
             <div class="d-flex justify-end">
@@ -309,6 +181,162 @@ const totalOrders = computed(() => orders.value.length);
   </v-dialog>
 </template>
 
+<script setup lang="ts">
+import { ref, onMounted, computed } from "vue";
+import axios from "axios";
+axios.defaults.withCredentials = true;
+
+// 後端 DTO
+type customerOrder = {
+  bookingId: string;
+  username: string;
+  houseName: string;
+  address: string;
+  tel: string;
+  bed: string;
+  people: number;
+  bookingStatus: string;
+  checkinDate: string | Date;
+  checkoutDate: string | Date;
+  grandtotal: number | string;
+  hostNetAmount: number | string;
+  platformFeeAmount: number | string;
+};
+
+// 卡片資料
+type OrderCard = {
+  id: string;
+  amount: number;
+  date: string | Date;
+  status: string;
+};
+
+const orders = ref<OrderCard[]>([]);
+const fullMap = ref<Record<string, customerOrder>>({});
+const showDetail = ref(false);
+const selectedOrder = ref<customerOrder | null>(null);
+const error = ref<string | null>(null);
+const loading = ref(true);
+
+// 欄位對齊
+function normalize(o: any): customerOrder {
+  return {
+    bookingId: o.bookingId ?? o.booking_id ?? o.id,
+    username: o.username,
+    houseName: o.houseName ?? o.housename,
+    address: o.address,
+    tel: o.tel,
+    bed: o.bed,
+    people: o.people ?? o.persons ?? 0,
+    bookingStatus: o.bookingStatus ?? o.bookingstatus,
+    checkinDate: o.checkinDate ?? o.checkindate ?? o.checkInDate ?? null,
+    checkoutDate: o.checkoutDate ?? o.checkoutdate ?? o.checkOutDate ?? null,
+    grandtotal: o.grandtotal ?? o.grandTotal ?? 0,
+    hostNetAmount: o.hostNetAmount ?? o.hostnetamount ?? 0,
+    platformFeeAmount: o.platformFeeAmount ?? o.platformfeeamount ?? 0,
+  };
+}
+
+// 安全轉 Date
+function toDate(v: any): Date | null {
+  if (!v) return null;
+  const d = new Date(v);
+  return isNaN(d as any) ? null : d;
+}
+
+onMounted(loadOrders);
+async function loadOrders() {
+  loading.value = true;
+  try {
+    const { data } = await axios.get("/api/orderconfirm/byCustomer");
+    const list = Array.isArray(data) ? data : [];
+    const normalized = list.map(normalize);
+
+    // 依入住日離今天最近排序
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    normalized.sort((a, b) => {
+      const da = toDate(a.checkinDate);
+      const db = toDate(b.checkinDate);
+
+      if (!da && !db) return 0;
+      if (!da) return 1;
+      if (!db) return -1;
+
+      const aFuture = da.getTime() >= today.getTime();
+      const bFuture = db.getTime() >= today.getTime();
+
+      if (aFuture !== bFuture) return aFuture ? -1 : 1;
+
+      const diffA = Math.abs(da.getTime() - today.getTime());
+      const diffB = Math.abs(db.getTime() - today.getTime());
+      return diffA - diffB;
+    });
+
+    fullMap.value = Object.fromEntries(normalized.map((o) => [o.bookingId, o]));
+
+    orders.value = normalized.map((o) => ({
+      id: o.bookingId,
+      amount: Number((o as any).grandtotal ?? 0),
+      date: o.checkinDate,
+      status: o.bookingStatus ?? "—",
+    }));
+  } catch (e: any) {
+    error.value = e?.response?.data || "無法取得訂單資料";
+  } finally {
+    loading.value = false;
+  }
+}
+
+function openDetail(bookingId: string) {
+  const raw = fullMap.value[bookingId];
+  if (raw) {
+    selectedOrder.value = normalize(raw);
+    showDetail.value = true;
+  }
+}
+
+// ====== 顯示工具 ======
+function pad2(n: number) {
+  return n.toString().padStart(2, "0");
+}
+
+function fmtDate(v?: string | Date) {
+  if (!v) return "-";
+  const d = new Date(v);
+  const y = d.getFullYear();
+  const M = pad2(d.getMonth() + 1);
+  const D = pad2(d.getDate());
+  const h = pad2(d.getHours());
+  const m = pad2(d.getMinutes());
+  return `${y}-${M}-${D} ${h}:${m}`;
+}
+
+function fmtAmount(n?: number) {
+  return new Intl.NumberFormat("zh-TW", { maximumFractionDigits: 0 }).format(
+    n || 0
+  );
+}
+
+function statusColor(status?: string) {
+  switch ((status || "").trim()) {
+    case "待入住":
+      return "amber";
+    case "已入住":
+      return "blue";
+    case "完成":
+      return "green";
+    case "已取消":
+      return "red";
+    default:
+      return "grey";
+  }
+}
+
+const totalOrders = computed(() => orders.value.length);
+</script>
+
 <style scoped>
 .fw-700 {
   font-weight: 700;
@@ -318,12 +346,12 @@ const totalOrders = computed(() => orders.value.length);
     "Liberation Mono", monospace;
 }
 
-/* 外層卡片背景*/
+/* 外層卡片背景 */
 .order-wrap {
   background: linear-gradient(180deg, #ffffff 0%, #fffaf4 100%);
 }
 
-/* 單筆卡片樣式*/
+/* 單筆卡片 */
 .order-card {
   background: #fff;
   border: 1px solid #eee;
@@ -336,24 +364,12 @@ const totalOrders = computed(() => orders.value.length);
   border-color: #f2ab27;
 }
 
-.label {
-  font-size: 0.85rem;
-  color: rgba(0, 0, 0, 0.6);
-  margin-bottom: 4px;
-}
-.value {
-  font-size: 1rem;
-  color: rgba(0, 0, 0, 0.85);
-  font-weight: 600;
-  word-break: break-all;
-}
 .section-title {
   font-size: 0.9rem;
   color: rgba(0, 0, 0, 0.6);
   letter-spacing: 0.5px;
   margin-bottom: 6px;
 }
-
 .kv-list {
   background: #fff;
   border: 1px solid #eee;
@@ -386,9 +402,5 @@ const totalOrders = computed(() => orders.value.length);
 }
 .kv-row .total {
   font-weight: 800;
-}
-.mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", monospace;
 }
 </style>

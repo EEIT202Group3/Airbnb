@@ -22,7 +22,7 @@ const routes = [
         path: '/coustomerlistings/:id',
         component: () => import('@/components/listing/customer/CustomerDetail.vue'),
       },
-       {
+      {
         path: '/search',
         component: () => import('@/components/listing/customer/SearchResults.vue'),
       },
@@ -139,7 +139,7 @@ const routes = [
             component: () => import("@/components/user/host/HostOrder.vue"),
             name: "HostOrder",
           },
-          
+
         ],
       },
       {
@@ -158,16 +158,16 @@ const routes = [
         component: () => import('@/components/listing/host/AddListing2.vue'),
         name: 'addlistings',
       },
-      
+
       {
         path: 'details/:id',
         component: () => import('@/components/listing/host/Detail.vue'),
       },
-       {
-            path: "edlistings/:id",
-            component: () => import("@/components/listing/host/EditListing.vue"),
-          }
-     
+      {
+        path: "edlistings/:id",
+        component: () => import("@/components/listing/host/EditListing.vue"),
+      }
+
     ],
   },
 
@@ -194,7 +194,7 @@ const routes = [
     path: '/carpaymentresult',
     name: 'carpaymentresult',
     component: CarResult,
-    props: true
+    props: (route) => ({ rid: route.query.rid })
   }
 ]
 
