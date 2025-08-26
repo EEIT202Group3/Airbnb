@@ -154,7 +154,7 @@
               class="d-flex justify-center"
             >
               <div class="thumb-wrapper">
-                <v-img :src="previewUrl(img)" cover class="rounded thumb" />
+                <v-img :src="`http://localhost:8080/images/reviews/${img}`" cover class="rounded thumb" />
                 <v-btn
                   v-if="isEditing && img !== null"
                   size="x-small"

@@ -11,14 +11,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+@Component
 public class ReviewUtils {
-	@Value("${app.storage.base-dir}")
+    @Value("${app.storage.base-dir}")
     private String baseDir;
-	
-	public String getToday() {
+    @Getter
+    private Path storageDir;
+    @PostConstruct
+    public void init() throws IOException {
+        storageDir = Paths.get(baseDir, "reviews").toAbsolutePath().normalize();
+        Files.createDirectories(storageDir);
+        System.out.println("Storage directory created at: " + storageDir);
+    }
+
+    public String getToday() {
         return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
 	}
@@ -33,8 +45,8 @@ public class ReviewUtils {
                 if (mf.isEmpty()) continue;
 
                 String fileName = UUID.randomUUID() + "_" + mf.getOriginalFilename(); // 避免覆蓋
-                File saveFilePath = new File(baseDir, fileName);
-                System.out.println("Utils.uploadImg()" + baseDir + fileName);
+                File saveFilePath = new File(storageDir.toString(), fileName);
+                System.out.println("Utils.uploadImg()" + storageDir.toString() + fileName);
                 imgList.add(fileName);
 
                 try {
@@ -62,7 +74,7 @@ public class ReviewUtils {
     
     public String saveImage(MultipartFile file) {
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path path = Paths.get("your_upload_path", fileName);
+        Path path = Paths.get(storageDir.toString(), fileName);
         try {
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
