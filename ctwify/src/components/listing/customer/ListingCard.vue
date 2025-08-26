@@ -274,7 +274,9 @@ export default {
   font-size: 20px;
 }
 
+
 /* Datepicker 樣式 */
+
 .card-datepicker .dp__input {
   border: none;
   background: transparent !important;
@@ -283,6 +285,7 @@ export default {
   font-size: 16px;
   cursor: pointer;
 }
+
 
 /* 房源卡片 */
 .listing-card {
@@ -299,6 +302,17 @@ export default {
   width: 100%;
   height: 180px;
   object-fit: cover;
+}
+
+/* 房源橫向滑動區 */
+.listing-container {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+.listing-scroll {
+  display: flex;
+  gap: 16px;
+  scroll-snap-align: start;
 }
 
 /* 房源橫向滑動區 */
@@ -347,6 +361,7 @@ export default {
   background-color: #f5f5f5;
   color: #333;
 }
+
 
 /* 簡單淡入動畫 */
 @keyframes fadeIn {

@@ -1,7 +1,9 @@
 package com.EEITG3.Airbnb.reviews.dto;
 
 import com.EEITG3.Airbnb.reviews.entity.Review;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ReviewMapper {
 	public static ReviewDTO toDTO(Review review) {
         ReviewDTO dto = new ReviewDTO();

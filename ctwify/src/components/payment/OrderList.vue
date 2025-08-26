@@ -151,7 +151,13 @@
 
         <!-- 只有訂單完成才能評價（若需請改判斷條件） -->
         <router-link
-          :to="{ name: 'HostReview', query: { bookingId: order.bookingId } }"
+
+          :to="{
+            name: 'InsertReview',
+            query: {
+              bookingId: order.bookingId,
+            },
+          }"
           custom
           v-slot="{ navigate }"
         >

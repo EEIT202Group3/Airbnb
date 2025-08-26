@@ -18,7 +18,7 @@
   <!-- 只有審核通過才顯示上架 / 下架 -->
   <p
     v-if="house.approved === true"
-    class="listing-status"
+    class="listing-status-placeholder"
     :class="house.published ? 'published' : 'unpublished'"
   >
     {{ house.published ? '已上架' : '已下架' }}
@@ -183,7 +183,7 @@ export default {
 .listing-title {
   flex-grow: 1; 
   margin-bottom: 8px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   line-height: 1.4;
   overflow: hidden;
@@ -198,12 +198,31 @@ export default {
   font-weight: 500;
 }
 
-.listing-status.published {
-  color: #28a745; /* 綠色 */
+
+.listing-status-placeholder.published {
+  color: #28a745; /* 綠色上架 */
 }
 
-.listing-status.unpublished {
-  color: #dc3545; /* 紅色 */
+.listing-status-placeholder.unpublished {
+  color: #dc3545; /* 紅色下架 */
 }
+
+
+.listing-info-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 80px; /* 可調整總高度 */
+}
+
+.listing-status-placeholder {
+  height: 18px; /* 固定高度，保持名稱位置不跳動 */
+  line-height: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
 
 </style>
