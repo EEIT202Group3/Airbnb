@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { useCustomerStore } from "@/stores/customer";
 import api from "@/api";
 import defaultAvatar from "@/images/default.png";
-import SimpleReview from "@/components/reviews/SimpleReview.vue";
+import CustReview from "@/components/reviews/CustReview.vue";
 const customerStore = useCustomerStore();
 const { customer } = storeToRefs(customerStore);
 const reviews = ref([]);
@@ -71,7 +71,7 @@ onMounted(async () => {
       <span class="text-subtitle-1 font-weight-medium">我曾撰寫的評價</span>
     </div>
     <v-sheet>
-      <simple-review :reviews="reviews"></simple-review>
+      <CustReview :reviews="reviews"></CustReview>
     </v-sheet>
   </v-card>
 </template>

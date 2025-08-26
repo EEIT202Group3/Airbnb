@@ -4,6 +4,7 @@
   <v-main style="padding-top: 70px;">
     <router-view></router-view>
   </v-main>
+  <v-footer><Chat></Chat></v-footer>
   <Footer app fixed></Footer>
   </v-app>
 </template>

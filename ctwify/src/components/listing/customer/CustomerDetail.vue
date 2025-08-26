@@ -263,7 +263,7 @@
         <button class="close-btn" @click="closeAmenitiesModal">關閉</button>
       </div>
     </div>
-    <simple-review :reviews="reviews"></simple-review>
+    <ListReview :reviews="reviews"></ListReview>
   </div>
 </template>
 
@@ -273,7 +273,7 @@ import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { ref, onMounted, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import SimpleReview from "@/components/reviews/SimpleReview.vue";
+import ListReview from "@/components/reviews/ListReview.vue";
 import DefaultAvatar from "@/images/default.png";
 
 const reviews = ref([]); // 評論列表
