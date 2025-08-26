@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div class="come" v-if="listing">
       <h3>{{ listing.houseName }}</h3>
 
@@ -506,6 +506,16 @@ onMounted(() => {
 @import "@/assets/listing/equipment.css";
 @import "@/assets/listing/datepicker.css";
 
+.container {
+  width: 100%;
+  max-width: 1100px; /* 與 navbar 對齊 */
+  margin: 0 auto;    /* 置中 */
+  padding: 0 16px;   /* 預留左右邊距 */
+  box-sizing: border-box;
+}
+
+
+
 /* 右側預訂卡片 */
 .booking-card {
   background: white;
@@ -612,7 +622,7 @@ onMounted(() => {
 
 /* 地圖樣式 */
 .map-wrapper {
-  width: 1020px;
+  width: 1100px;
   height: 500px;
   border-radius: 16px;
   overflow: hidden;

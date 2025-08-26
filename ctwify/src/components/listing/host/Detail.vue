@@ -304,7 +304,7 @@ function isFontAwesome(icon) {
 onMounted(async () => {
   const id = route.params.id;
   try {
-    const res = await axios.get(`/listings/${id}`);
+    const res = await axios.get(`/listings/${id}/basic`);
     listing.value = res.data;
 
     photos.value = [];
