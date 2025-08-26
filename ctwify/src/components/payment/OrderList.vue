@@ -134,7 +134,7 @@
 
         <router-link
           :to="{
-            name: 'HostReview',
+            name: 'InsertReview',
             query: {
               bookingId: order.bookingId,
             },
@@ -517,7 +517,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .soft-card {
