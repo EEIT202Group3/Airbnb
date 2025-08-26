@@ -56,6 +56,9 @@
               <div class="mt-2" style="font-size: 20px">
                 {{ item.cusComm || "（無評論內容）" }}
               </div>
+              <div class="mt-2" style="font-size: 20px">
+                {{ item.hostComm || "(房東未進行回復)" }}
+              </div>
             </v-card-text>
           </v-card>
 

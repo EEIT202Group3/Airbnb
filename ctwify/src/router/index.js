@@ -7,24 +7,28 @@ import CarResult from "@/components/carRent/frontpageComponent/CarPaymentResult.
 const routes = [
   //客戶首頁
   {
-    path: '/',
+    path: "/",
     component: () => import("@/layouts/MainLayout.vue"),
-    name: 'Homepage',
-    redirect: { name: 'HomeCard' },
+    name: "Homepage",
+    redirect: { name: "HomeCard" },
     children: [
       //主畫面 + 修維的部分
       {
-        path: '',
-        component: () => import("@/components/listing/customer/ListingCard.vue"),
-        name: 'HomeCard',
+        path: "",
+        component: () =>
+          import("@/components/listing/customer/ListingCard.vue"),
+        name: "HomeCard",
       },
       {
-        path: '/coustomerlistings/:id',
-        component: () => import('@/components/listing/customer/CustomerDetail.vue'),
+        path: "/coustomerlistings/:id",
+        component: () =>
+          import("@/components/listing/customer/CustomerDetail.vue"),
       },
-       {
-        path: '/search',
-        component: () => import('@/components/listing/customer/SearchResults.vue'),
+
+      {
+        path: "/search",
+        component: () =>
+          import("@/components/listing/customer/SearchResults.vue"),
       },
 
       //宜臻之後的部分，不能砍
@@ -39,12 +43,12 @@ const routes = [
         component: () => import("@/components/payment/PreviewConfirm.vue"),
       },
       {
-        path: '/payment/paypal',
-        name: 'PayPalPayment',
+        path: "/payment/paypal",
+        name: "PayPalPayment",
         component: () => import("@/components/payment/PayPalPayment.vue"),
-        props: route => ({
-          bookingId: route.query.bookingId
-        })
+        props: (route) => ({
+          bookingId: route.query.bookingId,
+        }),
       },
       {
         path: "/payment/redirect",
@@ -58,30 +62,31 @@ const routes = [
         props: true,
       },
       {
-        path: '/order/list',
-        name: 'OrderList',
-        component: () => import('@/components/payment/OrderList.vue'),
+        path: "/order/list",
+        name: "OrderList",
+        component: () => import("@/components/payment/OrderList.vue"),
       },
 
       //諺廷的部分
       {
-
-        path: '/login',
-        component: () => import('@/components/user/customer/LoginSignup.vue'),
+        path: "/login",
+        component: () => import("@/components/user/customer/LoginSignup.vue"),
       },
       {
-        path: '/customer',
+        path: "/customer",
         component: () => import("@/components/user/customer/CustomerPage.vue"),
         children: [
           {
-            path: '',
-            component: () => import('@/components/user/customer/CustomerInfo.vue'),
-            name: 'CustomerInfo',
+            path: "",
+            component: () =>
+              import("@/components/user/customer/CustomerInfo.vue"),
+            name: "CustomerInfo",
           },
           {
-            path: '/history',
-            component: () => import('@/components/user/customer/TripHistory.vue'),
-            name: 'TripHistory',
+            path: "/history",
+            component: () =>
+              import("@/components/user/customer/TripHistory.vue"),
+            name: "TripHistory",
           },
         ],
       },
@@ -90,7 +95,6 @@ const routes = [
         component: () =>
           import("@/components/user/customer/CustomerProfile.vue"),
         name: "CustomerProfile",
-
       },
       {
         path: "password",
@@ -109,7 +113,7 @@ const routes = [
         path: "reviews/insert",
         component: () =>
           import("@/components/reviews/customer/InsertReview.vue"),
-        name: "HostReview",
+        name: "InsertReview",
       },
     ],
   },
@@ -139,7 +143,13 @@ const routes = [
             component: () => import("@/components/user/host/HostOrder.vue"),
             name: "HostOrder",
           },
-          
+
+          {
+            path: "review",
+            component: () => import("@/components/user/host/HostReview.vue"),
+            name: "HostReview",
+          },
+            
         ],
       },
       {
@@ -154,11 +164,16 @@ const routes = [
       },
 
       {
-        path: '/addlistings',
-        component: () => import('@/components/listing/host/AddListing2.vue'),
-        name: 'addlistings',
+        path: "/addlistings",
+        component: () => import("@/components/listing/host/AddListing2.vue"),
+        name: "addlistings",
       },
-      
+
+      {
+        path: "details/:id",
+        component: () => import("@/components/listing/host/Detail.vue"),
+      },
+        
       {
         path: 'details/:id',
         component: () => import('@/components/listing/host/Detail.vue'),
@@ -166,42 +181,41 @@ const routes = [
        {
             path: "edlistings/:id",
             component: () => import("@/components/listing/host/EditListing.vue"),
-          }
-     
+        }
+    
     ],
   },
 
   //租車首頁
   {
-    path: '/car-front-homepage',
-    name: 'carFrontHomepage',
-    component: CarRentFrontHomepage
+    path: "/car-front-homepage",
+    name: "carFrontHomepage",
+    component: CarRentFrontHomepage,
   },
 
   {
-    path: '/car-select',
-    name: 'carSelect',
-    component: CarSelect
+    path: "/car-select",
+    name: "carSelect",
+    component: CarSelect,
   },
 
   {
-    path: '/car-detail/:id',
-    name: 'carDetail',
+    path: "/car-detail/:id",
+    name: "carDetail",
     component: CarDetail,
-    props: true
+    props: true,
   },
   {
-    path: '/carpaymentresult',
-    name: 'carpaymentresult',
+    path: "/carpaymentresult",
+    name: "carpaymentresult",
     component: CarResult,
-    props: true
-  }
-]
+    props: true,
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes, // 正確傳入已定義好的 routes
 });
-
 
 export default router;

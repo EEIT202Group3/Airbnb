@@ -407,6 +407,7 @@ hr {
   background-color: #1e8449;
 }
 
+
 .amenity-item span,
 .amenity-item i,
 .amenity-item .v-icon {

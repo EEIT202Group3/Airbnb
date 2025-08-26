@@ -274,7 +274,8 @@ export default {
   font-size: 20px;
 }
 
-/* 🔹 Datepicker 樣式 */
+
+/* Datepicker 樣式 */
 .card-datepicker .dp__input {
   border: none;
   background: transparent !important;
@@ -284,7 +285,8 @@ export default {
   cursor: pointer;
 }
 
-/* 🔹 房源卡片 */
+
+/* 房源卡片 */
 .listing-card {
   text-decoration: none;
   color: inherit;
@@ -299,9 +301,9 @@ export default {
   width: 100%;
   height: 180px;
   object-fit: cover;
-}
 
-/* 🔹 房源橫向滑動區 */
+
+/* 房源橫向滑動區 */
 .listing-container {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -312,7 +314,7 @@ export default {
   scroll-snap-align: start;
 }
 
-/* 🔹 dropdown 自訂縣市 */
+/* dropdown 自訂縣市 */
 .input-wrapper {
   position: relative;
   width: 100%; /* 改成 100% 讓他在小螢幕撐滿 */
@@ -348,13 +350,16 @@ export default {
   color: #333;
 }
 
-/* 🔹 簡單淡入動畫 */
+=
+
+/* 簡單淡入動畫 */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 🔹 響應式設計 (RWD) */
+
+/* 響應式設計 (RWD) */
 @media (max-width: 992px) {
   .background {
     height: auto;

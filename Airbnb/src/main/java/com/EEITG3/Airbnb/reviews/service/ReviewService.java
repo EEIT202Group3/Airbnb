@@ -1,11 +1,10 @@
 package com.EEITG3.Airbnb.reviews.service;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -39,17 +38,18 @@ public class ReviewService {
 	private final HostRepository hostRepository;
 	private final OrderRepository orderRepository;
 	private final ListRepository listingRepository;
+    private final ReviewUtils reviewUtils;
+    private final ReviewMapper mapper;
 
-	private ImageStorageService storage;
-
-	public ReviewService(ReviewRepository rRepository, CustomerRepository customerRepository, HostRepository hostRepository,OrderRepository orderRepository,ListRepository listingRepository,ImageStorageService storage) {
+    public ReviewService(ReviewRepository rRepository, CustomerRepository customerRepository, HostRepository hostRepository, OrderRepository orderRepository, ListRepository listingRepository, ReviewUtils reviewUtils, ImageStorageService storage, ReviewMapper mapper) {
 		this.rRepository = rRepository;
 		this.customerRepository = customerRepository;
 		this.hostRepository = hostRepository;
 		this.orderRepository = orderRepository;
 		this.listingRepository = listingRepository;
-		this.storage = storage;
-	}
+        this.reviewUtils = reviewUtils;
+        this.mapper = mapper;
+    }
 	
 	public List<ReviewDTO> findByTypeAndKeyword(String type, String keyword) {
 
@@ -86,9 +86,6 @@ public class ReviewService {
 	            .map(ReviewMapper::toDTO)
 	            .collect(Collectors.toList());
 	}
-//	public List<Review> findByTypeAndKeyword(String type, String keyword) {
-//		return rRepository.findByTypeAndKeyword(type, keyword);
-//	}
 
 	public ReviewDTO findByReviewID(Integer id) {
 		  return rRepository.findByReviewId(id)
@@ -128,7 +125,7 @@ public class ReviewService {
 	public ResponseEntity<?> insertReview(Integer listId, String bookingId, String custId, String hostId,
 			Integer cleanScore, Integer commScore, Integer valueScore, String custComm, List<MultipartFile> images) {
 		Review insertBean = new Review();
-		List<String> imageList = new ReviewUtils().uploadImg(images);
+		List<String> imageList =  reviewUtils.uploadImg(images);
 		// --- 關聯 Customer（不打 DB，可用 getReferenceById） ---
 		// 若你沒有 CustomerRepository，也可改用 em.getReference(Customer.class, custId)
 		Customer customerRef = customerRepository.getReferenceById(custId);
@@ -192,7 +189,7 @@ public class ReviewService {
 		}
 	}
 
-	public ResponseEntity<Review> patchReview(Integer id, ReviewPatchRequest req, MultipartFile image1,
+	public ResponseEntity<ReviewDTO> patchReview(Integer id, ReviewPatchRequest req, MultipartFile image1,
 			MultipartFile image2, MultipartFile image3) {
 		Review r = rRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Review not found"));
@@ -211,20 +208,20 @@ public class ReviewService {
 
 		if (image1 != null && !image1.isEmpty()) {
 			// 視需求：若要覆蓋前刪舊檔，可加 storage.deleteQuietly(r.getImage1());
-			r.setImage1(storage.saveImg(image1));
+			r.setImage1(reviewUtils.saveImage(image1));
 		}
 		if (image2 != null && !image2.isEmpty()) {
 			// storage.deleteQuietly(r.getImage2());
-			r.setImage2(storage.saveImg(image2));
+			r.setImage2(reviewUtils.saveImage(image2));
 		}
 		if (image3 != null && !image3.isEmpty()) {
 			// storage.deleteQuietly(r.getImage3());
-			r.setImage3(storage.saveImg(image3));
+			r.setImage3(reviewUtils.saveImage(image3));
 		}
 
 		Review saved = rRepository.save(r);
-
-		return ResponseEntity.ok(saved);
+		
+		return ResponseEntity.ok(mapper.toDTO(saved));
 	}
 	
 	public ReviewInsertDto insertData(String bookingId) {
@@ -237,6 +234,21 @@ public class ReviewService {
 		reviewInsertDto.setListImg(order.get().getListing().getPhoto1());
 		reviewInsertDto.setHouseName(order.get().getListing().getHouseName());
 		return reviewInsertDto;
+	}
+
+	public ResponseEntity<?> hostReplyReview(Integer reviewId,Map<String, String> payload) {
+		Optional<Review> reviewOptional = rRepository.findById(reviewId);
+		Review r = reviewOptional.get();
+		String hostComm = payload.getOrDefault("hostComm", "").trim();
+	    
+	    if (hostComm.isEmpty()) {
+	        return ResponseEntity.badRequest().body(Map.of("message", "回覆不得為空"));
+	    }
+	    // 可加權限檢查：principal 是否為此 review 的房東
+	    r.setHostComm(hostComm);
+	    rRepository.save(r);
+
+	    return ResponseEntity.ok(Map.of("message", "ok"));
 	}
 
 }
