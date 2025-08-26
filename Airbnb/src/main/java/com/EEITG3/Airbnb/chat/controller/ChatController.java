@@ -14,7 +14,6 @@ import org.springframework.stereotype.Controller;
 
 import com.EEITG3.Airbnb.chat.entity.ChatMessage;
 
-
 @Controller
 public class ChatController {
 	
@@ -40,7 +39,7 @@ public class ChatController {
         // 確保訊息完整性
         message.setType("PRIVATE");
         message.setTimestamp(new Date());
-        System.out.println("🟢 訊息來自使用者: " + principal.getName());
+        System.out.println("🟢 訊息來自使用者: " + principal.getName() + message.getSender());
         // Log 發送對象
         System.out.println("🟡 要推送給: " + message.getReceiver());
 
@@ -50,7 +49,7 @@ public class ChatController {
         
         // 發送給管理員
         template.convertAndSendToUser(
-            "2025001",           // 接收者 username
+            "ADMIN",           // 接收者 username
             "/queue/messages", // 目標路徑
             message
         );
@@ -63,8 +62,9 @@ public class ChatController {
     
     
     @MessageMapping("/adminReply")
-    public void adminReply(ChatMessage message) {
+    public void adminReply(ChatMessage message, Principal principal) {
         message.setType("ADMIN_REPLY");
+        message.setSender(principal.getName()); // 由後端保證 sender 正確
         message.setTimestamp(new Date());
         
         if (message.getReceiver() == null || message.getReceiver().trim().isEmpty()) {
@@ -72,11 +72,15 @@ public class ChatController {
             return;
         }
         
+        String receiver = "eszrdx417@gmail.com";
+        System.out.println("adminReply" + receiver);
+        message.setReceiver(receiver);
+        
         // 確保這裡的 receiver 是正確的用戶名
         System.out.println("發送訊息給: " + message.getReceiver());
         System.out.println(message.toString());
         template.convertAndSendToUser(
-            "test",    // 這裡應該是客戶的用戶名，不是 "ADMIN"
+        	receiver,    // 這裡應該是客戶的用戶名，不是 "ADMIN"
             "/queue/messages",        // 目標路徑
             message
         );

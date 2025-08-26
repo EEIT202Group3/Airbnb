@@ -1,5 +1,6 @@
 package com.EEITG3.Airbnb.reviews.dto;
 
+
 public class ReviewPatchRequest {
 	
 	
@@ -7,7 +8,20 @@ public class ReviewPatchRequest {
     private	Integer commScore;
     private Integer valueScore;
     private String cusComm;
-    
+    /*
+    @JsonCreator
+    public ReviewPatchRequest(
+            @JsonProperty("cleanScore") Integer cleanScore,
+            @JsonProperty("commScore") Integer commScore,
+            @JsonProperty("valueScore") Integer valueScore,
+            @JsonProperty("cusComm") String cusComm
+    ) {
+        this.cleanScore = cleanScore;
+        this.commScore = commScore;
+        this.valueScore = valueScore;
+        this.cusComm = cusComm;
+    }
+    */
     
 	public Integer getCleanScore() {
 		return cleanScore;

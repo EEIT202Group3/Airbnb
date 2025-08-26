@@ -115,11 +115,7 @@ const headers = [
 ];
 
 import axios from "axios";
-import {
-  fetchReviews,
-  getReviews,
-  deleteReview,
-} from "@/service/review/AdminService";
+import { fetchReviews, getReviews } from "@/service/review/AdminService";
 const reviews = ref([]);
 // 封裝取得數據方法
 /*
