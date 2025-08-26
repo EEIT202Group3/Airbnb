@@ -109,8 +109,8 @@ body {
   border: 1px solid #ddd;
   border-radius: 20px;
   overflow: hidden;
-  width: 300px;
-  height: 370px; 
+  width: 250px;
+  height: 350px; 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -124,19 +124,19 @@ body {
   transform: translateY(-2px); 
 }
 
-.listing img {
+.listing-img {
   width: 100%;
-  height: 200px; /* 照片高度 */
-   border-radius: 8px;
-  object-fit: cover; /* 保持比例裁切 */
+  height: 165px; /* 固定高度，你可以依需求調整 */
+  aspect-ratio: 4 / 3;
+  object-fit: cover; /* 裁切圖片以維持比例 */
+  border-radius: 6px;
 }
 
-.listing-info {
+/* .listing-info {
   flex: 1;
   font-size: 18px;
   font-weight: 500;
-  
-}
+} */
 
 .listing-actions form {
   display: inline-block;
@@ -181,18 +181,18 @@ body {
   font-weight: 500;
 }
 
-/* ===== 按鈕樣式 ===== */
-.btn-orange {
-  background-color: #f07b2d;
-  color: white;
-  border: none;
-  transition: background-color 0.3s;
+/* ===== 新增/更新按鈕樣式 ===== */
+.v-btn.orange-btn {
+  background-color: #f07b2d!important;
+  color: #fff !important;
+  transition: background-color 0.3s ease;
 }
 
-.btn-orange:hover,
-.btn:hover {
-  background-color: #e7630b;
+.v-btn.orange-btn:hover {
+  background-color:#e7630b !important;
 }
+
+
 .photo-section {
   text-align: center;
 }

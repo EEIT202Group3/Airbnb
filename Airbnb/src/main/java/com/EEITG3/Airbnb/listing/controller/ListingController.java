@@ -172,7 +172,6 @@ public class ListingController {
     }
 
 
-
     // 儲存房源設備（修改後更新設備）
     @PostMapping("/{id}/equipments")
     public void saveEquipments(@PathVariable("id") Integer id, @RequestBody String[] equipIds) {

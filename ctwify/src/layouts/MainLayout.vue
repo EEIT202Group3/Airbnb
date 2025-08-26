@@ -1,7 +1,7 @@
 <template>
   <Nav></Nav>
    <v-app>
-  <v-main style="padding-top: 70px;padding-bottom:-200px;">
+  <v-main style="padding-top: 70px;">
     <router-view></router-view>
   </v-main>
   <Footer app fixed></Footer>

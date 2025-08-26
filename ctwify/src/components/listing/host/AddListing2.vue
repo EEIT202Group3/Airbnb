@@ -4,10 +4,15 @@
       <div class="form-title">新增房源</div>
       <form @submit.prevent="submitForm" enctype="multipart/form-data">
         <div class="mb-3">
-          <label class="form-label">房屋名稱</label>
-          <input v-model="form.houseName" type="text" class="form-control" required />
-        </div>
-
+  <label class="form-label">房屋名稱</label>
+  <input 
+    v-model="form.houseName" 
+    type="text" 
+    class="form-control" 
+    required 
+    @input="checkHouseNameLength"
+  />
+</div>
         <!-- 地址輸入 + Google Maps -->
 <label class="form-label">地址</label>
 <div class="col">
@@ -153,9 +158,17 @@
           </div>
         </div>
 
-        <div class="text-center">
-          <button type="submit" class="btn btn-orange btn-lg px-5">新增房源</button>
-        </div>
+       <div class="text-center">
+  <v-btn
+    type="submit"
+    class="orange-btn px-6"
+    rounded="lg"
+    elevation="2"
+    size="large"
+  >
+    新增房源
+  </v-btn>
+</div>
 
         <!-- 表單結尾 -->
       </form>
@@ -212,6 +225,14 @@ export default {
         this.selectedPlace = place;
       }
     },
+  checkHouseNameLength() {
+    if (this.form.houseName.length > 25) {
+      // 確保用原生 alert
+      window.alert('房屋名稱最多 25 個字');
+      // 自動截斷字數
+      this.form.houseName = this.form.houseName.slice(0, 25);
+    }
+  },
     closeDialog() {
       this.showDialog = false;
     },

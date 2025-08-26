@@ -1,4 +1,5 @@
 <template>
+  <div style="height: 130px;"></div>
   <v-footer app class="airbnb-footer">
     <v-container>
       <v-row class="py-6" align="start" justify="space-between">
@@ -60,6 +61,7 @@
   background-color:#555555; /* 深灰背景 */
   color: #ffffff;
   font-size: 14px;
+  margin-top: 100px; /* 增加這行 */
 }
 
 .footer-title {
@@ -104,4 +106,6 @@
   border-color:white;
   border-width: 0.1px;
 }
+
+
 </style>

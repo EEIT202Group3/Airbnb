@@ -1,17 +1,17 @@
 <template>
-  <NBar></NBar>
-  <v-main style="margin-top: 45px;">
+  <Nav></Nav>
+   <v-app>
+  <v-main style="padding-top: 70px;">
     <router-view></router-view>
   </v-main>
-  <Footer></Footer>
+  <Footer app fixed></Footer>
+  </v-app>
 </template>
 <script setup>
-import NBar from './NBar.vue';
-import Footer from './Footer.vue';
+
+import Nav from "@/layouts/host/NBar.vue";
+import Footer from "@/layouts/Footer.vue";
 </script>
-<style scoped>
-.v-btn:hover {
-  background-color: #fef3e2 !important;
-  color: #d35400 !important;
-}
+<style>
+
 </style>

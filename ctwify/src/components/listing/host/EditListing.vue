@@ -108,8 +108,16 @@
           </div>
 <br>
           <div class="text-center">
-            <button type="submit" class="btn btn-orange btn-lg px-5">更新房源</button>
-          </div>
+  <v-btn
+    type="submit"
+    class="orange-btn px-6"
+    rounded="lg"
+    elevation="2"
+    size="large"
+  >
+    更新房源
+  </v-btn>
+</div>
         </form>
       </div>
     </div>
@@ -201,6 +209,8 @@ const updateListing = async () => {
     // 檢查是否修改了地址 & 原本狀態是已審核
   const addressChanged = listing.value.ads !== originalListing.value.ads
   const isApproved = originalListing.value.approved === true
+
+    console.log(originalListing.value.approved)
 
   if (addressChanged && isApproved) {
     const result = await Swal.fire({

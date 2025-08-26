@@ -248,7 +248,7 @@ export default {
 .container1,
 .listing-wrapper {
   width: 100%;
-  max-width: 1200px; /* 你要的對齊寬度 */
+  max-width: 1150px; /* 你要的對齊寬度 */
   margin: 0 auto;    /* 置中 */
   padding: 0 16px;   /* 預留邊距，避免太貼邊 */
   box-sizing: border-box;
