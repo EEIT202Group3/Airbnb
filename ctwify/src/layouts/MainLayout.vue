@@ -1,11 +1,10 @@
 <template>
   <Nav></Nav>
-  <v-app>
-    <v-main style="padding-top: 70px; padding-bottom: -200px">
-      <router-view></router-view>
-    </v-main>
-    <v-footer><Chat></Chat></v-footer>
-    <Footer app fixed></Footer>
+   <v-app>
+  <v-main style="padding-top: 70px;">
+    <router-view></router-view>
+  </v-main>
+  <Footer app fixed></Footer>
   </v-app>
 </template>
 <script setup>

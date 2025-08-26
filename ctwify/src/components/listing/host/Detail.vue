@@ -339,8 +339,9 @@ onMounted(async () => {
   align-items: center;
   gap: 8px;
   min-width: 140px;
+  background: transparent !important; /* 永遠透明背景 */
+  box-shadow: none !important;        /* 防止陰影 */
 }
-
 .amenity-icon {
   font-size: 20px;
   color: #555;
@@ -404,6 +405,13 @@ hr {
 }
 .publish-btn.publish:hover {
   background-color: #1e8449;
+}
+
+
+.amenity-item span,
+.amenity-item i,
+.amenity-item .v-icon {
+  background: transparent !important; /* 文字/icon 強制透明 */
 }
 
 </style>

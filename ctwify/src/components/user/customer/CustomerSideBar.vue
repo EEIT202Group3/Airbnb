@@ -22,7 +22,7 @@ const leftMenu = ref([
 </template>
 <style scoped>
 .sidebar-item {
-  width: 45%;
+  width:100%;
   font-size: 20px;
   font-weight: bold;
 }
