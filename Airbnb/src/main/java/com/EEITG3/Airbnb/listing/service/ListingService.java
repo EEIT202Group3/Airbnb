@@ -4,6 +4,7 @@ package com.EEITG3.Airbnb.listing.service;
 
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -286,45 +287,50 @@ public class ListingService {
 //        return saved.getListId();
 //    }
     
-    //編輯房源
-    @Transactional
+   
+     // 編輯房源（更新基本資料、設備、照片）
+
     public void updateListingWithPhotosAndEquipments(
             LisBean lisBean,
             List<MultipartFile> photos,
             List<Integer> equipmentIds
     ) throws IOException {
 
-        //建立儲存目錄（我後來改的跟新增房源一樣）
+        // 建立儲存目錄
         Path storageDir = Paths.get(baseDir, "listings").toAbsolutePath().normalize();
         Files.createDirectories(storageDir);
 
-        // 上傳圖片並收集檔名
+        // 有新照片 → 先清空舊的 → 再上傳新的
         if (photos != null && !photos.isEmpty()) {
+            clearPhotoFields(lisBean); // 
+
             List<String> photoFileNames = new ArrayList<>();
-            int limit = Math.min(photos.size(), 10);
+            int limit = Math.min(photos.size(), 10); // 最多10張
 
             for (int i = 0; i < limit; i++) {
                 MultipartFile photo = photos.get(i);
                 if (photo == null || photo.isEmpty()) continue;
 
+                // 檔名處理
                 String safeName = sanitizeFileName(photo.getOriginalFilename());
                 String fileName = System.currentTimeMillis() + "_" + safeName;
                 Path targetPath = storageDir.resolve(fileName).normalize();
 
+                // 確保不跳脫目錄
                 if (!targetPath.startsWith(storageDir)) {
                     throw new IOException("Invalid file path: " + fileName);
                 }
 
+                // 儲存檔案
                 Files.copy(photo.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
                 photoFileNames.add(fileName);
             }
 
-     
             applyPhotoFields(lisBean, photoFileNames);
         }
 
-        // 關聯設備
-        if (equipmentIds != null && !equipmentIds.isEmpty()) {
+        // 更新設備
+        if (equipmentIds != null) {
             List<EquipmentBean> equipList = new ArrayList<>();
             for (Integer id : equipmentIds) {
                 EquipmentBean equip = em.find(EquipmentBean.class, id);
@@ -333,8 +339,23 @@ public class ListingService {
             lisBean.setEquipments(equipList);
         }
 
-        //儲存
+        // 儲存
         listRepository.save(lisBean);
+    }
+
+    
+     //清空 LisBean 中的 photo1 ~ photo10 欄位
+     
+    private void clearPhotoFields(LisBean lisBean) {
+        for (int i = 1; i <= 10; i++) {
+            try {
+                Field field = LisBean.class.getDeclaredField("photo" + i);
+                field.setAccessible(true);
+                field.set(lisBean, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     //下架房源

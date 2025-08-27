@@ -370,7 +370,7 @@ export default {
   color: #333;
 }
 
-=
+
 
 /* 簡單淡入動畫 */
 @keyframes fadeIn {
