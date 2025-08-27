@@ -150,21 +150,30 @@
         </v-row>
 
         <!-- 只有訂單完成才能評價（若需請改判斷條件） -->
-        <router-link
-          v-if="isCompleted(statusOf(order))"
-          :to="{
-            name: 'InsertReview',
-            query: {
-              bookingId: order.bookingId,
-            },
-          }"
-          custom
-          v-slot="{ navigate }"
-        >
-          <v-btn @click.stop="navigate" icon>
-            <v-icon>mdi-car</v-icon>
-          </v-btn>
-        </router-link>
+        <v-tooltip text="完成後請記得留下評論喔" color="deep-orange-darken-2">
+          <template #activator="{ props }">
+            <router-link
+              v-if="isCompleted(statusOf(order))"
+              :to="{
+                name: 'InsertReview',
+                query: {
+                  bookingId: order.bookingId,
+                },
+              }"
+              custom
+              v-slot="{ navigate }"
+            >
+              <v-btn
+                @click.stop="navigate"
+                icon
+                class="bounce-btn"
+                v-bind="props"
+              >
+                <v-icon>mdi-comment-processing-outline</v-icon>
+              </v-btn>
+            </router-link>
+          </template>
+        </v-tooltip>
       </v-card-text>
     </v-card>
 
@@ -601,5 +610,18 @@ export default {
 }
 .value-link :deep(.v-btn__content) {
   text-decoration: underline;
+}
+.bounce-btn {
+  animation: bounce 1s ease infinite; 
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
 }
 </style>

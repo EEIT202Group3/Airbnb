@@ -1,7 +1,11 @@
-<template>
+  <template>
   <!-- 主聊天窗口 -->
   <div class="chat-wrapper" v-show="chatVisible">
-    <v-card width="400" class="elevation-12 chat-card">
+    <v-card
+      width="400"
+      max-height="90vh"
+      class="elevation-12 chat-card d-flex flex-column"
+    >
       <!-- 標題欄 -->
       <v-card-title
         class="chat-header d-flex justify-space-between align-center bg-black"
@@ -50,18 +54,18 @@
             {{ getWelcomeMessage() }}
           </p>
           <!-- <div class="quick-questions mt-4">
-            <v-chip
-              v-for="question in quickQuestions"
-              :key="question"
-              size="small"
-              variant="outlined"
-              color="primary"
-              class="ma-1"
-              @click="sendQuickMessage(question)"
-            >
-              {{ question }}
-            </v-chip>
-          </div> -->
+              <v-chip
+                v-for="question in quickQuestions"
+                :key="question"
+                size="small"
+                variant="outlined"
+                color="primary"
+                class="ma-1"
+                @click="sendQuickMessage(question)"
+              >
+                {{ question }}
+              </v-chip>
+            </div> -->
         </div>
 
         <!-- 訊息列表 -->
