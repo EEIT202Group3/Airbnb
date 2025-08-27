@@ -26,6 +26,7 @@ const routes = [
       },
 
       {
+
         path: "/search",
         component: () =>
           import("@/components/listing/customer/SearchResults.vue"),
@@ -183,6 +184,7 @@ const routes = [
             component: () => import("@/components/listing/host/EditListing.vue"),
         }
     
+
     ],
   },
 
@@ -212,7 +214,6 @@ const routes = [
     props: true,
   },
 ];
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes, // 正確傳入已定義好的 routes

@@ -36,48 +36,54 @@
         <v-spacer />
         <v-chip
           size="small"
-          :color="statusColor(order.bookingstatus)"
+          :color="statusColor(order.bookingstatus || order.bookingStatus)"
           variant="elevated"
           class="status-chip"
         >
-          <v-icon start size="16">
-            {{ statusIcon(order.bookingstatus) }}
-          </v-icon>
-          {{ order.bookingstatus }}
+          <v-icon start size="16">{{
+            statusIcon(order.bookingstatus || order.bookingStatus)
+          }}</v-icon>
+          {{ order.bookingstatus || order.bookingStatus }}
         </v-chip>
       </v-card-title>
 
-      <v-divider class="mx-4"></v-divider>
+      <v-divider class="mx-4" />
 
       <v-card-text class="py-3">
         <v-row>
           <v-col cols="12" md="6">
             <v-list density="compact" class="flat-list">
               <v-list-item>
-                <template #prepend>
-                  <v-icon color="deep-orange">mdi-home-city</v-icon>
-                </template>
-                <v-list-item-title class="kv">
-                  房名：<span class="value">{{ order.housename }}</span>
-                </v-list-item-title>
+                <template #prepend
+                  ><v-icon color="deep-orange">mdi-home-city</v-icon></template
+                >
+                <v-list-item-title class="kv"
+                  >房名：<span class="value">{{
+                    order.housename
+                  }}</span></v-list-item-title
+                >
               </v-list-item>
 
               <v-list-item>
-                <template #prepend>
-                  <v-icon color="deep-orange">mdi-map-marker</v-icon>
-                </template>
-                <v-list-item-title class="kv">
-                  地址：<span class="value">{{ order.address }}</span>
-                </v-list-item-title>
+                <template #prepend
+                  ><v-icon color="deep-orange">mdi-map-marker</v-icon></template
+                >
+                <v-list-item-title class="kv"
+                  >地址：<span class="value">{{
+                    order.address
+                  }}</span></v-list-item-title
+                >
               </v-list-item>
 
               <v-list-item>
-                <template #prepend>
-                  <v-icon color="deep-orange">mdi-phone</v-icon>
-                </template>
-                <v-list-item-title class="kv">
-                  電話：<span class="value">{{ order.tel }}</span>
-                </v-list-item-title>
+                <template #prepend
+                  ><v-icon color="deep-orange">mdi-phone</v-icon></template
+                >
+                <v-list-item-title class="kv"
+                  >電話：<span class="value">{{
+                    order.tel
+                  }}</span></v-list-item-title
+                >
               </v-list-item>
             </v-list>
           </v-col>
@@ -85,27 +91,37 @@
           <v-col cols="12" md="6">
             <v-list density="compact" class="flat-list">
               <v-list-item>
-                <template #prepend>
-                  <v-icon color="deep-orange">mdi-bed-queen-outline</v-icon>
-                </template>
-                <v-list-item-title class="kv">
-                  房型：<span class="value">{{ order.bed }}</span>
-                </v-list-item-title>
+                <template #prepend
+                  ><v-icon color="deep-orange"
+                    >mdi-bed-queen-outline</v-icon
+                  ></template
+                >
+                <v-list-item-title class="kv"
+                  >房型：<span class="value">{{
+                    order.bed
+                  }}</span></v-list-item-title
+                >
               </v-list-item>
 
               <v-list-item>
-                <template #prepend>
-                  <v-icon color="deep-orange">mdi-account-multiple</v-icon>
-                </template>
-                <v-list-item-title class="kv">
-                  人數：<span class="value">{{ order.people }}</span>
-                </v-list-item-title>
+                <template #prepend
+                  ><v-icon color="deep-orange"
+                    >mdi-account-multiple</v-icon
+                  ></template
+                >
+                <v-list-item-title class="kv"
+                  >人數：<span class="value">{{
+                    order.people
+                  }}</span></v-list-item-title
+                >
               </v-list-item>
 
               <v-list-item>
-                <template #prepend>
-                  <v-icon color="deep-orange">mdi-calendar-range</v-icon>
-                </template>
+                <template #prepend
+                  ><v-icon color="deep-orange"
+                    >mdi-calendar-range</v-icon
+                  ></template
+                >
                 <v-list-item-title class="kv">
                   入住：<span class="value">{{
                     formatDate(order.checkindate)
@@ -118,21 +134,24 @@
               </v-list-item>
 
               <v-list-item>
-                <template #prepend>
-                  <v-icon color="deep-orange">mdi-cash-multiple</v-icon>
-                </template>
-                <v-list-item-title class="kv">
-                  總金額：<span class="value emphasis"
+                <template #prepend
+                  ><v-icon color="deep-orange"
+                    >mdi-cash-multiple</v-icon
+                  ></template
+                >
+                <v-list-item-title class="kv"
+                  >總金額：<span class="value emphasis"
                     >NT$ {{ formatAmount(order.grandtotal) }}</span
-                  >
-                </v-list-item-title>
+                  ></v-list-item-title
+                >
               </v-list-item>
             </v-list>
           </v-col>
         </v-row>
-        <!-- 只有訂單完成才能評價 -->
 
+        <!-- 只有訂單完成才能評價（若需請改判斷條件） -->
         <router-link
+
           :to="{
             name: 'InsertReview',
             query: {
@@ -182,13 +201,12 @@
           </v-chip>
         </v-card-title>
 
-        <v-divider class="mx-4"></v-divider>
+        <v-divider class="mx-4" />
 
         <v-card-text v-if="detailLoading" class="py-6">
           <v-skeleton-loader type="article, actions" />
         </v-card-text>
 
-        <!-- 真的有資料再產生ㄋ內容，避免 undefined -->
         <v-card-text v-else-if="selectedOrder" class="py-4">
           <v-list density="comfortable" class="flat-list">
             <v-list-item>
@@ -216,7 +234,9 @@
                       variant="text"
                       color="deep-orange"
                       class="value-link"
-                      @click.stop="goCarPaymentResult(selectedOrder.bookingId)"
+                      @click.stop="
+                        goCarPaymentResult(selectedOrder.reservationId)
+                      "
                     >
                       {{ selectedOrder.reservationId }}
                       <v-icon end size="16">mdi-open-in-new</v-icon>
@@ -319,16 +339,16 @@
               <template #prepend
                 ><v-icon color="deep-orange">mdi-cash-100</v-icon></template
               >
-              <v-list-item-title class="kv"
-                >租車金額：<span class="value"
+              <v-list-item-title class="kv">
+                租車金額：<span class="value"
                   >NT$
                   {{
                     formatAmount(
                       selectedOrder.cartotal || selectedOrder.carTotal || 0
                     )
                   }}</span
-                ></v-list-item-title
-              >
+                >
+              </v-list-item-title>
             </v-list-item>
 
             <v-list-item>
@@ -337,16 +357,16 @@
                   >mdi-cash-multiple</v-icon
                 ></template
               >
-              <v-list-item-title class="kv"
-                >總金額：<span class="value emphasis"
+              <v-list-item-title class="kv">
+                總金額：<span class="value emphasis"
                   >NT$
                   {{
                     formatAmount(
                       selectedOrder.grandtotal || selectedOrder.grandTotal || 0
                     )
                   }}</span
-                ></v-list-item-title
-              >
+                >
+              </v-list-item-title>
             </v-list-item>
 
             <v-list-item>
@@ -407,7 +427,6 @@
 
 <script>
 import axios from "axios";
-import List from "../listing/host/List.vue";
 
 export default {
   name: "OrderList",
@@ -423,7 +442,16 @@ export default {
   mounted() {
     this.fetchOrders();
   },
+  //租車明細
   methods: {
+    goCarPaymentResult(reservationId) {
+      if (!reservationId) return;
+      this.$router.push({
+        name: "carpaymentresult",
+        query: { rid: String(reservationId) },
+      });
+    },
+
     statusIcon(s) {
       const k = (s || "").toString();
       if (k.includes("已入住")) return "mdi-bed";
@@ -450,7 +478,6 @@ export default {
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-
         const getCheckin = (o) => {
           const v = o.checkindate || o.checkinDate;
           const d = v ? new Date(v) : null;
@@ -458,22 +485,20 @@ export default {
         };
 
         list.sort((a, b) => {
-          const da = getCheckin(a);
-          const db = getCheckin(b);
+          const da = getCheckin(a),
+            db = getCheckin(b);
           if (!da && !db) return 0;
           if (!da) return 1;
           if (!db) return -1;
-
           const aFuture = da.getTime() >= today.getTime();
           const bFuture = db.getTime() >= today.getTime();
           if (aFuture !== bFuture) return aFuture ? -1 : 1;
-
           return Math.abs(da - today) - Math.abs(db - today);
         });
 
         this.orders = list;
       } catch (err) {
-        this.error = err.response?.data?.error || "無法取得訂單資料";
+        this.error = err?.response?.data?.error || "無法取得訂單資料";
       }
     },
 
@@ -489,7 +514,7 @@ export default {
         this.selectedOrder = res.data;
       } catch (err) {
         this.showDetail = false;
-        alert("取得明細失敗：" + (err.response?.data?.error || "未知錯誤"));
+        alert("取得明細失敗：" + (err?.response?.data?.error || "未知錯誤"));
       } finally {
         this.detailLoading = false;
       }
@@ -506,14 +531,6 @@ export default {
       if (!v) return "-";
       return new Date(v).toLocaleString("zh-TW");
     },
-
-    goCarPaymentResult(bookingId) {
-      if (!bookingId) return;
-      this.$router.push({
-        name: "carpaymentresult",
-        query: { bookingId: String(bookingId) },
-      });
-    },
   },
 };
 </script>
@@ -522,7 +539,6 @@ export default {
 .soft-card {
   background: #fff7ed;
 }
-
 .page-title {
   font-size: 28px;
   font-weight: 700;
@@ -533,7 +549,6 @@ export default {
   font-size: 18px;
   font-weight: 700;
 }
-
 .flat-list {
   --v-list-padding-start: 0;
   --v-list-padding-end: 0;
@@ -548,11 +563,9 @@ export default {
 .kv .emphasis {
   color: #b45309;
 }
-
 .status-chip {
   font-weight: 600;
 }
-
 .hoverable {
   transition: box-shadow 0.2s ease, transform 0.1s ease;
   cursor: pointer;
@@ -561,7 +574,6 @@ export default {
   transform: translateY(-1px);
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
 }
-
 .empty-box {
   text-align: center;
   color: #9a3412;
@@ -570,7 +582,6 @@ export default {
   padding: 28px 16px;
   border-radius: 16px;
 }
-
 .header-row {
   display: flex;
   align-items: center;

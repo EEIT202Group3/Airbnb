@@ -27,7 +27,7 @@
           </div>
         </div>
 
-        <!-- 查詢 -->
+        <!-- 查詢區（依 Email 叫資料） -->
         <v-card v-if="!searched" class="search-card">
           <v-card-text>
             <v-row align="center" no-gutters>
@@ -61,7 +61,7 @@
         <v-card v-if="orders.length > 0" class="data-card mt-6">
           <v-data-table
             :headers="headers"
-            :items="orders"
+            :items="filteredOrders"
             :items-per-page="10"
             density="comfortable"
             class="order-table"
@@ -69,12 +69,37 @@
             :loading="listLoading"
           >
             <template #top>
-              <div class="table-top">
-                <div class="table-title">
+              <div
+                class="table-top"
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  padding: 12px 16px;
+                "
+              >
+                <div
+                  class="table-title"
+                  style="display: flex; align-items: center"
+                >
                   <v-icon size="20" class="mr-2">mdi-database-eye</v-icon>
-                  共 {{ orders.length }} 筆結果
+                  共 {{ filteredOrders.length }} 筆結果
                 </div>
-                <div class="table-actions">
+                <div
+                  class="table-actions"
+                  style="display: flex; gap: 8px; align-items: center"
+                >
+                  <!-- 模糊搜尋（前端過濾） -->
+                  <v-text-field
+                    v-model="keyword"
+                    density="compact"
+                    variant="outlined"
+                    prepend-inner-icon="mdi-magnify"
+                    label="模糊搜尋（姓名/房源/地址/電話/狀態…）"
+                    hide-details
+                    clearable
+                    style="max-width: 340px"
+                  />
                   <v-btn variant="text" color="grey" @click="clearOrders">
                     <v-icon start>mdi-arrow-left</v-icon> 返回
                   </v-btn>
@@ -94,12 +119,12 @@
               </v-chip>
             </template>
 
-            <!-- 床型：只包一層 span，字不變、內容不變 -->
+            <!-- 床型 -->
             <template #item.bed="{ item }">
               <span class="bed-cell">{{ item.bed }}</span>
             </template>
 
-            <!-- 日期保持原本公式 -->
+            <!-- 日期 -->
             <template #item.checkinDate="{ item }">
               <span class="date-nowrap">{{
                 formatDate(item.checkinDate)
@@ -114,8 +139,8 @@
             <!-- 總金額 -->
             <template #item.grandtotal="{ item }">
               <div class="amt">
-                NT$
-                {{
+                NT{{ " "
+                }}{{
                   new Intl.NumberFormat("zh-TW").format(item.grandtotal || 0)
                 }}
               </div>
@@ -152,7 +177,7 @@
           </div>
         </v-sheet>
 
-        <!-- 明細 -->
+        <!-- 明細 Dialog -->
         <v-dialog v-model="detailDialog" max-width="720">
           <v-card class="detail-card">
             <v-toolbar flat density="comfortable">
@@ -170,7 +195,6 @@
               </v-chip>
             </v-toolbar>
             <v-divider />
-
             <v-card-text class="pt-6">
               <v-row>
                 <v-col cols="12" md="6">
@@ -199,7 +223,6 @@
                     <div class="v">{{ orderDetail?.address }}</div>
                   </div>
                 </v-col>
-
                 <v-col cols="12" md="6">
                   <div class="kv">
                     <div class="k">入住日期</div>
@@ -251,7 +274,6 @@
                     <div class="v">{{ formatDate(orderDetail?.paidTime) }}</div>
                   </div>
                 </v-col>
-
                 <v-col cols="12" md="6">
                   <div class="kv compact">
                     <div class="k">訂單狀態</div>
@@ -275,8 +297,9 @@
                           newBookingStatus === orderDetail?.bookingStatus
                         "
                         @click="updateBookingStatus"
-                        >確認更新</v-btn
                       >
+                        確認更新
+                      </v-btn>
                     </div>
                   </div>
 
@@ -302,8 +325,9 @@
                           newMentStatus === orderDetail?.mentStatus
                         "
                         @click="updateMentStatus"
-                        >確認更新</v-btn
                       >
+                        確認更新
+                      </v-btn>
                     </div>
                   </div>
                 </v-col>
@@ -324,7 +348,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import api from "@/api";
 import { useRouter } from "vue-router";
 
@@ -341,12 +365,14 @@ const updating = ref(false);
 const orderDetail = ref<any | null>(null);
 const detailDialog = ref(false);
 
+// 下拉選單
 const bookingStatusOptions = ["待入住", "已完成", "已取消"];
 const mentStatusOptions = ["待付款", "已付款", "已退款"];
 
 const newBookingStatus = ref("");
 const newMentStatus = ref("");
 
+// 表頭
 const headers = [
   { title: "用戶名稱", key: "username" },
   { title: "房源名稱", key: "houseName" },
@@ -367,6 +393,7 @@ const headers = [
   },
 ];
 
+// 狀態色
 function statusColor(s?: string) {
   const k = (s || "").trim();
   if (k === "待入住") return "info";
@@ -375,6 +402,7 @@ function statusColor(s?: string) {
   return "grey";
 }
 
+/* ========== 後端查詢（依 Email 載入） ========== */
 async function fetchOrders() {
   if (!customerId.value) {
     alert("請輸入用戶 Email");
@@ -497,6 +525,31 @@ async function updateMentStatus() {
   }
 }
 
+/* ========== 前端模糊搜尋（多欄位包含） ========== */
+const keyword = ref("");
+const searchFields = [
+  "username",
+  "houseName",
+  "address",
+  "tel",
+  "bed",
+  "bookingStatus",
+  "people",
+];
+
+const filteredOrders = computed(() => {
+  const q = keyword.value.trim().toLowerCase();
+  if (!q) return orders.value;
+  return orders.value.filter((o) =>
+    searchFields.some((k) =>
+      String((o as any)[k] ?? "")
+        .toLowerCase()
+        .includes(q)
+    )
+  );
+});
+
+/* ========== 工具 ========== */
 function formatDate(v: any) {
   if (!v) return "—";
   const s = typeof v === "string" ? v : new Date(v).toISOString();
@@ -509,6 +562,8 @@ function fmt(n: any) {
 function clearOrders() {
   orders.value = [];
   searched.value = false;
+  keyword.value = "";
+  customerId.value = "";
 }
 </script>
 
@@ -534,8 +589,6 @@ function clearOrders() {
   color: #6b7280;
   font-size: 18px;
 }
-
-/* 卡片 */
 .search-card {
   border: 1px solid #e5e7eb;
   background: linear-gradient(#fafafa, #f6f7f9);
@@ -546,19 +599,17 @@ function clearOrders() {
   border-radius: 20px;
   overflow: hidden;
 }
-
-/* 表格 */
 .order-table :deep(th) {
   color: #6b7280;
   font-weight: 700 !important;
   font-size: 17px;
+  white-space: nowrap;
 }
 .order-table :deep(td) {
   font-size: 17px;
-  line-height: 1.35;
-  padding: 14px 12px;
+  line-height: 1.5;
+  padding: 18px 12px;
 }
-
 .order-table :deep(thead) {
   background: #f8fafc;
 }
@@ -571,19 +622,15 @@ function clearOrders() {
 .order-table :deep(tbody tr:hover) {
   background: #eef2ff;
 }
-
 .bed-cell {
   white-space: nowrap;
 }
-
 .amt {
   font-weight: 800;
   font-size: 20px;
   letter-spacing: 0.2px;
   text-align: right;
 }
-
-/* 明細卡 */
 .detail-card {
   border-radius: 30px;
 }
@@ -611,7 +658,7 @@ function clearOrders() {
 }
 .highlight {
   background: #fafafa;
-  padding: 8px 8px;
+  padding: 8px;
   border-radius: 12px;
 }
 .strong {
@@ -621,7 +668,6 @@ function clearOrders() {
   width: 140px;
   display: inline-block;
 }
-
 .empty {
   display: flex;
   flex-direction: column;
@@ -630,25 +676,11 @@ function clearOrders() {
   min-height: 220px;
   border-style: dashed !important;
 }
-
-/* 共用 */
+.date-nowrap {
+  white-space: nowrap;
+}
 .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
     monospace;
-}
-.order-table :deep(td) {
-  font-size: 17px;
-  line-height: 1.5;
-  padding: 18px 12px;
-}
-.order-table :deep(th) {
-  color: #6b7280;
-  font-weight: 700 !important;
-  font-size: 17px;
-  white-space: nowrap;
-}
-/*日期欄*/
-.date-nowrap {
-  white-space: nowrap;
 }
 </style>
