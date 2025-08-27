@@ -54,3 +54,9 @@ export async function getRevenue() {
     })
     return response.data
 }
+export async function getYearlyRevenue() {
+    const response = await axios.get(`${BASE_URL}/api/getYearlyRevenue`, {
+        withCredentials: true,
+    })
+    return response.data
+}

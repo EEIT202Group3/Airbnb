@@ -1,6 +1,7 @@
 package com.EEITG3.Airbnb.users.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,6 +29,7 @@ import com.EEITG3.Airbnb.payMent.repository.OrderRepository;
 import com.EEITG3.Airbnb.users.dto.LogInRequest;
 import com.EEITG3.Airbnb.users.dto.MonthlyRegist;
 import com.EEITG3.Airbnb.users.dto.SignUpRequest;
+import com.EEITG3.Airbnb.users.dto.YearlyRevenue;
 import com.EEITG3.Airbnb.users.entity.Host;
 import com.EEITG3.Airbnb.users.entity.HostDetails;
 import com.EEITG3.Airbnb.users.repository.HostRepository;
@@ -226,7 +228,18 @@ public class HostServiceImpl implements HostService {
 		return orderRepo.getMonthlyRevenue();
 	}
 
-	
-
-	
+	@Override
+	public Map<String, Object> getYearlyRevenue() {
+		List<YearlyRevenue> yearlyRevenue = orderRepo.getYearlyRevenue();
+		Map<String, Object> result = new HashMap<String, Object>();
+		List<String> months = new ArrayList<String>();
+		List<BigDecimal> revenues = new ArrayList<BigDecimal>();
+		for(YearlyRevenue data : yearlyRevenue) {
+			months.add(data.getMonth());
+			revenues.add(data.getRevenue());
+		}
+		result.put("months", months);
+		result.put("revenues", revenues);
+		return result;
+	}
 }

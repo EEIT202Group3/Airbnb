@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { ref,onMounted } from 'vue';
+import Chart from 'chart.js/auto';
 import { storeToRefs } from 'pinia';
 import { useHostStore } from '@/stores/host';
-import { getRevenue } from '@/service/host/hostService';
+import { getRevenue,getYearlyRevenue } from '@/service/host/hostService';
 import defaultAvatar from '@/images/default.png'
 
 const hostStore = useHostStore()
 const {host} = storeToRefs(hostStore)
 const revenue = ref()
+const months = ref([]);
+const monthlyRevenue = ref([]);
 
 onMounted(
     async()=>{
@@ -15,6 +18,42 @@ onMounted(
             hostStore.fetchUser();
         }
         revenue.value = await getRevenue()
+        const revenueData = await getYearlyRevenue()
+        months.value = revenueData.months
+        monthlyRevenue.value = revenueData.revenues
+        const ctx1 = document.getElementById('yearlyRevenue') as HTMLCanvasElement
+        new Chart(ctx1,{
+            data:{
+                datasets:[{
+                    type:'line',
+                    label:'折線圖',
+                    tension:0.1,
+                    pointRadius: 3,
+                    borderColor: 'rgb(255, 145, 36)',
+                    data:monthlyRevenue.value
+                },{
+                    type:'bar',
+                    label:'柱狀圖',
+                    backgroundColor:'rgb(255, 229, 204)',
+                    data:monthlyRevenue.value
+                }],
+                labels:months.value
+            },
+            options:{
+                plugins:{
+                    title:{
+                        display:true,
+                        text:'收益統計',
+                        font:{
+                            size:28,
+                            weight:'bold'
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        })
     }
 )
 </script>
@@ -63,12 +102,27 @@ onMounted(
         <v-divider class="my-6" />
 
         <div class="d-flex align-center mb-4">
-            <v-icon class="mr-2">mdi-chat-processing-outline</v-icon>
-            <span class="text-subtitle-1 font-weight-medium">每月收益</span>
+            <v-icon class="mr-2">mdi-chart-line</v-icon>
+            <span class="text-subtitle-1 font-weight-medium">收益</span>
         </div>
-        <v-sheet class="pa-8 text-medium-emphasis rounded-lg bg-grey-lighten-5 text-center">
-        {{revenue}}
-        </v-sheet>
+        
+        <v-row>
+            <v-col cols="12" md="3">
+                <v-card class="d-flex elevation-2 rounded-xl" style="height: 100px;">
+                    <v-card-text class="text-center">
+                        <h1 style="color: green;">${{revenue}}</h1>
+                        <div>本月收益</div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+            <v-col cols="12" md="9">
+                <v-card class="d-flex elevation-2 rounded-xl" style="height: 300px;">
+                    <v-card-text class="text-center">
+                        <canvas id="yearlyRevenue"></canvas>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
     </v-card>
 </template>
 <style scoped>
