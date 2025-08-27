@@ -148,6 +148,7 @@
       <v-pagination
         v-model="currentPage"
         :length="totalPages"
+         :total-visible="5"
         color="primary"
       ></v-pagination>
     </v-row>

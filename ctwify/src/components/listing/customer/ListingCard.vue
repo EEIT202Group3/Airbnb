@@ -8,7 +8,7 @@
         <div class="search-section">
           <i class="fa fa-search"></i>
           <div class="search-text">
-            <div class="search-label">地點</div>
+            <div class="search-label">{{ locationLabel }}</div>
             <div class="input-wrapper">
               <input
                 type="text"
@@ -144,6 +144,8 @@ export default {
         { name: '台中市熱門房源', api: '/listings/city/台中市/top-rated' },
         { name: '高雄市熱門房源', api: '/listings/city/高雄市/top-rated' },
       ],
+      locationLabels: ["地點", "地址", "縣市", "目的地"], // 會輪播的文字
+       currentLabelIndex: 0,  // 目前顯示哪個
       listingsByCategory: {},
       listings: [],
       locationInput: '',
@@ -163,11 +165,28 @@ export default {
       return this.taiwanCities.filter(city =>
         city.includes(this.locationInput)
       );
-    }
+    },
+    filteredCities() {
+    return this.taiwanCities.filter(city =>
+      city.includes(this.locationInput)
+    );
+  },
+  locationLabel() {
+    return this.locationLabels[this.currentLabelIndex];
+  }
   },
   mounted() {
     this.loadListings();
     this.loadAllCategories();
+
+    this.loadListings();
+    this.loadAllCategories();
+
+  // 每 2 秒切換一次地點標籤
+  setInterval(() => {
+    this.currentLabelIndex =
+      (this.currentLabelIndex + 1) % this.locationLabels.length;
+  }, 1000);
   },
   methods: {
     selectCity(city) {
