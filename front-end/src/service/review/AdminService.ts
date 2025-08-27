@@ -4,7 +4,7 @@ const BASE_URL = "http://localhost:8080";
 
 export async function fetchReviews(keyword, type) {
   try {
-    const res = await axios.get(`${BASE_URL}/api/admins/reviews`, {
+    const res = await axios.get(`${BASE_URL}/api/reviews`, {
       params: {
         keyword: keyword,
         type: type,

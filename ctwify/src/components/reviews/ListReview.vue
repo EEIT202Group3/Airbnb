@@ -1,18 +1,35 @@
 <!-- 有評論時 -->
 <template v-else>
+  <v-row class="align-center text-center">
+    <!-- 左 -->
+    <v-col class="d-flex flex-column align-center mb-5">
+      <div class="text-h5 font-weight-bold">乾淨度</div>
+      <div class="text-h4 font-weight-bold">{{ avg.clean }}</div>
+      <v-icon size="48">mdi-spray</v-icon>
+    </v-col>
+
+    <v-divider vertical></v-divider>
+
+    <!-- 中 -->
+    <v-col class="d-flex flex-column align-center mb-5">
+      <div class="text-h5 font-weight-bold">溝通評分</div>
+      <div class="text-h4 font-weight-bold">{{ avg.comm }}</div>
+      <v-icon size="48">mdi-comment-outline</v-icon>
+    </v-col>
+
+    <v-divider vertical></v-divider>
+
+    <!-- 右 -->
+    <v-col class="d-flex flex-column align-center mb-5">
+      <div class="text-h5 font-weight-bold">性價比</div>
+      <div class="text-h4 font-weight-bold">{{ avg.value }}</div>
+      <v-icon size="48">mdi-tag-outline</v-icon>
+    </v-col>
+  </v-row>
+  <v-divider :thickness="3"></v-divider>
   <v-row>
-    <v-col
-      v-for="item in pagedReviews"
-      :key="item.reviewId"
-      cols="12"
-      md="6"
-    >
-      <v-card
-        class="mb-5"
-        flat
-        dense
-        style="font-size: 16px"
-      >
+    <v-col v-for="item in pagedReviews" :key="item.reviewId" cols="12" md="6">
+      <v-card class="mb-5" flat dense style="font-size: 16px">
         <v-card-text>
           <div class="d-flex">
             <div class="d-flex flex-column">
@@ -140,10 +157,12 @@ function maskEmail(email) {
     );
   }
 }
-/*
+
+console.log(props.reviews);
+
 const avg = computed(() => {
   if (props.reviews.length === 0) return { clean: 0, comm: 0, value: 0 };
-  
+
   const total = props.reviews.reduce(
     (acc, review) => {
       acc.clean += review.cleanScore;
@@ -155,12 +174,12 @@ const avg = computed(() => {
   );
 
   return {
-    clean: (total.clean / props.reviews.length).toFixed(2),
-    comm: (total.comm / props.reviews.length).toFixed(2),
-    value: (total.value / props.reviews.length).toFixed(2),
+    clean: (total.clean / props.reviews.length).toFixed(1),
+    comm: (total.comm / props.reviews.length).toFixed(1),
+    value: (total.value / props.reviews.length).toFixed(1),
   };
 });
-*/
+console.log(avg.value.clean);
 </script>
 <style scoped>
 /* 與 A.vue 的 .come 命名相同 — 這段只影響 B.vue（scoped） */
