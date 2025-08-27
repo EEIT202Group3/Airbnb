@@ -523,10 +523,11 @@ onMounted(() => {
   box-sizing: border-box;
 }
 
-  margin: 0 auto; /* 置中 */
-  padding: 0 16px; /* 預留左右邊距 */
+/*  margin: 0 auto;
+  padding: 0 16px;
   box-sizing: border-box;
 }
+*/
 /* 右側預訂卡片 */
 .booking-card {
   background: white;

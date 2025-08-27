@@ -69,7 +69,7 @@ onMounted(
         <br>
         <v-row>
             <v-col cols="3">
-                <v-card class="pa-8 elevation-2 rounded-xl" style="width: 140%;">
+                <v-card class="pa-8 elevation-2 rounded-xl" style="width: 170%;">
                     <div v-if="host" class="d-flex align-center">
                         <v-avatar size="80" class="mr-4">
                             <!--  -->
@@ -92,8 +92,8 @@ onMounted(
                     </div>
                 </v-card>
             </v-col>
-            <v-col cols="9">
-                <v-card class="pa-8 elevation-2 rounded-xl" style="width: 90%; margin-left: 50px;" >
+            <v-col cols="8">
+                <v-card class="pa-8 elevation-2 rounded-xl" style="width: 90%; margin-left: 85px;" >
                     <h3 style="font-weight: bold;">房東介紹</h3>
                     <p>{{ host?.intro?host.intro:'此房東沒有介紹' }}</p>
                 </v-card>
@@ -109,7 +109,7 @@ onMounted(
         </div>
         
         <v-row>
-            <v-col cols="12" md="3">
+            <v-col cols="12" md="4">
                 <v-card class="d-flex elevation-2 rounded-xl" style="height: 100px;">
                     <v-card-text class="text-center">
                         <h1 style="color: green;">${{revenue}}</h1>
@@ -117,7 +117,9 @@ onMounted(
                     </v-card-text>
                 </v-card>
             </v-col>
-            <v-col cols="12" md="9">
+        </v-row>
+        <v-row>
+            <v-col cols="12">
                 <v-card class="d-flex elevation-2 rounded-xl" style="height: 300px;">
                     <v-card-text class="text-center">
                         <canvas id="yearlyRevenue"></canvas>

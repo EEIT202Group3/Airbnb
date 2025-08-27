@@ -301,6 +301,7 @@ export default {
   width: 100%;
   height: 180px;
   object-fit: cover;
+}
 
 
 /* 房源橫向滑動區 */
