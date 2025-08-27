@@ -151,7 +151,7 @@
 
         <!-- 只有訂單完成才能評價（若需請改判斷條件） -->
         <router-link
-
+          v-if="isCompleted(statusOf(order))"
           :to="{
             name: 'InsertReview',
             query: {
@@ -161,11 +161,7 @@
           custom
           v-slot="{ navigate }"
         >
-          <v-btn
-            :disabled="order.bookingStatus == '已完成'"
-            @click="navigate"
-            icon
-          >
+          <v-btn @click.stop="navigate" icon>
             <v-icon>mdi-car</v-icon>
           </v-btn>
         </router-link>
@@ -444,6 +440,13 @@ export default {
   },
   //租車明細
   methods: {
+    statusOf(o) {
+      return (o.bookingstatus ?? o.bookingStatus ?? "").toString();
+    },
+    isCompleted(status) {
+      return ["已完成", "完成", "已結束"].some((k) => status.includes(k));
+    },
+
     goCarPaymentResult(reservationId) {
       if (!reservationId) return;
       this.$router.push({
