@@ -1,3 +1,4 @@
+<!-- 已停用 -->
 <template>
   <v-data-table
     :headers="headers"
@@ -43,7 +44,7 @@
             :width="252"
             aspect-ratio="4/3"
             cover
-            :src="`http://localhost:8080/images/${selectedReview.image1}`"
+            :src="`http://localhost:8080/images/reviews/${selectedReview.image1}`"
           ></v-img>
         </div>
         <div>
@@ -52,7 +53,7 @@
             :width="252"
             aspect-ratio="4/3"
             cover
-            :src="`http://localhost:8080/images/${selectedReview.image2}`"
+            :src="`http://localhost:8080/images/reviews/${selectedReview.image2}`"
           ></v-img>
         </div>
         <div>
@@ -61,7 +62,7 @@
             :width="252"
             aspect-ratio="4/3"
             cover
-            :src="`http://localhost:8080/images/${selectedReview.image3}`"
+            :src="`http://localhost:8080/images/reviews/${selectedReview.image3}`"
           ></v-img>
         </div>
       </v-card-text>

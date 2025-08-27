@@ -442,6 +442,8 @@ onMounted(async () => {
       withCredentials: true,
     });
     reviews.value = reviewRes.data;
+    console.log(reviews.value);
+
     // 圖片整理（支援10張）
     photos.value = [];
     for (let i = 1; i <= 10; i++) {
@@ -518,8 +520,8 @@ onMounted(() => {
   width: 100%;
   max-width: 1100px; /* 與 navbar 對齊 */
 
-  margin: 0 auto;    /* 置中 */
-  padding: 0 16px;   /* 預留左右邊距 */
+  margin: 0 auto; /* 置中 */
+  padding: 0 16px; /* 預留左右邊距 */
   box-sizing: border-box;
 }
 
