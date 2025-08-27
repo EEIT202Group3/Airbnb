@@ -16,6 +16,9 @@ import '@mdi/font/css/materialdesignicons.css'
 import VueGoogleMaps from '@fawmi/vue-google-maps'
 import vue3GoogleLogin from 'vue3-google-login'
 
+// 引入全局字體樣式
+import './assets/global.css'
+
 
 const app = createApp(App)
 

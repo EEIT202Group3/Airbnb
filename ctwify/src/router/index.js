@@ -24,6 +24,7 @@ const routes = [
         component: () =>
           import("@/components/listing/customer/CustomerDetail.vue"),
       },
+
       {
 
         path: "/search",
@@ -149,6 +150,7 @@ const routes = [
             component: () => import("@/components/user/host/HostReview.vue"),
             name: "HostReview",
           },
+            
         ],
       },
       {
@@ -172,10 +174,16 @@ const routes = [
         path: "details/:id",
         component: () => import("@/components/listing/host/Detail.vue"),
       },
+        
       {
-        path: "edlistings/:id",
-        component: () => import("@/components/listing/host/EditListing.vue"),
+        path: 'details/:id',
+        component: () => import('@/components/listing/host/Detail.vue'),
       },
+       {
+            path: "edlistings/:id",
+            component: () => import("@/components/listing/host/EditListing.vue"),
+        }
+    
 
     ],
   },

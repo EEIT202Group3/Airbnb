@@ -276,7 +276,6 @@ export default {
 
 
 /* Datepicker 樣式 */
-
 .card-datepicker .dp__input {
   border: none;
   background: transparent !important;
@@ -302,18 +301,7 @@ export default {
   width: 100%;
   height: 180px;
   object-fit: cover;
-}
 
-/* 房源橫向滑動區 */
-.listing-container {
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-}
-.listing-scroll {
-  display: flex;
-  gap: 16px;
-  scroll-snap-align: start;
-}
 
 /* 房源橫向滑動區 */
 .listing-container {
@@ -362,12 +350,14 @@ export default {
   color: #333;
 }
 
+=
 
 /* 簡單淡入動畫 */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 
 /* 響應式設計 (RWD) */
 @media (max-width: 992px) {
