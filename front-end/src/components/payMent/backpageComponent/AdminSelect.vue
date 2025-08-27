@@ -137,15 +137,15 @@
         <template #item.totalPlatformFee="{ item }">
           NT$ {{ fmt(item.totalPlatformFee) }}
         </template>
-        <template #item.totalNetPayout="{ item }"
-          ><strong>NT$ {{ fmt(item.totalNetPayout) }}</strong></template
-        >
+        <template #item.totalNetPayout="{ item }">
+          <strong>NT$ {{ fmt(item.totalNetPayout) }}</strong>
+        </template>
 
         <template #item.createdAt="{ item }">{{ dt(item.createdAt) }}</template>
         <template #item.updatedAt="{ item }">{{ dt(item.updatedAt) }}</template>
-        <template #item.payoutDate="{ item }">{{
-          dt(item.payoutDate)
-        }}</template>
+        <template #item.payoutDate="{ item }">
+          {{ dt(item.payoutDate) }}
+        </template>
 
         <template #item.actions="{ item }">
           <div class="action-bar">
@@ -190,6 +190,29 @@
       </v-data-table>
     </v-card>
 
+    <!-- ✅ 總攬（對目前查詢結果加總） -->
+    <v-card class="mt-4" rounded="xl">
+      <v-card-text class="d-flex justify-end">
+        <div class="text-right total-box">
+          <div class="muted">
+            月份：{{ filters.month || "（未指定，顯示目前結果）" }}
+          </div>
+          <div>
+            筆數：<b>{{ totals.count }}</b>
+          </div>
+          <div class="company-income">
+            租車收入總額：<b>NT$ {{ fmt(totals.earnings) }}</b>
+          </div>
+          <div class="company-income">
+            公司收入（平台抽成）：<b>NT$ {{ fmt(totals.fees) }}</b>
+          </div>
+          <div>
+            房東實拿總額：<b>NT$ {{ fmt(totals.net) }}</b>
+          </div>
+        </div>
+      </v-card-text>
+    </v-card>
+
     <!-- 明細彈窗 -->
     <v-dialog v-model="ordersDialog" max-width="1000">
       <v-card rounded="xl">
@@ -218,21 +241,21 @@
             class="elevation-0 big-table"
             :items-per-page="10"
           >
-            <template #item.bookingId="{ item }"
-              ><code class="mono">{{ item.bookingId }}</code></template
-            >
-            <template #item.grossAmount="{ item }"
-              >NT$ {{ fmt(item.grossAmount) }}</template
-            >
-            <template #item.platformFee="{ item }"
-              >NT$ {{ fmt(item.platformFee) }}</template
-            >
-            <template #item.netAmount="{ item }"
-              ><b>NT$ {{ fmt(item.netAmount) }}</b></template
-            >
-            <template #item.createdAt="{ item }">{{
-              dt(item.createdAt)
-            }}</template>
+            <template #item.bookingId="{ item }">
+              <code class="mono">{{ item.bookingId }}</code>
+            </template>
+            <template #item.grossAmount="{ item }">
+              NT$ {{ fmt(item.grossAmount) }}
+            </template>
+            <template #item.platformFee="{ item }">
+              NT$ {{ fmt(item.platformFee) }}
+            </template>
+            <template #item.netAmount="{ item }">
+              <b>NT$ {{ fmt(item.netAmount) }}</b>
+            </template>
+            <template #item.createdAt="{ item }">
+              {{ dt(item.createdAt) }}
+            </template>
           </v-data-table>
 
           <v-divider class="my-4" />
@@ -311,8 +334,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import api from "@/api"; // baseURL: http://localhost:8080/api/admins/
+import { ref, onMounted, computed } from "vue";
+import api from "@/api";
 
 type PayoutRow = {
   payoutId: string;
@@ -366,6 +389,26 @@ const headers = [
 ];
 
 const items = ref<PayoutRow[]>([]);
+
+// 合計：對目前查詢結果加總
+const totals = computed(() => {
+  const rows = items.value || [];
+  const earnings = rows.reduce((a, r) => a + Number(r.totalEarnings ?? 0), 0);
+  const fees = rows.reduce((a, r) => a + Number(r.totalPlatformFee ?? 0), 0);
+  const net = rows.reduce((a, r) => a + Number(r.totalNetPayout ?? 0), 0);
+  return { earnings, fees, net, count: rows.length };
+});
+
+// 只統計狀態為 paid 的列
+const totalsPaid = computed(() => {
+  const rows = (items.value || []).filter(
+    (r) => String(r.status || "").toLowerCase() === "paid"
+  );
+  const earnings = rows.reduce((a, r) => a + Number(r.totalEarnings ?? 0), 0);
+  const fees = rows.reduce((a, r) => a + Number(r.totalPlatformFee ?? 0), 0);
+  const net = rows.reduce((a, r) => a + Number(r.totalNetPayout ?? 0), 0);
+  return { earnings, fees, net, count: rows.length };
+});
 
 // 明細相關
 const ordersDialog = ref(false);
@@ -601,5 +644,19 @@ onMounted(fetchPayouts);
   letter-spacing: 0.2px;
   font-weight: 600;
   padding-inline: 14px !important;
+}
+
+/*合計區塊樣式 */
+.total-box {
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+.total-box .company-income {
+  color: #b45309;
+  font-weight: 800;
+}
+.total-box .muted {
+  color: #6b7280;
+  font-size: 0.95rem;
 }
 </style>
