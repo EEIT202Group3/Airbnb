@@ -26,7 +26,10 @@ public interface HostService {
 	Host hostUpdate(Map<String, Object> patchPayload, HostDetails hostDetails);
 	//更新大頭貼
 	Host updateAvatar(Host host,MultipartFile avatar) throws IOException;
-	//登出
+	//查當月收益
+	Double getMonthlyRevenue();
+	//查年度收益
+	Map<String, Object> getYearlyRevenue();
 	
 	//後台功能
 	//找全部房東
@@ -45,6 +48,4 @@ public interface HostService {
 	Integer getTotalHosts();
 	//查已驗證房東
 	Integer getVerifiedHosts();
-	//查當月收益
-	Double getMonthlyRevenue();
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.EEITG3.Airbnb.payMent.dto.HostOrderAggDto;
 import com.EEITG3.Airbnb.payMent.entity.Order;
+import com.EEITG3.Airbnb.users.dto.YearlyRevenue;
 import com.EEITG3.Airbnb.users.entity.Host;
 
 @Repository
@@ -50,6 +51,24 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 			  AND MONTH(checkout_date) = MONTH(GETDATE());
 			""",nativeQuery = true)
 	Double getMonthlyRevenue();
+	
+	@Query(value="""
+			;WITH Last12Months AS (
+			    SELECT FORMAT(DATEADD(MONTH, -v.number, CAST(GETDATE() AS DATE)), 'yyyy-MM') AS month
+			    FROM master.dbo.spt_values v
+			    WHERE v.type = 'P' AND v.number BETWEEN 0 AND 11
+			)
+			SELECT 
+			    m.month,
+			    ISNULL(SUM(o.host_net_amount), 0) AS total_revenue
+			FROM Last12Months m
+			LEFT JOIN orderlist o
+			    ON FORMAT(o.checkout_date, 'yyyy-MM') = m.month
+			    AND o.booking_status = '已完成'
+			GROUP BY m.month
+			ORDER BY m.month
+			""",nativeQuery=true)
+	List<YearlyRevenue> getYearlyRevenue();
 	
 		
 }

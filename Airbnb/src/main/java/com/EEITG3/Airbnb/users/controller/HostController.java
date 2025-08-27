@@ -130,6 +130,12 @@ public class HostController {
 		Double result = service.getMonthlyRevenue();
 		return ResponseEntity.ok(result);
 	}
+	//查年度收益
+	@GetMapping("/getYearlyRevenue")
+	public ResponseEntity<?> getYearlyRevenue(){
+		Map<String, Object> result = service.getYearlyRevenue();
+		return ResponseEntity.ok(result);
+	}
 	
 //後台功能
 	//找全部房東
