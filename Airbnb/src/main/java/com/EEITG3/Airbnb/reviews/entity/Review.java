@@ -86,6 +86,17 @@ public class Review {
 	
 	@Column(name="image3")
 	private String image3;
+	
+	@Column(name="report")
+	private Integer report;
+
+	public Integer getReport() {
+		return report;
+	}
+
+	public void setReport(Integer report) {
+		this.report = report;
+	}
 
 	public int getReviewId() {
 		return reviewId;

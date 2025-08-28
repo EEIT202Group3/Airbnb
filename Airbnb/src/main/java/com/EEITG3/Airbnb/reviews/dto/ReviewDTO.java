@@ -15,6 +15,13 @@ public class ReviewDTO {
 	private String image1;
 	private String image2;
 	private String image3;
+	private Integer report;
+	public Integer getReport() {
+		return report;
+	}
+	public void setReport(Integer report) {
+		this.report = report;
+	}
 	public int getReviewId() {
 		return reviewId;
 	}

@@ -50,6 +50,14 @@ public class ReviewService {
         this.reviewUtils = reviewUtils;
         this.mapper = mapper;
     }
+    
+    public void reportReview(Integer reviewId) {
+        Review review = rRepository.findById(reviewId)
+            .orElseThrow(() -> new RuntimeException("Review not found"));
+
+        review.setReport(1);
+        rRepository.save(review);
+    }
 	
 	public List<ReviewDTO> findByTypeAndKeyword(String type, String keyword) {
 
