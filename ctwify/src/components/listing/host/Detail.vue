@@ -4,27 +4,9 @@
     <div class="come" v-if="listing">
       <h3>{{ listing.houseName }}</h3>
 
-      <!-- 照片區 -->
-      <div class="photo-section">
-        <img
-          id="mainPhoto"
-          class="main-photo"
-          :src="mainPhoto"
-          alt="主圖片"
-          v-if="mainPhoto"
-        />
-        <div class="thumbs" v-if="photos.length > 0">
-          <img
-            v-for="(photo, index) in photos"
-            :key="index"
-            :src="photo"
-            @click="switchMainPhoto(photo)"
-            class="thumb-img"
-            :class="{ 'selected-thumb': selectedPhoto === photo }"
-            alt="縮圖"
-          />
-        </div>
-      </div>
+   <!-- 照片區 -->
+       <ListingPhotos :photos="photos" v-model:mainPhoto="mainPhoto" />
+
 
       <!-- 資訊區 -->
       <div class="info-flex">
@@ -174,7 +156,7 @@
 import axios from "@/api";
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import SimpleReview from "@/components/reviews/SimpleReview.vue";
+import ListingPhotos from "@/components/listing/customer/ListingPhotos.vue";
 
 const route = useRoute();
 const router = useRouter();

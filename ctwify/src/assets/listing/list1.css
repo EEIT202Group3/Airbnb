@@ -55,13 +55,12 @@ nav a {
    text-align: center;
  }
 
- .main-photo {
-   width: 100%;
-   max-height: 450px;
-   object-fit: cover;
-   border-radius: 12px;
-   margin-bottom: 0;
- }
+.main-photo {
+  width: 100%;
+  aspect-ratio: 16 / 7;  /* 固定比例 */
+  object-fit: cover;     /* 裁切而不是拉伸 */
+  border-radius: 12px;
+}
 
  .thumbs {
    display: flex;
@@ -250,7 +249,7 @@ nav a:hover {
    left: 0;
    width: 100%;
    height: 100%;
-   background: rgba(0, 0, 0, 0.5);
+   background-color: rgba(0,0,0,0.5); /* 遮罩半透明，但不影響子元素 */
    display: flex;
    justify-content: center;
    align-items: center;
@@ -259,7 +258,7 @@ nav a:hover {
 
  /* Modal 內容 */
  .modal-content {
-   background-color: #ffffff;
+   background-color: #ffffff !important;
    padding: 20px;
    border-radius: 12px;
    max-width: 700px;
@@ -267,6 +266,7 @@ nav a:hover {
    max-height: 700px;
    overflow-y: auto;
    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+   opacity: 1; /* 動畫時固定 */
  }
 
 
@@ -308,12 +308,6 @@ nav a:hover {
    border-radius: 8px;
    cursor: pointer;
    transition: border 0.3s ease;
- }
-
- .selected-thumb {
-   border: 4px solid #363532;
-   box-shadow: 0 0 0 4px rgba(243, 142, 41, 0.902);
-   border-radius: 6px;
  }
 
  .under {
