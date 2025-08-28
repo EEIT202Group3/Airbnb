@@ -96,6 +96,7 @@ public class ReviewService {
 	public List<ReviewDTO> getReviewsByHostToken(String email) {
 		  Optional<Host> hostByEmail = hostRepository.findHostByEmail(email);
 		  String HostId = hostByEmail.get().getHostId();
+		  System.out.println(HostId);
 		
 		return rRepository.findByHost_HostIdContainingIgnoreCase(HostId).stream()
 	            .map(ReviewMapper::toDTO)
