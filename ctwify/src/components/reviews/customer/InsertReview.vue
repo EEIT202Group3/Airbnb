@@ -137,8 +137,10 @@
             </v-btn>
           </div>
         </v-form>
+        <v-btn @click="testInsert">測試評論</v-btn>
       </v-card-text>
     </v-card>
+    
   </v-container>
 </template>
 
@@ -175,6 +177,10 @@ const custComm = ref("");
 // 上傳檔案 & 預覽（含 revoke 機制避免記憶體洩漏）
 const files = ref([]);
 const previews = ref([]); // [{ url, revoke }]
+
+function testInsert(){
+  custComm.value ='房源整體非常乾淨，入住過程順利，房東回覆快速且友善。周邊生活機能方便，交通便利，價格也合理。這次住宿體驗很愉快，下次有機會會再回訪，值得推薦給朋友！'
+}
 
 function refreshPreviews() {
   // 先釋放舊的 URL
