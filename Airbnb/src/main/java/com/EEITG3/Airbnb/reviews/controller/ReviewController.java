@@ -40,6 +40,12 @@ public class ReviewController {
 	@Autowired
 	private JwtService jwtService;
 	
+	@PatchMapping("reviews/{id}/report")
+    public ResponseEntity<?> reportReview(@PathVariable Integer id) {
+        rService.reportReview(id);
+        return ResponseEntity.ok("Reported");
+    }
+	
 	@GetMapping("/reviews/insertData/{bookingId}")
 	public ReviewInsertDto getInsertData(@PathVariable String bookingId) {
 		System.out.println(rService.insertData(bookingId));

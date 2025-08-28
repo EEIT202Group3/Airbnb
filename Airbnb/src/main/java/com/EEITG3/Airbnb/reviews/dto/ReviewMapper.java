@@ -23,6 +23,7 @@ public class ReviewMapper {
         dto.setImage2(review.getImage2());
         dto.setImage3(review.getImage3());
         dto.setListId(review.getListing().getListId());
+        dto.setReport(review.getReport());
         return dto;
   }
 }
