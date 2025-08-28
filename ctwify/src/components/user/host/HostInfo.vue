@@ -112,7 +112,7 @@ onMounted(
             <v-col cols="12" md="4">
                 <v-card class="d-flex elevation-2 rounded-xl" style="height: 100px;">
                     <v-card-text class="text-center">
-                        <h1 style="color: green;">${{revenue}}</h1>
+                        <h1 style="color: green;">${{revenue?revenue:0}}</h1>
                         <div>本月收益</div>
                     </v-card-text>
                 </v-card>
