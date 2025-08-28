@@ -1,6 +1,7 @@
 <!-- 有評論時 -->
 <template v-else>
-  <v-row class="align-center text-center">
+  <v-divider :thickness="1" ></v-divider>
+  <v-row class="align-center text-center" style="margin-top : 60px;">
     <!-- 左 -->
     <v-col class="d-flex flex-column align-center mb-5">
       <div class="text-h5 font-weight-bold">乾淨度</div>
@@ -26,7 +27,7 @@
       <v-icon size="48">mdi-tag-outline</v-icon>
     </v-col>
   </v-row>
-  <v-divider :thickness="3"></v-divider>
+  <v-divider :thickness="1"></v-divider>
   <v-row>
     <v-col v-for="item in pagedReviews" :key="item.reviewId" cols="12" md="6">
       <v-card class="mb-5" flat dense style="font-size: 16px">
@@ -102,7 +103,7 @@ const props = defineProps({
 });
 
 const page = ref(1);
-const itemsPerPage = 5;
+const itemsPerPage = 6;
 
 const totalPages = computed(() =>
   Math.ceil(props.reviews.length / itemsPerPage)

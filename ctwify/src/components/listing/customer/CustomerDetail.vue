@@ -249,7 +249,6 @@
       </div>
     </div>
      <ListReview :reviews="reviews"></ListReview>
-        <simple-review></simple-review>
   </div>
 </template>
 
@@ -263,7 +262,7 @@ import SimpleReview from "@/components/reviews/SimpleReview.vue";
 import DefaultAvatar from "@/images/default.png";
 import ListingPhotos from "@/components/listing/customer/ListingPhotos.vue";
 import ListReview from "@/components/reviews/ListReview.vue";
-
+const reviews = ref([]);
 
 const route = useRoute();
 const router = useRouter();
@@ -416,7 +415,10 @@ onMounted(async () => {
   try {
     const res = await axios.get(`/listings/${id}`);
     listing.value = res.data;
-
+     const reviewRes = await axios.get(`/api/reviews/listing/${id}`, {
+      withCredentials: true,
+    });
+    reviews.value = reviewRes.data;
     // 圖片整理（支援10張）
     photos.value = [];
     for (let i = 1; i <= 10; i++) {

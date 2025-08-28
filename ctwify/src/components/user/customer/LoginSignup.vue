@@ -53,6 +53,18 @@ const emit = defineEmits(['login-success'])
 const forget = ref(false)
 const email = ref('')
 
+function testLoginData(){
+  login.value.email='happy186565@gmail.com'
+  login.value.password='Ctwify123*'
+}
+
+function testRegistData(){
+  register.value.email='nickck0527@gmail.com'
+  register.value.password='@Test123'
+  register.value.phone='0900000000'
+  register.value.username='nick'
+}
+
 //提交登入資訊
 async function onLogin() {
   //這邊的.validate()是vuetify提供的表單驗證功能，會去讀每個欄位上用:rules定義的驗證方法(所以上面才要先設定那些方法)
@@ -201,6 +213,10 @@ async function googleLogin(response:any){
           <a href="#" @click.prevent="forget = true" style="color:	#FF8000;">Forgot password?</a>
         </div>
 
+        <v-btn class="mb-4" @click="testLoginData()">
+          測試資料
+        </v-btn>
+
         <v-btn block class="gradient-btn mb-4" rounded="lg" size="large" @click="onLogin">
           Login
         </v-btn>
@@ -262,6 +278,9 @@ async function googleLogin(response:any){
           </div>
         </div>
 
+        <v-btn class="mb-4" @click="testRegistData()">
+          測試資料
+        </v-btn>
         <v-btn
           block
           class="gradient-btn"

@@ -20,6 +20,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
 	List<Review> findByCustomer_CustomerIdContainingIgnoreCase(String customerId);
 
+
 	List<Review> findByListing_ListId(Integer listId); // 精確比對
 
 	@Query("SELECT new com.EEITG3.Airbnb.reviews.dto.ReviewWithCustomerDto("

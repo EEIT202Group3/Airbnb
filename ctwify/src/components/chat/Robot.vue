@@ -627,6 +627,7 @@ defineExpose({ openChat, closeChat, connect, disconnect, sendMessage });
   right: 20px;
   z-index: 1000;
   max-height: calc(100vh - 120px);
+  margin-bottom: 100px;
 }
 
 .chat-toggle {
