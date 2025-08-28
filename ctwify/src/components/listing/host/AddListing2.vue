@@ -1,5 +1,16 @@
 <template>
   <div class="container">
+    <!-- form title + 一鍵填入按鈕，左右對齊 -->
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <v-btn
+    color="blue"
+    size="small"
+    class="text-white"
+    @click="fillDemoData"
+  >
+    一鍵填入
+  </v-btn>
+</div>
     <div class="form-container">
       <div class="form-title">新增房源</div>
       <form @submit.prevent="submitForm" enctype="multipart/form-data">
@@ -216,6 +227,33 @@ export default {
     }
   },
  methods: {
+  fillDemoData() {
+  this.form.houseName = "全新翻修/當天可訂/美麗島捷運/六合夜市";
+  this.address = "800台灣高雄市新興區六合二路";
+  this.form.room = "整套房屋";
+  this.form.bedType = "加大雙人床";
+  this.form.bedCount = 2;
+  this.form.describe = "";
+  this.form.tel = "02-12345678";
+  this.form.ppl = 4;
+  this.form.price = 1960;
+
+  // 根據設備名稱選擇幾項具代表性的設備
+  const wantedNames = [
+    "電視",       // 客廳
+    "吹風機",     // 衛浴
+    "洗衣機",     // 臥室和洗衣
+    "電動車充電", // 停車位和設施
+    "冷氣",       // 冷氣和暖氣
+    "冰箱",       // 廚房和餐飲
+    "滅火器",     // 居家安全
+    "無線藍芽音響" // 娛樂
+  ];
+
+  this.form.equipments = this.equipList
+    .filter(eq => wantedNames.includes(eq.equip_name))
+    .map(eq => eq.equip_id);
+},
     setPlace(place) {
       if (place && place.geometry) {
         this.mapCenter = {
@@ -226,11 +264,11 @@ export default {
       }
     },
   checkHouseNameLength() {
-    if (this.form.houseName.length > 25) {
+    if (this.form.houseName.length >30) {
       // 確保用原生 alert
-      window.alert('房屋名稱最多 25 個字');
+      window.alert('房屋名稱最多 30 個字');
       // 自動截斷字數
-      this.form.houseName = this.form.houseName.slice(0, 25);
+      this.form.houseName = this.form.houseName.slice(0, 30);
     }
   },
     closeDialog() {
@@ -500,6 +538,15 @@ export default {
 
 body {
   padding-right: 0 !important;
+}
+
+/* 停用設備卡片在 focus/active 狀態下的橘框 */
+.equip-item:focus,
+.equip-item:focus-visible,
+.equip-item:active {
+  outline: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 </style>
