@@ -308,4 +308,13 @@ onMounted(() => {
   white-space: normal;
   user-select: none;
 }
+
+/* 停用設備卡片在 focus/active 狀態下的橘框 */
+.equip-item:focus,
+.equip-item:focus-visible,
+.equip-item:active {
+  outline: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
 </style>

@@ -46,7 +46,7 @@ public class EmailService {
 					    <h2 style="color: #2c3e50;">歡迎加入 Ctwify！</h2>
 					        <p>%s 您好，請點擊下方按鈕以完成帳號驗證：</p>
 					        <p>
-					            <a href="%s" style="background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+					            <a href="%s" style="background-color: #FF8000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
 					                 驗證我的帳號
 					            </a>
 					        </p>
@@ -86,7 +86,7 @@ public class EmailService {
 					    <h2 style="color: #2c3e50;">歡迎加入 Ctwify！</h2>
 					        <p>%s 您好，請點擊下方按鈕以完成帳號驗證：</p>
 					        <p>
-					            <a href="%s" style="background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+					            <a href="%s" style="background-color: #FF8000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
 					                 驗證我的帳號
 					            </a>
 					        </p>
@@ -125,7 +125,7 @@ public class EmailService {
 					    <h2 style="color: #2c3e50;">重設密碼</h2>
 					        <p>請點擊下方按鈕以重設密碼：</p>
 					        <p>
-					            <a href="%s" style="background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+					            <a href="%s" style="background-color: #FF8000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
 					                 重設密碼
 					            </a>
 					        </p>

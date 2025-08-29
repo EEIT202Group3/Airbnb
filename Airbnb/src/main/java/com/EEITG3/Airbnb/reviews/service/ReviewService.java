@@ -50,6 +50,14 @@ public class ReviewService {
         this.reviewUtils = reviewUtils;
         this.mapper = mapper;
     }
+    
+    public void reportReview(Integer reviewId) {
+        Review review = rRepository.findById(reviewId)
+            .orElseThrow(() -> new RuntimeException("Review not found"));
+
+        review.setReport(1);
+        rRepository.save(review);
+    }
 	
 	public List<ReviewDTO> findByTypeAndKeyword(String type, String keyword) {
 
@@ -96,6 +104,7 @@ public class ReviewService {
 	public List<ReviewDTO> getReviewsByHostToken(String email) {
 		  Optional<Host> hostByEmail = hostRepository.findHostByEmail(email);
 		  String HostId = hostByEmail.get().getHostId();
+		  System.out.println(HostId);
 		
 		return rRepository.findByHost_HostIdContainingIgnoreCase(HostId).stream()
 	            .map(ReviewMapper::toDTO)

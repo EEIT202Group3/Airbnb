@@ -33,21 +33,36 @@
   </v-row>
 
   <v-data-table
-    :headers="headers"
-    :items="reviews"
-    :items-per-page="10"
-    class="elevation-1"
-    style="font-size: 22px"
-  >
-    <template #item.actions="{ item }">
-      <v-btn icon color="info" @click="viewReview(item)">
-        <v-icon>mdi-eye</v-icon>
-      </v-btn>
-      <v-btn icon color="error" @click="handleDelete(item)">
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
-    </template>
-  </v-data-table>
+  :headers="headers"
+  :items="reviews"
+  :items-per-page="10"
+  class="elevation-1"
+  style="font-size: 22px"
+>
+  <!-- 檢舉提示 icon：顯示在 customerEmail 欄位 -->
+  <template #item.reviewId="{ item }">
+    <span>{{ item.reviewId }}</span>
+    <v-icon
+      v-if="item.report === 1"
+      color="error"
+      size="18"
+      style="margin-left: 6px"
+      title="此評論已被檢舉"
+    >
+      mdi-alert-circle-outline
+    </v-icon>
+  </template>
+
+  <!-- 操作欄 -->
+  <template #item.actions="{ item }">
+    <v-btn icon color="info" @click="viewReview(item)">
+      <v-icon>mdi-eye</v-icon>
+    </v-btn>
+    <v-btn icon color="error" @click="handleDelete(item)">
+      <v-icon>mdi-delete</v-icon>
+    </v-btn>
+  </template>
+</v-data-table>
   <!-- 查看評論視窗 -->
   <v-dialog v-model="viewDialog" max-width="500" style="font-size: 22px">
     <v-card>
@@ -148,7 +163,7 @@ const viewReview = async (item) => {
   try {
     selectedReview.value = await getReviews(id);
     viewDialog.value = true;
-    console.log(selectedReview.value.image1);
+    console.log(selectedReview.value);
   } catch (err) {
     console.error("取得評論失敗:", err);
     selectedReview.value = null;

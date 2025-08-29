@@ -1,40 +1,29 @@
- .come {
-   font-family: 'Segoe UI', sans-serif;
-   margin: 40px auto;
-   max-width: 1100px;
-   color: #333;
- }
+.come {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 40px auto;
+  max-width: 1100px;
+  color: #333;
+}
 
- .container2 {
-   position: sticky;
-   top: 0;
-   z-index: 999;
-   background-color: white;
-   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-   margin: 0 auto;
-   padding: 0px 0px;
-   box-sizing: content-box;
-   width: 100%;
- }
-/* 
-.naver {
-   position: sticky;
-   top: 0;
-   z-index: 999;
-   background-color: white;
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   padding: 1rem 24.5vw;
-   background-color: #ffffff;
-   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-   position: sticky;
- }  */
+.container2 {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  padding: 0px 0px;
+  /* CHANGED: 用 border-box，避免加 padding 時寬度出界 */
+  box-sizing: border-box;
+  width: 100%;
+}
 
- .logo {
-   font-size: 1.5rem;
-   font-weight: 600;
- }
+/* .naver 留著備用（略） */
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
 
 nav a {
   display: inline-flex;
@@ -46,272 +35,316 @@ nav a {
   text-decoration: none;
 }
 
+.highlight {
+  color: #f07b2d;
+}
 
- .highlight {
-   color: #f07b2d;
- }
-
- .photo-section {
-   text-align: center;
- }
+.photo-section {
+  text-align: center;
+}
 
 .main-photo {
   width: 100%;
-  aspect-ratio: 16 / 7;  /* 固定比例 */
-  object-fit: cover;     /* 裁切而不是拉伸 */
+  aspect-ratio: 16 / 7;
+  /* 固定比例 */
+  object-fit: cover;
+  /* 裁切而不是拉伸 */
   border-radius: 12px;
 }
 
- .thumbs {
-   display: flex;
-   justify-content: center;
-   gap: 8px;
-   margin-top: 10px;
-   flex-wrap: wrap;
- }
+.thumbs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
 
- .thumbs img {
-   width: 100px;
-   height: 65px;
-   object-fit: cover;
-   border-radius: 6px;
-   cursor: pointer;
-   border: 1px solid #ccc;
- }
+.thumbs img {
+  width: 100px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+}
 
- .info-flex {
-   display: flex;
-   justify-content: space-between;
-   align-items: flex-start;
-   margin-top: 30px;
- }
+.info-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 30px;
+}
 
- .info-left {
-   width: 60%;
-   font-size: 1.1rem;
- }
+.info-left {
+  width: 60%;
+  font-size: 1.1rem;
+}
 
- .info-right {
-   width: 35%;
-   border: 1px solid #eee;
-   padding: 20px;
-   border-radius: 10px;
-   background-color: #fafafa;
- }
+.info-right {
+  width: 35%;
+  border: 1px solid #eee;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #fafafa;
+}
 
- h1 {
-   margin-bottom: 10px;
- }
+h1 {
+  margin-bottom: 10px;
+}
 
- .label {
-   font-weight: bold;
-   margin-top: 10px;
- }
+/* CHANGED: 合併 .label 規則（避免前後互相覆蓋） */
+.label {
+  font-weight: 500;
+  /* 想要更粗可改 600/700 */
+  font-size: 17px;
+  color: #555;
+}
 
- .description,
- .amenities {
-   margin-top: 25px;
- }
+.description,
+.amenities {
+  margin-top: 25px;
+}
 
- .amenity-list {
-   display: flex;
-   flex-wrap: wrap;
-   gap: 10px;
-   margin-top: 10px;
- }
+/* ===== amenities 命名空間 + reset（修正灰底圓角） ===== */
+.amenities .amenity-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
 
- .amenity-item {
-   /* background-color: #f1f3f5; */
-   padding: 6px 12px;
-   /* border-radius: 20px; */
-   font-size: 1.1rem;
- }
+.amenities .amenity-item {
+  padding: 6px 12px;
+  font-size: 1.1rem;
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
 
- .price {
-   font-size: 1.2rem;
-   font-weight: bold;
-   margin-bottom: 10px;
- }
+/* 連偽元素一併清掉，避免外部 chip/tag 樣式回彈 */
+.amenities .amenity-item *,
+.amenities .amenity-item::before,
+.amenities .amenity-item::after,
+.amenities .amenity-item *::before,
+.amenities .amenity-item *::after {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
 
- .price1 {
-   font-size: 1.5rem;
-   font-weight: bold;
-   margin-bottom: 10px;
- }
+/* 若模板中把文字包 <span class="amenity-text">，這條會更穩 */
+.amenities .amenity-text {
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
 
- .book-btn {
-   background-color: #f07b2d;
-   color: white;
-   border: none;
-   padding: 12px;
-   width: 100%;
-   font-size: 1rem;
-   border-radius: 8px;
-   cursor: pointer;
-   transition: background 0.3s;
- }
+.price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
 
- .book-btn:hover {
-   background-color: #e7630b;
- }
+.price1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
 
- .btn:hover {
-   background-color: #e65d03;
- }
+.book-btn {
+  background-color: #f07b2d;
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
 
- .listing-actions button:hover {
-   background-color: #e7630b;
- }
+.book-btn:hover {
+  background-color: #e7630b;
+}
+
+.btn:hover {
+  background-color: #e65d03;
+}
+
+
+.listing-actions button:hover {
+  background-color: #e7630b;
+}
 
 nav a:hover {
   background-color: #edececb7;
   color: #000;
 }
- #menu-toggle {
-   display: none;
- }
 
- .menu-icon {
-   font-size: 16px;
-   cursor: pointer;
-   display: inline-block;
-   padding: 26px;
-    color:#0b0b0b;
-    text-decoration: none;
-    cursor: pointer;
-    background: transparent;
- }
- .menu-icon i {
-  position: relative;
-  top: -3px; /* 可以調整為 -2px、-4px 看起來最順 */
+#menu-toggle {
+  display: none;
 }
 
- .menu {
-   position: relative;
-   display: inline-block;
- }
+.menu-icon {
+  font-size: 16px;
+  display: inline-block;
+  padding: 26px;
+  color: #0b0b0b;
+  text-decoration: none;
+  cursor: pointer;
+  /* 精簡：保留一次即可 */
+  background: transparent;
+}
 
- .dropdown {
-   display: none;
-   position: absolute;
-   top: 40px;
-   left: 0;
-   background-color: white;
-   border: 1px solid #ccc;
-   border-radius: 5px;
-   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-   min-width: 150px;
-   z-index: 100;
- }
+.menu-icon i {
+  position: relative;
+  top: -3px;
+  /* 視覺微調 */
+}
 
- .dropdown a {
-   display: block;
-   padding: 10px;
-   color: #333;
-   text-decoration: none;
-   font-size: 17px; 
- }
+.menu {
+  position: relative;
+  display: inline-block;
+}
 
- .dropdown a:hover {
-   background-color: #f0f0f0;
- }
+/* CHANGED: 下拉 z-index 提高，避免被 sticky 蓋住 */
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  min-width: 150px;
+  z-index: 1100;
+}
 
- #menu-toggle:checked+label+.dropdown {
-   display: block;
- }
+.dropdown a {
+  display: block;
+  padding: 10px;
+  color: #333;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.dropdown a:hover {
+  background-color: #f0f0f0;
+}
+
+#menu-toggle:checked+label+.dropdown {
+  display: block;
+}
 
 .menu-icon:hover {
   background-color: #edececb7;
   color: #000;
 }
 
- .description-text {
-   white-space: pre-line;
+.description-text {
+  white-space: pre-line;
+}
 
- }
+/* 顯示更多按鈕 */
+.show-more-btn {
+  background-color: #e2e2e2;
+  padding: 8px 20px;
+  border-radius: 10px;
+  border: none;
+  color: #454545;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 6px;
+  transition: background 0.3s;
+}
 
- /* 顯示更多按鈕 */
- .show-more-btn {
-   background-color: #e2e2e2;
-   padding: 8px 20px;
-   border-radius: 10px;
-   border: none;
-   color: #454545;
-   cursor: pointer;
-   font-weight: bold;
-   margin-top: 6px;
-   transition: background 0.3s;
- }
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* 遮罩半透明，但不影響子元素 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
 
- .modal-overlay {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background-color: rgba(0,0,0,0.5); /* 遮罩半透明，但不影響子元素 */
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   z-index: 10000;
- }
+/* Modal 內容 */
+.modal-content {
+  background-color: #ffffff !important;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 700px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 1;
+  /* 動畫時固定 */
+}
 
- /* Modal 內容 */
- .modal-content {
-   background-color: #ffffff !important;
-   padding: 20px;
-   border-radius: 12px;
-   max-width: 700px;
-   width: 90%;
-   max-height: 700px;
-   overflow-y: auto;
-   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-   opacity: 1; /* 動畫時固定 */
- }
+.modal-content h4 {
+  margin-top: 0;
+}
 
+/* 關閉按鈕 */
+.close-btn {
+  background-color: #f07b2d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s;
+}
 
- .modal-content h4 {
-   margin-top: 0;
- }
+.show-more-btn:hover {
+  background-color: #cdcccc;
+}
 
- /* 關閉按鈕 */
- .close-btn {
-   background-color: #f07b2d;
-   color: white;
-   border: none;
-   padding: 8px 12px;
-   border-radius: 6px;
-   cursor: pointer;
-   margin-top: 10px;
-   transition: background 0.3s;
- }
+.close-btn:hover {
+  background-color: #D35400;
+}
 
- .show-more-btn:hover {
-   background-color: #cdcccc;
- }
+/* 統一縮圖類別（可把模板中的縮圖都用 .thumb-img） */
+.thumb-img {
+  width: 100px;
+  height: 65px;
+  object-fit: cover;
+  margin-right: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border 0.3s ease;
+}
 
- .close-btn:hover {
-   background-color: #D35400;
- }
+.under {
+  background-color: rgb(188, 187, 187);
+  padding: 200px;
+}
 
- .label {
-   font-weight: 400;
-   font-size: 17px;
-   color: #555;
- }
+/* ===== RWD：≤960px 時改直向排列、縮小 nav padding，照片比例改 16:9 更穩 ===== */
+@media (max-width: 960px) {
+  .info-flex {
+    flex-direction: column;
+    gap: 16px;
+  }
 
- .thumb-img {
-   width: 80px;
-   height: 80px;
-   object-fit: cover;
-   margin-right: 8px;
-   border-radius: 8px;
-   cursor: pointer;
-   transition: border 0.3s ease;
- }
+  .info-left,
+  .info-right {
+    width: 100%;
+  }
 
- .under {
-   background-color: rgb(188, 187, 187);
-   padding: 200px;
+  nav a {
+    padding: 14px 16px;
+  }
 
- }
+  .main-photo {
+    aspect-ratio: 16 / 9;
+  }
+}

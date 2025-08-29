@@ -28,6 +28,7 @@ async function logout(){
   try {
     await customerStore.logout()
     alert('登出成功')
+    router.push({name:'Homepage'})
   } catch (error) {
     console.log(error.response)
     alert('登出失敗')
@@ -100,9 +101,6 @@ async function toHost(){
         </v-list-item>
         <v-list-item to="/order/list">
           <v-list-item-title>訂房紀錄</v-list-item-title>
-        </v-list-item>
-        <v-list-item to="/main/list">
-          <v-list-item-title>我的房源</v-list-item-title>
         </v-list-item>
         <v-list-item @click="logout()">
           <v-list-item-title>登出</v-list-item-title>
