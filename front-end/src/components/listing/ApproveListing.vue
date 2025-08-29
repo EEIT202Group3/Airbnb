@@ -184,7 +184,7 @@
           </div>
         </v-card-text>
 
-        <!-- ✅ 把操作按鈕統一放到彈窗右下角 -->
+        <!-- 把操作按鈕統一放到彈窗右下角 -->
         <v-card-actions>
           <v-spacer></v-spacer>
 
