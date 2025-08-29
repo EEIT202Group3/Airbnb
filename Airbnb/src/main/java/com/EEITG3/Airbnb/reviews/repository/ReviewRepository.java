@@ -23,10 +23,12 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
 	List<Review> findByListing_ListId(Integer listId); // 精確比對
 
-	@Query("SELECT new com.EEITG3.Airbnb.reviews.dto.ReviewWithCustomerDto("
-			+ "r.reviewId ,r.cleanScore, r.commScore, r.valueScore, r.reviewDate, "
-			+ "r.cusComm, r.hostComm, c.email, c.avatarURL) " + "FROM Review r JOIN r.customer c "
-			+ "WHERE r.listing.listId = :listId " + "ORDER BY r.reviewDate DESC")
+	@Query("SELECT new com.EEITG3.Airbnb.reviews.dto.ReviewWithCustomerDto(" +
+		       "r.reviewId ,r.cleanScore, r.commScore, r.valueScore, r.reviewDate," +
+		       "r.cusComm, r.hostComm, c.email, c.avatarURL, r.isVisible) " +  // 👈 最後才是 isVisible
+		       "FROM Review r JOIN r.customer c " +
+		       "WHERE r.listing.listId = :listId AND r.isVisible = 0" +
+		       "ORDER BY r.reviewDate DESC")
 	List<ReviewWithCustomerDto> findReviewsByListId(@Param("listId") Integer listId);
 
 //	@Query("SELECT r, l.list_id, l.photo1 FROM Review r JOIN ")

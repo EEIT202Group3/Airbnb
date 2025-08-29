@@ -89,6 +89,9 @@ public class Review {
 	
 	@Column(name="report")
 	private Integer report;
+	
+	@Column(name="is_visible")
+	private Integer isVisible;
 
 	public Integer getReport() {
 		return report;

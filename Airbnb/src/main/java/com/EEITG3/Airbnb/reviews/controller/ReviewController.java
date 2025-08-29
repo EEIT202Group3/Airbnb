@@ -40,6 +40,18 @@ public class ReviewController {
 	@Autowired
 	private JwtService jwtService;
 	
+	@PatchMapping("admins/reviews/{id}/visibility")
+	public ResponseEntity<?> updateVisibility(@PathVariable Integer id, @RequestBody Map<String, Integer> body) {
+		 Integer isVisible = body.get("isVisible");
+		    boolean updated = rService.updateReviewVisibility(id, isVisible);
+
+		    if (updated) {
+		        return ResponseEntity.ok(Map.of("message", "更新成功"));
+		    } else {
+		        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("找不到評論");
+		    }
+	}
+	
 	@PatchMapping("reviews/{id}/report")
     public ResponseEntity<?> reportReview(@PathVariable Integer id) {
         rService.reportReview(id);

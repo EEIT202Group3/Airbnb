@@ -1,7 +1,7 @@
 <!-- 有評論時 -->
 <template v-else>
-  <v-divider :thickness="1" ></v-divider>
-  <v-row class="align-center text-center" style="margin-top : 60px;">
+  <v-divider :thickness="1"></v-divider>
+  <v-row class="align-center text-center" style="margin-top: 60px">
     <!-- 左 -->
     <v-col class="d-flex flex-column align-center mb-5">
       <div class="text-h5 font-weight-bold">乾淨度</div>
@@ -30,16 +30,22 @@
   <v-divider :thickness="1"></v-divider>
   <v-row>
     <v-col v-for="item in pagedReviews" :key="item.reviewId" cols="12" md="6">
-      <v-card class="mb-5" flat dense style="font-size: 16px">
+      <v-card
+        v-if="item && item.isVisible === 0"
+        class="mb-5"
+        flat
+        dense
+        style="font-size: 16px"
+      >
         <v-btn
-  icon
-  variant="text"
-  class="position-absolute"
-  style="top: 8px; right: 8px; opacity: 0.3"
-  @click="handleReport(item.reviewId)"
->
-  <v-icon color="red" size="24">mdi-alert-circle-outline</v-icon>
-</v-btn>
+          icon
+          variant="text"
+          class="position-absolute"
+          style="top: 8px; right: 8px; opacity: 0.3"
+          @click="handleReport(item.reviewId)"
+        >
+          <v-icon color="red" size="24">mdi-alert-circle-outline</v-icon>
+        </v-btn>
         <v-card-text>
           <div class="d-flex">
             <div class="d-flex flex-column">
@@ -103,7 +109,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import axios from 'axios';
+import axios from "axios";
 
 const props = defineProps({
   reviews: {
@@ -115,15 +121,15 @@ const props = defineProps({
 const page = ref(1);
 const itemsPerPage = 6;
 
-async function handleReport (reviewId){
+async function handleReport(reviewId) {
   console.log(props.reviews.r);
-  
+
   try {
     await axios.patch(`http://localhost:8080/api/reviews/${reviewId}/report`);
-    alert('檢舉成功');
+    alert("檢舉成功");
   } catch (err) {
-    console.error('檢舉失敗', err);
-    alert('檢舉失敗');
+    console.error("檢舉失敗", err);
+    alert("檢舉失敗");
   }
 }
 

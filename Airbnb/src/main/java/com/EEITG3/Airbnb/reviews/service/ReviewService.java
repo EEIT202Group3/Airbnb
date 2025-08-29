@@ -58,6 +58,18 @@ public class ReviewService {
         review.setReport(1);
         rRepository.save(review);
     }
+    
+    public boolean updateReviewVisibility(Integer id, Integer isVisible) {
+        Optional<Review> optional = rRepository.findById(id);
+        if (optional.isPresent()) {
+            Review review = optional.get();
+            review.setIsVisible(isVisible);
+            rRepository.save(review);
+            return true;
+        } else {
+            return false;
+        }
+    }
 	
 	public List<ReviewDTO> findByTypeAndKeyword(String type, String keyword) {
 
@@ -149,6 +161,7 @@ public class ReviewService {
 		insertBean.setCommScore(commScore);
 		insertBean.setValueScore(valueScore);
 		insertBean.setCusComm(custComm);
+		insertBean.setIsVisible(0);
 		String reviewDate = new ReviewUtils().getToday();
 		insertBean.setReviewDate(reviewDate);
 		for (int i = 0; i < imageList.size() && i < 3; i++) {
