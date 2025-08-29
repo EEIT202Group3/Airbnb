@@ -161,54 +161,7 @@ public class ListingController {
     }
 
     // 新增房源（包含設備與照片）
-    @PostMapping(path = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createListing(
-    		@AuthenticationPrincipal HostDetails hostdetails,
-            @RequestParam("houseName") String houseName,
-            @RequestParam("ads") String ads,
-            @RequestParam("room") String room,
-            @RequestParam("bed") String bed,
-            @RequestParam("describe") String describe,
-            @RequestParam("tel") String tel,
-            @RequestParam("ppl") int ppl,
-            @RequestParam("price") int price,
-            @RequestParam("equipments") List<Integer> equipmentIds,
-            @RequestParam("photos") List<MultipartFile> photos
-    ) {
-    	System.out.println("收到檔案數量：" + photos.size());
-    	Host host = hostservice.currentHost(hostdetails);
-    	String hostId = host.getHostId();
-    	System.out.print(hostId);
-        for (MultipartFile photo : photos) {
-            System.out.println("檔案名：" + photo.getOriginalFilename());
-        }
-        try {
-            LisBean lisBean = new LisBean();
-            lisBean.setHostId(hostId);
-            lisBean.setHouseName(houseName);
-            lisBean.setAds(ads);
-            lisBean.setRoom(room);
-            lisBean.setBed(bed);
-            lisBean.setDescribe(describe);
-            lisBean.setTel(tel);
-            lisBean.setPpl(ppl);
-            lisBean.setPrice(price);
-
-            // 新增時強制狀態為待審核
-            lisBean.setApproved(null); 
-          
-            lisBean.setApproved(null); // Boolean 欄位
-            // 或 lisBean.setAuditStatus("PENDING"); // String 欄位
-
-            Integer listId = listingService.saveListingWithPhotosAndEquipments(lisBean, photos, equipmentIds);
-            return ResponseEntity.ok(listId);
-        } catch (MultipartException e) {
-            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("上傳檔案過大或格式錯誤: " + e.getMessage());
-        } catch (Exception e) {
-        	e.printStackTrace();
-            return ResponseEntity.internalServerError().body("建立房源失敗: " + e.getMessage());
-        }
-    }
+    
   //編輯房源
     @PutMapping(path = "/{id}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateListing(

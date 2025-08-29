@@ -93,6 +93,14 @@ public class Review {
 	@Column(name="is_visible")
 	private Integer isVisible;
 
+	public Integer getIsVisible() {
+		return isVisible;
+	}
+
+	public void setIsVisible(Integer isVisible) {
+		this.isVisible = isVisible;
+	}
+
 	public Integer getReport() {
 		return report;
 	}

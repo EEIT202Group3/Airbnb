@@ -350,6 +350,8 @@ export default {
         .then(() => {
           alert("房源已永久刪除");
           this.fetchAllListings();
+           this.filterStatus = "pending";
+           this.modalVisible = false;
         })
         .catch((err) => {
           console.error("刪除失敗:", err);
@@ -379,6 +381,8 @@ export default {
         .then((res) => {
           alert(res.data);
           this.fetchAllListings();
+           this.filterStatus = "pending";
+           this.modalVisible = false;
         })
         .catch((err) => {
           console.error("標記失敗:", err);
@@ -392,6 +396,8 @@ export default {
         .then(() => {
           alert("房源已下架");
           this.fetchAllListings();
+           this.filterStatus = "pending";
+          this.modalVisible = false;
         })
         .catch((err) => {
           console.error("下架失敗:", err);
@@ -405,6 +411,8 @@ export default {
         .then(() => {
           alert("房源已重新上架");
           this.fetchAllListings();
+           this.filterStatus = "pending";
+          this.modalVisible = false;
         })
         .catch((err) => {
           console.error("上架失敗:", err);
