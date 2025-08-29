@@ -28,6 +28,7 @@ async function logout(){
   try {
     await customerStore.logout()
     alert('登出成功')
+    router.push({name:'Homepage'})
   } catch (error) {
     console.log(error.response)
     alert('登出失敗')
