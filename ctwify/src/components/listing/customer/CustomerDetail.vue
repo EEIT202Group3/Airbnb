@@ -262,6 +262,7 @@ import SimpleReview from "@/components/reviews/SimpleReview.vue";
 import DefaultAvatar from "@/images/default.png";
 import ListingPhotos from "@/components/listing/customer/ListingPhotos.vue";
 import ListReview from "@/components/reviews/ListReview.vue";
+
 const reviews = ref([]);
 
 const route = useRoute();

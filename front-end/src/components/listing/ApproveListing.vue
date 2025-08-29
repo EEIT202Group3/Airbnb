@@ -13,7 +13,7 @@
           dense
           outlined
           item-title="text"
-          item-value="value"
+          item-value="value" 
         />
       </v-col>
 
@@ -79,65 +79,12 @@
           </div>
 
           <div class="flex-grow-1 ms-4">
-            <div class="d-flex align-center justify-space-between">
-              <div>
-                <h5 class="mb-1">{{ listing.houseName }}</h5>
-                <div class="text-subtitle-2 mb-1">
-                  房東 ID：{{ listing.hostId }}
-                </div>
-                <div>地址：{{ listing.ads }}</div>
-                <div>價格：NT${{ listing.price }}</div>
-              </div>
-              <div class="d-flex flex-column align-end">
-                <!-- 狀態按鈕 -->
-                <template v-if="filterStatus === 'approved'">
-                  <v-btn
-                    color="error"
-                    @click="markAsError(listing.listId)"
-                    class="mb-2"
-                  >
-                    資訊錯誤
-                  </v-btn>
-                </template>
-
-                <template v-else-if="filterStatus === 'unpublished'">
-                  <v-btn
-                    color="error"
-                    @click="deleteListing(listing.listId)"
-                  >
-                    刪除房源
-                  </v-btn>
-                </template>
-
-                <template v-else-if="filterStatus === 'rejected'">
-                  <v-btn
-                    color="success"
-                    @click="approveListing(listing.listId)"
-                    class="mb-2"
-                  >
-                    通過審核
-                  </v-btn>
-                
-                </template>
-
-                <template v-else-if="filterStatus === 'pending'">
-                  <v-btn
-                    color="success"
-                    @click="approveListing(listing.listId)"
-                    class="mb-2"
-                  >
-                    通過審核
-                  </v-btn>
-                  <v-btn
-                    color="error"
-                    @click="markAsError(listing.listId)"
-                    class="mb-2"
-                  >
-                    資訊錯誤
-                  </v-btn>
-                </template>
-              </div>
+            <h5 class="mb-1">{{ listing.houseName }}</h5>
+            <div class="text-subtitle-2 mb-1">
+              房東 ID：{{ listing.hostId }}
             </div>
+            <div>地址：{{ listing.ads }}</div>
+            <div>價格：NT${{ listing.price }}</div>
           </div>
         </v-card>
       </v-col>
@@ -148,7 +95,7 @@
       <v-pagination
         v-model="currentPage"
         :length="totalPages"
-         :total-visible="5"
+        :total-visible="5"
         color="primary"
       ></v-pagination>
     </v-row>
@@ -237,8 +184,44 @@
           </div>
         </v-card-text>
 
+        <!-- 把操作按鈕統一放到彈窗右下角 -->
         <v-card-actions>
           <v-spacer></v-spacer>
+
+          <template v-if="filterStatus === 'approved'">
+            <v-btn color="error" @click="markAsError(detailListing.listId)">
+              資訊錯誤
+            </v-btn>
+          </template>
+
+          <template v-else-if="filterStatus === 'unpublished'">
+            <v-btn color="error" @click="deleteListing(detailListing.listId)">
+              刪除房源
+            </v-btn>
+          </template>
+
+          <template v-else-if="filterStatus === 'rejected'">
+            <v-btn color="success" @click="approveListing(detailListing.listId)">
+              通過審核
+            </v-btn>
+          </template>
+
+          <template v-else-if="filterStatus === 'pending'">
+            <v-btn
+              color="success"
+              @click="approveListing(detailListing.listId)"
+              class="me-2"
+            >
+              通過審核
+            </v-btn>
+            <v-btn
+              color="error"
+              @click="markAsError(detailListing.listId)"
+            >
+              資訊錯誤
+            </v-btn>
+          </template>
+
           <v-btn color="secondary" @click="modalVisible = false">
             關閉
           </v-btn>
@@ -247,6 +230,7 @@
     </v-dialog>
   </v-container>
 </template>
+
 
 
 <script>
@@ -379,6 +363,9 @@ export default {
         .then((res) => {
           alert(res.data);
           this.fetchAllListings();
+      
+      this.filterStatus = "pending";
+      this.modalVisible = false;
         })
         .catch((err) => {
           console.error("審核失敗:", err);
