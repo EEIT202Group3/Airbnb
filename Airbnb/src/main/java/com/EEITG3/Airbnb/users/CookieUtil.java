@@ -12,7 +12,7 @@ public class CookieUtil {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
-                .path("/")
+                .path("/api/customers")
                 .maxAge(60 * 60)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -23,7 +23,7 @@ public class CookieUtil {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
-                .path("/")
+                .path("/api/customers")
                 .maxAge(0)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -34,7 +34,7 @@ public class CookieUtil {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
-                .path("/")
+                .path("/api/hosts")
                 .maxAge(60 * 60)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -45,7 +45,7 @@ public class CookieUtil {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
-                .path("/")
+                .path("/api/hosts")
                 .maxAge(0)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

@@ -78,7 +78,7 @@ export default {
     fetchListings() {
       this.loading = true;
       axios
-        .get(`http://localhost:8080/listings/host`)
+        .get(`http://localhost:8080/api/hosts/getListing`)
         .then((res) => {
 
           this.houseList = res.data.filter(house => house.deleted !== true);

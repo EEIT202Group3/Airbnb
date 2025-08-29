@@ -74,6 +74,7 @@ async function editAvatar() {
             avatar.value = null
         }else{
             alert('失敗，重作')
+            return
         }
     } catch (error) {
        alert('更新失敗') 

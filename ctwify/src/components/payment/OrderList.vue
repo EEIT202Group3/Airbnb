@@ -483,7 +483,7 @@ export default {
 
     async fetchOrders() {
       try {
-        const res = await axios.get("/api/orderconfirm/byCustomer", {
+        const res = await axios.get("/api/customers/orderconfirm/byCustomer", {
           withCredentials: true,
         });
         const list = Array.isArray(res.data) ? res.data : [];

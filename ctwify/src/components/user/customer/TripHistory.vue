@@ -248,7 +248,7 @@ onMounted(loadOrders);
 async function loadOrders() {
   loading.value = true;
   try {
-    const { data } = await axios.get("/api/orderconfirm/byCustomer");
+    const { data } = await axios.get("/api/customers/orderconfirm/byCustomer");
     const list = Array.isArray(data) ? data : [];
     const normalized = list.map(normalize);
 

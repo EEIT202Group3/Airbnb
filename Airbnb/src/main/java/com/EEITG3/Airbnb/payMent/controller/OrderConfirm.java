@@ -32,7 +32,7 @@ import com.EEITG3.Airbnb.users.repository.HostRepository;
 
 //接收 /ordersconfirm 的 POST 請求
 @RestController
-@RequestMapping("/api/orderconfirm")
+@RequestMapping("/api")
 
 public class OrderConfirm {
 
@@ -50,7 +50,7 @@ public class OrderConfirm {
 	
 
 
-	@PostMapping("/preview")
+	@PostMapping("/customers/orderconfirm/preview")
 	public ResponseEntity<?> previewOrder(@RequestBody OrderRequestDto dto,
 			@CookieValue(value = "jwt_customer", required = false) String token) {
 
@@ -65,7 +65,7 @@ public class OrderConfirm {
 		}
 	}
 
-	@PostMapping("/finalize")
+	@PostMapping("/customers/orderconfirm/finalize")
 	public ResponseEntity<?> finalizeOrder(@RequestBody OrderRequestDto dto,
 			@CookieValue(value = "jwt_customer") String token) {
 		try {
@@ -78,21 +78,21 @@ public class OrderConfirm {
 		}
 
 	// 單筆訂單明細
-	@GetMapping("/detail")
+	@GetMapping("/orderconfirm/detail")
 	public OrderDetailResponseDto orderDetailResponseDto(@RequestParam("bookingId") String bookingId) {
 		return orderService.getOrderByBookingId(bookingId);
 		
 	}
 
 	// 客戶查詢全部訂單
-	@GetMapping("/byCustomer")
+	@GetMapping("/customers/orderconfirm/byCustomer")
 	public List<OrderAllResponseDto> getOrdersByCustomerId(@CookieValue(value = "jwt_customer") String token) {
 		String email = jwtService.extractEmail(token);
 
 		return orderService.getOrdersByCustomerId(email);
 	}
 	// 依房東ID查詢房東訂單
-	@GetMapping("/byhost")
+	@GetMapping("/hosts/orderconfirm/byhost")
 	public List<HostAllOrderResponseDto> byHost(
 	        @CookieValue(value = "jwt_host", required = false) String token) {
 

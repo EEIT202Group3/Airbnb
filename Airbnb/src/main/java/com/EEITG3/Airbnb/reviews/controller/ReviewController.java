@@ -91,7 +91,7 @@ public class ReviewController {
 		return rService.getReviewsByCustomerToken(email);
 	}
 	
-	@GetMapping("/reviews/token/byHost")
+	@GetMapping("/hosts/reviews/token/byHost")
 	public List<ReviewDTO> getReviewsByHostToken(@CookieValue(value = "jwt_host") String token) {
 		String email = jwtService.extractEmail(token);
 		System.out.println(email);

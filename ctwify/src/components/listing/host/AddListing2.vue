@@ -400,7 +400,7 @@ export default {
         formData.append("equipments", id);
       });
       try {
-        const res = await axios.post("/listings/add", formData,{
+        const res = await axios.post("/api/hosts/listings/add", formData,{
           withCredentials:true,
         }); 
       if (res.status === 200) {

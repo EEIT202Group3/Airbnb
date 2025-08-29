@@ -115,7 +115,7 @@ async function loadReviews() {
   loading.value = true;
   try {
     // 依你的後端路由調整：/api/reviews/byhost 或 /api/reviews/host
-    const { data } = await axios.get<HostReview[]>("/api/reviews/token/byHost");
+    const { data } = await axios.get<HostReview[]>("/api/hosts/reviews/token/byHost");
 
     const list = Array.isArray(data) ? data : [];
 
