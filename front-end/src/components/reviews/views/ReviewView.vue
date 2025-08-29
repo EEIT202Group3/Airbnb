@@ -33,36 +33,48 @@
   </v-row>
 
   <v-data-table
-  :headers="headers"
-  :items="reviews"
-  :items-per-page="10"
-  class="elevation-1"
-  style="font-size: 22px"
->
-  <!-- 檢舉提示 icon：顯示在 customerEmail 欄位 -->
-  <template #item.reviewId="{ item }">
-    <span>{{ item.reviewId }}</span>
-    <v-icon
-      v-if="item.report === 1"
-      color="error"
-      size="18"
-      style="margin-left: 6px"
-      title="此評論已被檢舉"
-    >
-      mdi-alert-circle-outline
-    </v-icon>
-  </template>
+    :headers="headers"
+    :items="reviews"
+    :items-per-page="10"
+    class="elevation-1"
+    style="font-size: 22px"
+  >
+    <!-- 檢舉提示 icon：顯示在 customerEmail 欄位 -->
+    <template #item.reviewId="{ item }">
+      <span>{{ item.reviewId }}</span>
+      <v-icon
+        v-if="item.report === 1"
+        color="error"
+        size="18"
+        style="margin-left: 6px"
+        title="此評論已被檢舉"
+      >
+        mdi-alert-circle-outline
+      </v-icon>
+    </template>
 
-  <!-- 操作欄 -->
-  <template #item.actions="{ item }">
-    <v-btn icon color="info" @click="viewReview(item)">
-      <v-icon>mdi-eye</v-icon>
-    </v-btn>
-    <v-btn icon color="error" @click="handleDelete(item)">
-      <v-icon>mdi-delete</v-icon>
-    </v-btn>
-  </template>
-</v-data-table>
+    <!-- 操作欄 -->
+    <template #item.actions="{ item }">
+      <v-btn icon color="info" @click="viewReview(item)">
+        <v-icon>mdi-eye</v-icon>
+      </v-btn>
+      <v-btn icon color="error" @click="handleDelete(item)">
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+
+      <!-- 新增檢舉狀態下切換 isVisible 的按鈕 -->
+      <v-btn
+        v-if="item.report > 0"
+        icon
+        color="warning"
+        @click="toggleVisibility(item)"
+      >
+        <v-icon>
+          {{ item.isVisible === 1 ? "mdi-eye-off" : "mdi-eye" }}
+        </v-icon>
+      </v-btn>
+    </template>
+  </v-data-table>
   <!-- 查看評論視窗 -->
   <v-dialog v-model="viewDialog" max-width="500" style="font-size: 22px">
     <v-card>
@@ -145,6 +157,28 @@ const fetchReviews = async (keyword = "", type = "") => {
   reviews.value = res.data;
 };
 */
+
+const toggleVisibility = async (item) => {
+  const newStatus = item.isVisible === 1 ? 0 : 1;
+
+  try {
+    const res = await axios.patch(
+      `http://localhost:8080/api/admins/reviews/${item.reviewId}/visibility`,
+      { isVisible: newStatus },
+      { withCredentials: true }
+    );
+
+    if (res.status === 200) {
+      item.isVisible = newStatus; // 前端同步更新狀態
+      console.log(`評論 ${item.reviewId} 的 isVisible 改為：${newStatus}`);
+    } else {
+      alert("狀態更新失敗！");
+    }
+  } catch (err) {
+    console.error("切換 isVisible 失敗:", err);
+    alert("伺服器發生錯誤！");
+  }
+};
 onMounted(async () => {
   reviews.value = await fetchReviews(keyword.value, searchType.value);
   console.log(reviews.value, "reviews fetched on mounted");

@@ -12,7 +12,14 @@ public class ReviewWithCustomerDto {
     
     private String email;
     private String avatarURL;
+    private Integer isVisible;
     
+	public Integer getIsVisible() {
+		return isVisible;
+	}
+	public void setIsVisible(Integer isVisible) {
+		this.isVisible = isVisible;
+	}
 	public Integer getReviewId() {
 		return reviewId;
 	}
@@ -91,6 +98,19 @@ public class ReviewWithCustomerDto {
 		this.hostComm = hostComm;
 		this.email = email;
 		this.avatarURL = avatarURL;
+	}
+	public ReviewWithCustomerDto(Integer reviewId, Integer cleanScore, Integer commScore, Integer valueScore,
+			String reviewDate, String cusComm, String hostComm, String email, String avatarURL, Integer isVisible) {
+		this.reviewId = reviewId;
+		this.cleanScore = cleanScore;
+		this.commScore = commScore;
+		this.valueScore = valueScore;
+		this.reviewDate = reviewDate;
+		this.cusComm = cusComm;
+		this.hostComm = hostComm;
+		this.email = email;
+		this.avatarURL = avatarURL;
+		this.isVisible = isVisible;
 	}
 	
 	
