@@ -61,25 +61,7 @@ public class ListingController {
     }
 
 
-    //根據host_id查詢(ID、房名、圖片1)
-    @GetMapping("/host")
-    public List<Map<String, Object>> getListingsByHostId(@AuthenticationPrincipal HostDetails hostdetails) {
-    	Host host = hostservice.currentHost(hostdetails);
-    	String hostId = host.getHostId();
-    	List<LisBean> list = listRepository.findByHostId(hostId);
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (LisBean bean : list) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("listId", bean.getListId());
-            map.put("houseName", bean.getHouseName());
-            map.put("ads", bean.getAds());
-            map.put("photo1", bean.getPhoto1());
-            map.put("approved", bean.getApproved());  
-            map.put("published", bean.getPublished());
-            result.add(map);
-        }
-        return result;
-    }
+
     
     //顯示房源卡用的
     @GetMapping("/simple")

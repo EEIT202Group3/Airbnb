@@ -41,7 +41,7 @@ onMounted(loadOrders);
 async function loadOrders() {
   loading.value = true;
   try {
-    const { data } = await axios.get<HostOrder[]>("/api/orderconfirm/byhost");
+    const { data } = await axios.get<HostOrder[]>("/api/hosts/orderconfirm/byhost");
     const list = Array.isArray(data) ? data : [];
     fullMap.value = Object.fromEntries(list.map((o) => [o.bookingId, o]));
     orders.value = list.map((o) => ({

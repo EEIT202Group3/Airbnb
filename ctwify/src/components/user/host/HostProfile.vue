@@ -75,7 +75,7 @@ async function editAvatar(){
             await hostStore.fetchUser()
             alert('更新成功')
             avatarActive.value = false
-            avatar.value = false
+            avatar.value = null
         }else{
             alert('更新失敗')
             return

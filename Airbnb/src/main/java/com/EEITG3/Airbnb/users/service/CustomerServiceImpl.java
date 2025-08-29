@@ -162,7 +162,7 @@ public class CustomerServiceImpl implements CustomerService {
 	private String getExtension(String filename) {
         if (filename == null) return "png";
         int dotIndex = filename.lastIndexOf('.');
-        return (dotIndex >= 0) ? filename.substring(dotIndex + 1).toLowerCase() : "png";
+        return (dotIndex >= 0) ? filename.substring(+1).toLowerCase() : "png";
     }
 	
 	@Override

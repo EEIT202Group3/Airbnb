@@ -166,8 +166,9 @@ public class CustomerController {
 	
 	//找個人資料
 	@GetMapping("/customers/current")
-	public Customer getCurrentCustomer(@AuthenticationPrincipal CustomerDetails customerDetails) {
-		return service.currentCustomer(customerDetails);
+	public ResponseEntity<?> getCurrentCustomer(@AuthenticationPrincipal CustomerDetails customerDetails) {
+		Customer result = service.currentCustomer(customerDetails);
+		return ResponseEntity.ok(result);
 	}
 	//更新大頭照
 	@PostMapping(value = "/customers/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

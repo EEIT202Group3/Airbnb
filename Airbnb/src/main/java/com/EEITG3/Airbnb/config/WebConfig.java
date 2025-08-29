@@ -32,10 +32,10 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addResourceHandler("/images/listings/**").addResourceLocations(listingPath).setCachePeriod(3600);
 
 		registry.addResourceHandler("/images/avatar/customers/**").addResourceLocations(customerAvatarPath)
-				.setCachePeriod(3600);
+				.setCachePeriod(0);
 
 		registry.addResourceHandler("/images/avatar/hosts/**").addResourceLocations(hostAvatarPath)
-				.setCachePeriod(3600);
+				.setCachePeriod(0);
 
 		registry.addResourceHandler("/carPicture/**").addResourceLocations(carPicturePath).setCachePeriod(3600);
 
