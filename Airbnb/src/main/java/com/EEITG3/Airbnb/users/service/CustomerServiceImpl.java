@@ -221,6 +221,20 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 	
 	@Override
+	public Customer suspend(String email, String reason) {
+		Optional<Customer> temp = repo.findCustomerByEmail(email);
+		Customer customer = new Customer();
+		if(temp.isPresent()) {
+			customer = temp.get();
+		}
+		customer.setActive(false);
+		customer.setSuspensionReason(reason);
+		return repo.save(customer);
+	}
+	
+	
+	
+	@Override
 	public Customer permission(String status, String customerEmail) {
 		//先找到客戶
 		Optional<Customer> temp = repo.findCustomerByEmail(customerEmail);
@@ -287,5 +301,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public Integer getVerifiedCustomers() {
 		return repo.getVerifiedCustomers();
 	}
+
+	
 	
 }

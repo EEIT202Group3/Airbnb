@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref,onMounted } from 'vue';
 import { getAllCustomers } from '@/service/user/CustomerService';
-import { permission } from '@/service/user/CustomerService';
+import { suspendService,permission } from '@/service/user/CustomerService';
 import { useRouter } from 'vue-router';
 import { findLike } from '@/service/user/CustomerService';
 const router = useRouter();
@@ -40,6 +40,9 @@ async function updatePermission(active,email){
         alert('更新失敗')
     }
 }
+
+
+
 async function search(){
     if(keyword.value==='reset'||keyword.value===null){
         customers.value = await getAllCustomers();
@@ -59,6 +62,32 @@ async function search(){
         }
         customers.value = data;
     }
+}
+
+const suspendDialog = ref(false)
+const suspendReason = ref('')
+const suspendEmail = ref('')
+
+function openSuspendDialog(email: string) {
+  suspendEmail.value = email;
+  suspendDialog.value = true;
+}
+
+
+async function suspend(){
+    try {
+        await suspendService(suspendReason.value,suspendEmail.value)
+        alert('更新成功')
+        await search();
+        suspendDialog.value = false
+    } catch (error) {
+        alert('更新失敗')   
+        suspendDialog.value = false
+    }
+}
+
+function testData(){
+    suspendReason.value='多次發表不當言論、多次違反平台規範、惡意給予不實評價、檢舉次數過多且屬實'
 }
 
 
@@ -108,11 +137,26 @@ async function search(){
                 <td>{{ customer.createAt }}</td>
                 <td v-if="customer.active" style="color: green;">啟用中</td>
                 <td v-else style="color: red;">停權中</td>
-                <td v-if="customer.active"><v-btn color="red" @click="updatePermission(customer.active,customer.email)">停權</v-btn></td>
+                <td v-if="customer.active"><v-btn color="red" @click="openSuspendDialog(customer.email)">停權</v-btn></td>
                 <td v-else><v-btn color="green" @click="updatePermission(customer.active,customer.email)">啟用</v-btn></td>
             </tr>
         </tbody>
     </v-table>
+    <v-dialog v-model="suspendDialog">
+        <v-card class="pa-6 mx-auto" style="width: 25%; height: 300px">
+        <form @submit.prevent="suspend()">
+            <v-textarea
+            label="停權原因"
+            variant="outlined"
+            prepend-icon="mdi-block-helper"
+            v-model="suspendReason"
+            required
+            ></v-textarea>
+            <v-btn type="submit">送出</v-btn>
+            <v-btn @click="testData" class="ml-5">測試資料</v-btn>
+        </form>
+        </v-card>
+    </v-dialog>
 </template>
 <style scoped>
 </style>

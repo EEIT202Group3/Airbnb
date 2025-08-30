@@ -36,7 +36,7 @@ public class CustomerDetails implements UserDetails {
 	//可以透過後臺來停權使用者
 	@Override
     public boolean isAccountNonLocked() {
-        return customer.isActive(); // 若設為 false 則視為鎖定
+		return true;
     }
 	@Override
     public boolean isCredentialsNonExpired() {

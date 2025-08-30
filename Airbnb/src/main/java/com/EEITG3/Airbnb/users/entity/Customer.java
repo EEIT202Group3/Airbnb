@@ -44,6 +44,17 @@ public class Customer {
 	
 	@Column(name = "verification_token")
 	private String verificationToken;
+	
+	@Column(name = "suspension_reason")
+	private String suspensionReason;
+
+	public String getSuspensionReason() {
+		return suspensionReason;
+	}
+
+	public void setSuspensionReason(String suspensionReason) {
+		this.suspensionReason = suspensionReason;
+	}
 
 	public Customer() {}
 	

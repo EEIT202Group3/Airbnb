@@ -65,6 +65,9 @@ function testRegistData(){
   register.value.username='nick'
 }
 
+const suspendReason = ref('')
+const suspendDialog = ref(false)
+
 //提交登入資訊
 async function onLogin() {
   //這邊的.validate()是vuetify提供的表單驗證功能，會去讀每個欄位上用:rules定義的驗證方法(所以上面才要先設定那些方法)
@@ -76,23 +79,26 @@ async function onLogin() {
     await customerStore.login(login.value)
     alert('登入成功')
     emit('login-success')
-  } catch (error) {
-    let msg = ''
-    const status = error.response.status
-    switch(status){
+  } catch (error: any) {
+    const status = error.response?.status
+    const data = error.response?.data
+
+    switch (status) {
       case 401:
-        msg = '帳號或密碼錯誤'
+        alert('帳號或密碼錯誤')
         break
-      case 423:
-        msg = '您已被停權，請聯絡客服'
+      case 423: {
+        const reason = data?.reason || ''
+        suspendReason.value = reason
+        suspendDialog.value = true
         break
+      }
       case 403:
-        msg = '請先完成驗證'
+        alert('請先完成驗證')
         break
       default:
-        msg = '未知錯誤'
+        alert('未知錯誤')
     }
-    alert(`${msg}`)
   }
 }
 
@@ -168,6 +174,19 @@ async function googleLogin(response:any){
       <v-btn block class="gradient-btn mb-4" rounded="lg" size="large" @click="sendEmail()">
         發送驗證信
       </v-btn>
+    </v-card>
+    <v-card v-else-if="suspendDialog" class="auth-card rounded-xl pa-8" width="360">
+      <v-card-title style="color: red;">
+        您已被停權
+      </v-card-title>
+      <v-card-subtitle>
+        請與客服聯繫
+      </v-card-subtitle>
+      <v-card-text>
+        <div>停權原因：</div>
+        <div>{{ suspendReason }}</div>
+      </v-card-text>
+      <v-btn @click="suspendDialog=false" class="gradient-btn">關閉</v-btn>
     </v-card>
     <v-card v-else class="auth-card rounded-xl pa-8" width="360">
       <div class="text-h5 text-center font-weight-bold mb-6">Login Form</div>
@@ -293,6 +312,7 @@ async function googleLogin(response:any){
         </v-btn>
       </v-form>
     </v-card>
+    
 </template>
 
 <style scoped>

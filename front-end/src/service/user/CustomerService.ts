@@ -20,6 +20,19 @@ export async function getAllCustomers() {
     }
 }
 
+//停權
+export async function suspendService(reason, email) {
+    const data = {
+        reason: reason,
+        email: email
+    }
+    const response = await axios.patch(`${BASE_URL}/api/admins/customers/suspend`, data, {
+        withCredentials: true,
+    })
+    return response.data
+}
+
+
 //更改權限
 export async function permission(status, customerEmail) {
     const data = {
