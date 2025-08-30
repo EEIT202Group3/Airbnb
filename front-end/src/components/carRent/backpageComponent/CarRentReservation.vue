@@ -158,17 +158,39 @@ const deleteReservation = async () => {
 };
 
 // 修改預約
+import Swal from "sweetalert2";
+
 const saveEditing = async () => {
   try {
     await api.put(`/reservations/update`, reservation.value);
-    alert("修改成功");
+
+    Swal.fire({
+      toast: true,
+      position: "top",
+      icon: "success",
+      title: "修改成功",
+      showConfirmButton: false,
+      timer: 2000
+    });
+
     isEditing.value = false;
   } catch (err: any) {
     const msg = err?.response?.data?.message || "修改失敗，請稍後再試";
-    if (msg.includes("該車牌已被登入")) alert("該車牌已被登入，請再次檢查車牌資訊");
-    else alert(msg);
+    const displayMsg = msg.includes("該時段已被租用")
+        ? "該時段已被租用，請再次檢查預定資訊"
+        : msg;
+
+    Swal.fire({
+      toast: true,
+      position: "top",
+      icon: "error",
+      title: displayMsg,
+      showConfirmButton: false,
+      timer: 2000
+    });
   }
 };
+
 
 const startInsertReservation = () => {
   reservation.value = {

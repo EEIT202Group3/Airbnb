@@ -31,7 +31,7 @@ public class ReservationController {
         try {
             return rService.insert(reservation);
         } catch (Exception e) {
-            throw new RuntimeException("新增失敗" + e);
+            throw new RuntimeException("新增失敗" + e.getMessage());
         }
     }
 
