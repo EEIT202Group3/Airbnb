@@ -1,7 +1,5 @@
 package com.EEITG3.Airbnb.users.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,22 +13,27 @@ import com.EEITG3.Airbnb.users.repository.CustomerRepository;
 @Service
 public class CustomerDetailsService implements UserDetailsService {
 
-	private CustomerRepository repo;
-	
-	@Autowired
-	public CustomerDetailsService(CustomerRepository repo) {
-		this.repo = repo;
-	}
-	
-	//因為要用email做驗證，所以這邊傳入email
-	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		Optional<Customer> temp = repo.findCustomerByEmail(email);
-		if(!temp.isPresent()) {
-			throw new UsernameNotFoundException("找不到使用者");
-		}
-		Customer customer = temp.get();
-		return new CustomerDetails(customer);
-	}
+    private final CustomerRepository repo;
 
+    @Autowired
+    public CustomerDetailsService(CustomerRepository repo) {
+        this.repo = repo;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Customer customer = repo.findCustomerByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("找不到使用者"));
+
+        // 🔽 停權檢查
+        if (Boolean.FALSE.equals(customer.isActive())) {
+            String reason = customer.getSuspensionReason();
+            if (reason == null || reason.isBlank()) {
+                reason = "帳號已停權"; // 沒填原因就給預設字串
+            }
+            throw new org.springframework.security.authentication.LockedException(reason);
+        }
+
+        return new CustomerDetails(customer);
+    }
 }

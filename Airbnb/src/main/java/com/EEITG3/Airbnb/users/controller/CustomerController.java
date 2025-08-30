@@ -231,6 +231,14 @@ public class CustomerController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
+	//停權
+	@PatchMapping("/admins/customers/suspend")
+	public ResponseEntity<?> suspend(@RequestBody Map<String, Object> data){
+		String reason = (String)data.get("reason");
+		String email = (String)data.get("email");
+		Customer customer = service.suspend(email, reason);
+		return ResponseEntity.ok(customer);
+	}
 	
 	//模糊搜尋
 	@GetMapping("/admins/customers/findlike")

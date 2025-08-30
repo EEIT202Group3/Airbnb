@@ -18,6 +18,9 @@ public class AuthExceptionHandler {
 
     @ExceptionHandler(LockedException.class)
     public ResponseEntity<?> handleLocked(LockedException e) {
-        return ResponseEntity.status(423).body(Map.of("error", "帳號已停權"));
+        return ResponseEntity.status(423).body(Map.of(
+            "reason", e.getMessage(),
+            "message", "帳號已停權"
+        ));
     }
 }

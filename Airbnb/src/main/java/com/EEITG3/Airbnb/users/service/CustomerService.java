@@ -41,6 +41,9 @@ public interface CustomerService {
 //後台功能
 	//找全部客戶
 	List<Customer> findAllCustomers();
+	//停權
+	Customer suspend(String email,String reason);
+	
 	//停權、啟用
 	Customer permission(String status,String customerEmail);
 	//模糊查詢email
