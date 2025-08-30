@@ -9,6 +9,7 @@ declare global {
 import Sidebar from "@/components/carRent/backpageComponent/Sidebar.vue";
 import { onMounted, onBeforeUnmount, ref, computed, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import Swal from "sweetalert2";
 import api from "@/api";
 
 
@@ -67,14 +68,34 @@ const startInsertVehicle = () => {
 const insertVehicle = async () => {
   try {
     const res = await api.post(`/vehicles/insert`, vehicle.value);
-    alert("新增成功！");
+
+    // 成功提示
+    Swal.fire({
+      toast: true,
+      position: "top",
+      icon: "success",
+      title: "新增成功！",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+
     const newId = res.data.vehicleId;
     insertVehicleMode.value = false;
     isEditing.value = false;
     await router.push(`/car-rent/vehicles/${newId}`);
   } catch (err: any) {
-    const msg = err?.response?.data?.message || "更新失敗，請稍後再試";
-    alert(msg);
+    const msg =
+        "新增失敗：車牌號碼重複";
+
+    // 失敗提示
+    Swal.fire({
+      toast: true,
+      position: "top",
+      icon: "error",
+      title: `${msg}`,
+      showConfirmButton: false,
+      timer: 2000,
+    });
   }
 };
 

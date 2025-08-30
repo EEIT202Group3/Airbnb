@@ -11,7 +11,7 @@ const props = defineProps<{
       location="left"
       temporary
       scrim
-      @update:model-value="(val) => { if (!val) close(); }"
+      @update:model-value="(val) => { if (!val) close(); }"  class="mini-drawer"
   >
     <div class="pa-4">
       <v-btn variant="outlined" block class="mb-3" @click="close">
@@ -51,4 +51,11 @@ const props = defineProps<{
 </template>
 
 <style scoped>
+.mini-drawer {
+  height: 50vh !important;
+  top: 0;
+  bottom: auto;
+  border-radius: 0 8px 8px 0;
+}
+
 </style>
